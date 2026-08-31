@@ -18,5 +18,3 @@ placeholder chip in its place — nothing breaks.
 
 Source: the "Gatha Hero" Claude Design project (`uploads/`). The design API
 caps file reads at 256 KB, so these need to be exported/copied in by hand.
-
-<!-- hook test -->
