@@ -1,20 +1,20 @@
 # assets/
 
 The hero's hover interaction flings six cut-out stickers out from behind the
-headline. Drop the source PNGs here with these exact names:
+headline. The source art was supplied from the "Gatha Hero" Claude Design
+project and re-encoded here as WebP (longest edge 560 px, quality 82) — the
+originals were 200 KB–600 KB PNGs; the whole set is now ~370 KB.
 
-| file                 | used as        | on-screen height |
-|----------------------|----------------|------------------|
-| `cheesecake.png`     | left slot 1    | 109 px           |
-| `CHAICROISSANT.png`  | left slot 2    | 120 px           |
-| `matcha.png`         | left slot 3    | 133 px           |
-| `nycmodel.png`       | right slot 1   | 106 px           |
-| `Gatha 1.png`        | right slot 2   | 123 px           |
-| `wip logo 1.png`     | right slot 3   | 101 px           |
+| file                  | used as        | on-screen height |
+|-----------------------|----------------|------------------|
+| `cheesecake.webp`     | left slot 1    | 109 px           |
+| `CHAICROISSANT.webp`  | left slot 2    | 120 px           |
+| `matcha.webp`         | left slot 3    | 133 px           |
+| `nycmodel.webp`       | right slot 1   | 106 px           |
+| `Gatha 1.webp`        | right slot 2   | 123 px           |
+| `wip logo 1.webp`     | right slot 3   | 101 px           |
 
-Transparent-background PNGs, roughly 2x the on-screen height (≈220–270 px tall)
-so they stay crisp. Until a file is present the page shows a labelled
-placeholder chip in its place — nothing breaks.
-
-Source: the "Gatha Hero" Claude Design project (`uploads/`). The design API
-caps file reads at 256 KB, so these need to be exported/copied in by hand.
+To replace one: drop a transparent-background image at the same path (any
+web format — update the extension in the `CUTS` array in `index.html` if it
+changes). If a file is missing the page shows a labelled placeholder chip in
+its slot and nothing breaks.
