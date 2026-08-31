@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gatha Bhakta — I design across screens and spaces</title>
+<meta name="description" content="Gatha is a product designer and an architect. 0-to-1 design for education, healthcare and AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap">
+<style>
+  :root{
+    --cream:#FAF6EF;
+    --pink:#F0ABCE;
+    --pink-ink:#C97FA6;
+    --ink:#2C2018;
+    --ink-mid:#5A4535;
+    --ink-soft:#8C7260;
+    --border:#D9CEBD;
+    --gb-serif-display:"Lora","JejuMyeongjo",Georgia,serif;
+    --gb-serif:"Lora","JejuMyeongjo",Georgia,serif;
+    --gb-sans:"DM Sans",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+    --ease-out:cubic-bezier(.16,1,.3,1);
+    --ease:cubic-bezier(.2,0,.2,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--gb-sans);
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:inherit;text-decoration:none}
+
+  /* ── scroll stage ─────────────────────────────── */
+  .stage{
+    height:100dvh;
+    overflow-y:auto;
+    overflow-x:hidden;
+    position:relative;
+    background:var(--cream);
+    container-type:inline-size;
+    scrollbar-width:thin;
+    scrollbar-color:var(--pink) rgba(44,32,24,.05);
+  }
+  .stage[data-sb="white"]{ scrollbar-color:#FFFFFF rgba(44,32,24,.10); }
+  .stage::-webkit-scrollbar{width:10px}
+  .stage::-webkit-scrollbar-track{background:rgba(44,32,24,.05)}
+  .stage::-webkit-scrollbar-thumb{
+    border-radius:999px;background:var(--pink);
+    transition:background 240ms var(--ease);
+  }
+  .stage[data-sb="white"]::-webkit-scrollbar-thumb{background:#FFFFFF}
+  .stage[data-sb="white"]::-webkit-scrollbar-track{background:rgba(44,32,24,.10)}
+
+  /* ── hero (sticky) ────────────────────────────── */
+  .hero{
+    position:sticky;top:0;
+    height:100dvh;min-height:600px;
+    display:grid;grid-template-rows:auto 1fr;
+    background:var(--cream);
+    z-index:2;
+  }
+
+  .nav{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:2.1cqw 4.1cqw;gap:3.4cqw;
+  }
+  .nav__group{
+    display:flex;gap:3.8cqw;
+    font-family:var(--gb-sans);font-weight:600;
+    font-size:clamp(9px,.95cqw,12px);line-height:1;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--pink-ink);
+  }
+  .nav__group--right{justify-content:flex-end}
+  .nav__group a{transition:color 160ms var(--ease)}
+  .nav__group a:hover{color:var(--ink)}
+  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;animation:gspin 40s linear infinite}
+  .nav__mark path{fill:var(--pink)}
+
+  /* ── hero centrepiece + hover playground ──────── */
+  .play{
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 3cqw 2.4cqw;
+  }
+
+  .claim{
+    position:relative;
+    border:1px solid var(--border);border-radius:4px;
+    padding:3.4cqw 4.2cqw;
+    display:flex;flex-direction:column;align-items:center;gap:1.9cqw;
+    background:rgba(250,246,239,.72);
+    max-width:84cqw;
+    z-index:1;
+  }
+  .claim__tick{position:absolute;width:7px;height:7px;background:var(--pink)}
+  .claim__tick--tl{left:-4px;top:-4px}
+  .claim__tick--tr{right:-4px;top:-4px}
+  .claim__tick--bl{left:-4px;bottom:-4px}
+  .claim__tick--br{right:-4px;bottom:-4px}
+
+  .claim h1{
+    margin:0;
+    font-family:var(--gb-serif-display);font-weight:400;
+    font-size:clamp(40px,6.4cqw,104px);
+    line-height:1.06;letter-spacing:-.025em;
+    color:var(--ink);text-align:center;max-width:76cqw;
+  }
+  .claim__lede{
+    margin:0;
+    font-family:var(--gb-serif);
+    font-size:clamp(16px,2.1cqw,30px);
+    line-height:1.45;color:var(--ink-mid);
+    text-align:center;max-width:52cqw;
+  }
+  .claim__areas{
+    display:flex;align-items:center;gap:1.6cqw;
+    font-family:var(--gb-sans);font-weight:600;
+    font-size:clamp(9px,1cqw,13px);line-height:1;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--ink);
+  }
+  .claim__dot{width:6px;height:6px;border-radius:50%;background:var(--pink)}
+
+  /* ── flying cutouts ──────────────────────────── */
+  .cutout{
+    position:absolute;left:50%;top:50%;
+    width:auto;object-fit:contain;pointer-events:none;
+    transform:translate(-50%,-50%) scale(.55);
+    opacity:0;
+    transition:transform 760ms var(--ease-out),opacity 620ms var(--ease);
+    filter:drop-shadow(0 10px 22px rgba(44,32,24,.16));
+    z-index:0;
+  }
+  .cutout--ph{
+    display:flex;align-items:flex-end;justify-content:center;
+    border-radius:10px;
+    background:#FDFBF7;border:1px solid var(--border);
+    box-shadow:inset 0 0 0 4px #fff;
+    font-family:var(--gb-serif);font-style:italic;
+    color:var(--ink-soft);font-size:12px;
+    padding:8px 12px;
+  }
+
+  /* ── scribbles ───────────────────────────────── */
+  .scrib{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    transition:left 1400ms var(--ease),top 1400ms var(--ease),transform 1400ms var(--ease);
+    pointer-events:none;z-index:0;
+  }
+  .scrib svg{display:block;overflow:visible}
+  .scrib path{
+    fill:none;stroke-width:2.3;stroke-linejoin:round;stroke-linecap:round;
+    stroke-dasharray:240;
+  }
+  .scrib--0 path,.scrib--4 path{stroke:#E8C98A}
+  .scrib--1 path{stroke:var(--pink)}
+  .scrib--0 path{animation:gscribble 4.4s ease-in-out 0s infinite}
+  .scrib--1 path{animation:gscribble 4.75s ease-in-out .25s infinite}
+  .scrib--4 path{animation:gscribble 5.8s ease-in-out 1s infinite}
+
+  /* ── selected work ───────────────────────────── */
+  .work{
+    position:relative;z-index:3;
+    background:var(--pink);
+    padding:7.2cqw 4.1cqw 12cqw;
+    min-height:100dvh;
+    container-type:inline-size;
+  }
+  .work__head{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2cqw;
+    border-bottom:1px solid rgba(44,32,24,.28);padding-bottom:1.4cqw;
+  }
+  .work__eyebrow{
+    font-family:var(--gb-sans);font-weight:600;
+    font-size:clamp(9px,.95cqw,12px);line-height:1;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--ink);
+  }
+  .work__count{
+    text-align:right;
+    font-family:var(--gb-sans);font-weight:400;
+    font-size:clamp(9px,.95cqw,12px);line-height:1;
+    letter-spacing:.16em;text-transform:uppercase;color:rgba(44,32,24,.7);
+  }
+  .work__pip{width:8px;height:8px;border-radius:50%;background:var(--cream)}
+
+  .row{
+    display:grid;grid-template-columns:3.4cqw 1fr auto;align-items:baseline;gap:2cqw;
+    padding:2.1cqw 0;border-bottom:1px solid rgba(44,32,24,.18);
+    text-decoration:none;
+    transition:padding-left 260ms var(--ease),background 260ms var(--ease);
+  }
+  .row:hover{padding-left:1.4cqw;background:rgba(250,246,239,.28)}
+  .row__no{
+    font-family:var(--gb-sans);font-weight:400;
+    font-size:clamp(9px,.9cqw,12px);line-height:1;
+    letter-spacing:.16em;color:rgba(44,32,24,.6);
+  }
+  .row__title{
+    font-family:var(--gb-serif);
+    font-size:clamp(20px,2.4cqw,36px);line-height:1.15;color:var(--ink);
+  }
+  .row__meta{
+    font-family:var(--gb-sans);font-weight:400;
+    font-size:clamp(9px,.9cqw,12px);line-height:1.4;
+    letter-spacing:.16em;text-transform:uppercase;color:rgba(44,32,24,.65);
+    text-align:right;
+  }
+
+  .colophon{
+    position:relative;z-index:3;
+    background:var(--pink);
+    padding:0 4.1cqw 6cqw;
+    display:flex;justify-content:space-between;align-items:baseline;gap:2cqw;
+    font-family:var(--gb-sans);font-weight:400;
+    font-size:clamp(9px,.9cqw,12px);letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(44,32,24,.6);
+  }
+  .colophon a:hover{color:var(--ink)}
+
+  @keyframes gspin{to{transform:rotate(360deg)}}
+  @keyframes gscribble{
+    0%{stroke-dashoffset:240}
+    30%{stroke-dashoffset:0}
+    64%{stroke-dashoffset:0}
+    100%{stroke-dashoffset:-240}
+  }
+
+  @media (max-width:720px){
+    .hero{min-height:560px}
+    .nav{padding:22px 20px;gap:16px}
+    .nav__group{gap:16px;font-size:9px}
+    .claim{padding:34px 24px;gap:16px;max-width:88vw}
+    .claim h1{font-size:clamp(30px,9vw,44px);max-width:none}
+    .claim__lede{font-size:15px;max-width:38ch}
+    .claim__areas{font-size:9px;gap:10px;flex-wrap:wrap;justify-content:center}
+    .cutout{display:none}
+    .work{padding:64px 20px 96px}
+    .row{grid-template-columns:24px 1fr;gap:6px 12px}
+    .row__meta{grid-column:2;text-align:left}
+    .colophon{flex-direction:column;gap:6px;padding:0 20px 48px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .nav__mark{animation:none}
+    .scrib path{animation:none;stroke-dashoffset:0}
+    .cutout{transition:opacity 300ms linear}
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <section class="hero">
+    <nav class="nav">
+      <div class="nav__group">
+        <a href="#work">Work</a>
+        <a href="#" aria-disabled="true">Resume</a>
+      </div>
+      <svg class="nav__mark" viewBox="0 0 342 342" aria-hidden="true">
+        <path d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path>
+      </svg>
+      <div class="nav__group nav__group--right">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+    </nav>
+
+    <div class="play" id="play">
+      <div class="claim">
+        <span class="claim__tick claim__tick--tl"></span>
+        <span class="claim__tick claim__tick--tr"></span>
+        <span class="claim__tick claim__tick--bl"></span>
+        <span class="claim__tick claim__tick--br"></span>
+
+        <h1>I design across screens and spaces.</h1>
+
+        <p class="claim__lede">Gatha is a product designer and an architect<br>0-to-1 design for education, healthcare and AI.</p>
+
+        <div class="claim__areas">
+          <span>Education</span>
+          <span class="claim__dot"></span>
+          <span>Healthcare</span>
+          <span class="claim__dot"></span>
+          <span>AI</span>
+        </div>
+      </div>
+      <!-- cutouts + scribbles injected here -->
+    </div>
+  </section>
+
+  <section class="work" id="work">
+    <div class="work__head">
+      <span class="work__eyebrow">Selected work</span>
+      <span class="work__pip"></span>
+      <span class="work__count">Five of nine</span>
+    </div>
+
+    <a class="row" href="#">
+      <span class="row__no">01</span>
+      <span class="row__title">House of small rooms</span>
+      <span class="row__meta">Interior · 2024</span>
+    </a>
+    <a class="row" href="#">
+      <span class="row__no">02</span>
+      <span class="row__title">A copilot that admits it is unsure</span>
+      <span class="row__meta">AI · 0-to-1 product · 2026</span>
+    </a>
+    <a class="row" href="#">
+      <span class="row__no">03</span>
+      <span class="row__title">A museum game for ten-year-olds</span>
+      <span class="row__meta">Education · 2025</span>
+    </a>
+    <a class="row" href="#">
+      <span class="row__no">04</span>
+      <span class="row__title">Where platform growth actually comes from</span>
+      <span class="row__meta">Research · growth · 2025</span>
+    </a>
+    <a class="row" href="#">
+      <span class="row__no">05</span>
+      <span class="row__title">Ward rounds, rebuilt</span>
+      <span class="row__meta">Healthcare · 2025</span>
+    </a>
+  </section>
+
+  <footer class="colophon">
+    <span>Gatha Bhakta — portfolio 2026</span>
+    <a href="mailto:hello@gathaabhakta.com">hello@gathaabhakta.com</a>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var stage = document.getElementById('stage');
+  var play  = document.getElementById('play');
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ── pink → white scrollbar flip ─────────────── */
+  function onScroll(){
+    stage.setAttribute('data-sb', stage.scrollTop > stage.clientHeight * 0.5 ? 'white' : 'pink');
+  }
+  stage.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  /* ── flying cutouts ─────────────────────────── */
+  var CUTS = [
+    {file:'cheesecake.png',      label:'cheesecake', h:109},
+    {file:'CHAICROISSANT.png',   label:'chai croissant', h:120},
+    {file:'matcha.png',          label:'matcha', h:133},
+    {file:'nycmodel.png',        label:'new york', h:106},
+    {file:'Gatha 1.png',         label:'gatha', h:123},
+    {file:'wip logo 1.png',      label:'mark', h:101}
+  ];
+  var SLOTS = [[430,-206],[455,8],[415,212]];
+
+  function jitter(n){ return (Math.random() - 0.5) * n; }
+  function makeSpread(){
+    var left = [], right = [];
+    SLOTS.forEach(function(s){
+      var x = s[0], y = s[1];
+      var dx = -Math.abs(jitter(26)), dy = jitter(30), rot = Math.round(jitter(22));
+      left.push ({tx: Math.round(-x - dx), ty: Math.round(y + dy), rot:-rot, sc:1});
+      right.push({tx: Math.round( x + dx), ty: Math.round(y + dy), rot: rot, sc:1});
+    });
+    return left.concat(right);
+  }
+
+  var K = 1;
+  function scaleFactor(){ return Math.max(0.62, Math.min(1.5, window.innerWidth / 1160)); }
+
+  var cutEls = CUTS.map(function(c, i){
+    var el = document.createElement('img');
+    el.className = 'cutout';
+    el.alt = '';
+    el.src = 'assets/' + encodeURIComponent(c.file);
+    el.dataset.baseH = c.h;
+    el.onerror = function(){
+      // graceful placeholder until the real sticker art is dropped into /assets
+      var ph = document.createElement('div');
+      ph.className = 'cutout cutout--ph';
+      ph.dataset.baseH = c.h;
+      ph.style.height = (c.h * K) + 'px';
+      ph.style.width  = Math.round(c.h * 1.35 * K) + 'px';
+      ph.textContent = c.label;
+      el.replaceWith(ph);
+      cutEls[i] = ph;
+      resize();
+    };
+    play.appendChild(el);
+    return el;
+  });
+
+  function resize(){
+    K = scaleFactor();
+    cutEls.forEach(function(el){
+      var h = (el.dataset.baseH | 0) * K;
+      el.style.height = h + 'px';
+      if (el.classList.contains('cutout--ph')) el.style.width = Math.round(h * 1.35) + 'px';
+    });
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var spread = null;
+  function applyState(on){
+    cutEls.forEach(function(el, i){
+      if (on && spread){
+        var s = spread[i];
+        el.style.transitionDelay = (60 * i) + 'ms';
+        el.style.transform = 'translate(-50%,-50%) translate(' + (s.tx * K) + 'px,' + (s.ty * K) + 'px) rotate(' + s.rot + 'deg) scale(' + s.sc + ')';
+        el.style.opacity = '1';
+      } else {
+        el.style.transitionDelay = (40 * (5 - i)) + 'ms';
+        el.style.transform = 'translate(-50%,-50%) scale(.55)';
+        el.style.opacity = '0';
+      }
+    });
+  }
+  play.addEventListener('mouseenter', function(){ spread = makeSpread(); applyState(true); });
+  play.addEventListener('mouseleave', function(){ applyState(false); spread = null; });
+
+  /* ── re-rolling scribbles (indices 0, 1, 4) ── */
+  var STAR = 'M20 5c1.6 12.5 3.5 14.4 15 15-11.5.6-13.4 2.5-15 15-1.6-12.5-3.5-14.4-15-15 11.5-.6 13.4-2.5 15-15z';
+  var HEART = 'M20 33C10 25 5 20.5 5 15a7.5 7.5 0 0 1 15-3 7.5 7.5 0 0 1 15 3c0 5.5-5 10-15 18z';
+  var SCRIBS = [
+    {i:0, size:50, d:STAR},
+    {i:1, size:46, d:HEART},
+    {i:4, size:50, d:STAR}
+  ];
+  var scribEls = SCRIBS.map(function(s){
+    var wrap = document.createElement('div');
+    wrap.className = 'scrib scrib--' + s.i;
+    wrap.innerHTML = '<svg width="' + s.size + '" height="' + s.size + '" viewBox="0 0 40 40"><path d="' + s.d + '"></path></svg>';
+    play.appendChild(wrap);
+    return {el:wrap, i:s.i};
+  });
+  function r(a,b){ return a + Math.random() * (b - a); }
+  function rollScribs(){
+    scribEls.forEach(function(o){
+      var x = (o.i % 2) ? r(94.6, 96.0) : r(4.0, 5.4);
+      var y = r(8, 88);
+      var rot = Math.round(r(-28, 28));
+      o.el.style.left = (Math.round(x * 10) / 10) + '%';
+      o.el.style.top  = (Math.round(y * 10) / 10) + '%';
+      o.el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
+    });
+  }
+  rollScribs();
+  if (!reduce) setInterval(rollScribs, 6500);
+})();
+</script>
+</body>
+</html>
