@@ -407,9 +407,16 @@
       el.style.height = h + 'px';
       if (el.classList.contains('cutout--ph')) el.style.width = Math.round(h * 1.35) + 'px';
     });
+    if (spread) applyState(true);   // keep the edge clamp honest after a resize
   }
-  resize();
-  window.addEventListener('resize', resize);
+
+  // Pull a sticker's horizontal offset back in if the spread would push its
+  // box off the screen — leaves a 32px gutter. Vertical spread is untouched.
+  function clampX(el, tx){
+    var half = (el.offsetWidth || (el.dataset.baseH | 0) * K * 1.4) / 2;
+    var lim = Math.max(0, window.innerWidth / 2 - half - 32);
+    return Math.max(-lim, Math.min(lim, tx));
+  }
 
   var spread = null;
   function applyState(on){
@@ -417,7 +424,7 @@
       if (on && spread){
         var s = spread[i];
         el.style.transitionDelay = (60 * i) + 'ms';
-        el.style.transform = 'translate(-50%,-50%) translate(' + (s.tx * K) + 'px,' + (s.ty * K) + 'px) rotate(' + s.rot + 'deg) scale(' + s.sc + ')';
+        el.style.transform = 'translate(-50%,-50%) translate(' + clampX(el, s.tx * K) + 'px,' + (s.ty * K) + 'px) rotate(' + s.rot + 'deg) scale(' + s.sc + ')';
         el.style.opacity = '1';
       } else {
         el.style.transitionDelay = (40 * (5 - i)) + 'ms';
@@ -426,6 +433,9 @@
       }
     });
   }
+  resize();
+  window.addEventListener('resize', resize);
+
   play.addEventListener('mouseenter', function(){ spread = makeSpread(); applyState(true); });
   play.addEventListener('mouseleave', function(){ applyState(false); spread = null; });
 
