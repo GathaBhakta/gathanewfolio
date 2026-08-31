@@ -86,18 +86,7 @@
   .play{
     position:relative;
     display:flex;align-items:center;justify-content:center;
-    padding:0 3cqw;
-  }
-
-  /* the frame — a screen-relative box the cut-outs play inside and never leave.
-     JS keeps every sticker at least --spill (32px) clear of these edges. */
-  .field{
-    --spill:32px;
-    position:relative;
-    width:min(1180px, 92vw);
-    height:min(640px, calc(100dvh - 140px));
-    min-height:300px;
-    display:flex;align-items:center;justify-content:center;
+    padding:0 3cqw 2.4cqw;
   }
 
   .claim{
@@ -106,7 +95,7 @@
     padding:3.4cqw 4.2cqw;
     display:flex;flex-direction:column;align-items:center;gap:1.9cqw;
     background:rgba(250,246,239,.72);
-    width:min(720px, 60cqw);
+    max-width:84cqw;
     z-index:1;
   }
   /* stickers + scribbles ride ABOVE the hairline claim box */
@@ -119,9 +108,9 @@
   .claim h1{
     margin:0;
     font-family:var(--gb-serif-display);font-weight:400;
-    font-size:clamp(38px,5.4cqw,88px);
+    font-size:clamp(40px,6.4cqw,104px);
     line-height:1.06;letter-spacing:-.025em;
-    color:var(--ink);text-align:center;
+    color:var(--ink);text-align:center;max-width:76cqw;
   }
   .claim__lede{
     margin:0;
@@ -247,9 +236,8 @@
     .hero{min-height:560px}
     .nav{padding:22px 20px;gap:16px}
     .nav__group{gap:16px;font-size:9px}
-    .field{width:92vw;height:auto;min-height:0}
-    .claim{padding:34px 24px;gap:16px;width:92vw}
-    .claim h1{font-size:clamp(30px,9vw,44px)}
+    .claim{padding:34px 24px;gap:16px;max-width:88vw}
+    .claim h1{font-size:clamp(30px,9vw,44px);max-width:none}
     .claim__lede{font-size:15px;max-width:38ch}
     .claim__areas{font-size:9px;gap:10px;flex-wrap:wrap;justify-content:center}
     .cutout{display:none}
@@ -285,7 +273,6 @@
     </nav>
 
     <div class="play" id="play">
-      <div class="field" id="field">
       <div class="claim">
         <span class="claim__tick claim__tick--tl"></span>
         <span class="claim__tick claim__tick--tr"></span>
@@ -304,8 +291,7 @@
           <span>AI</span>
         </div>
       </div>
-      <!-- cutouts + scribbles injected into .field here -->
-      </div>
+      <!-- cutouts + scribbles injected here -->
     </div>
   </section>
 
@@ -355,10 +341,7 @@
   "use strict";
   var stage = document.getElementById('stage');
   var play  = document.getElementById('play');
-  var field = document.getElementById('field');
   var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var SPILL = 32;          // px every sticker must stay clear of the frame edge
-  var spread = null;
 
   /* ── pink → white scrollbar flip ─────────────── */
   function onScroll(){
@@ -378,48 +361,22 @@
     {file:'Gatha 1.webp',         label:'gatha', h:190},
     {file:'wip logo 1.webp',      label:'mark', h:101}
   ];
-  // three vertical tiers per side, as a fraction of the frame's half-height
-  var TIERS = [-0.66, 0.03, 0.68];
+  var SLOTS = [[430,-206],[455,8],[415,212]];
 
   function jitter(n){ return (Math.random() - 0.5) * n; }
-  function clamp(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
-
-  function frameHalf(){
-    var r = field.getBoundingClientRect();
-    return { hw: r.width / 2, hh: r.height / 2 };
-  }
-  function stickerHalf(el){
-    var w = el.offsetWidth, h = el.offsetHeight;
-    if (!w || !h){ h = (el.dataset.baseH | 0) * K; w = h * 1.4; }
-    return { w: w / 2, h: h / 2 };
-  }
-
-  // Each sticker is pinned toward its side of the frame, then pulled back in
-  // so its bounding box keeps SPILL px clear of every frame edge — no clip,
-  // no bleed, whatever the screen size.
   function makeSpread(){
-    var f = frameHalf(), out = [];
-    for (var side = 0; side < 2; side++){
-      var sign = side ? 1 : -1;
-      for (var t = 0; t < 3; t++){
-        var idx = side * 3 + t;
-        var s = stickerHalf(cutEls[idx]);
-        var maxX = Math.max(0, f.hw - s.w - SPILL);
-        var maxY = Math.max(0, f.hh - s.h - SPILL);
-        var jx = Math.abs(jitter(20)), jy = jitter(22);
-        var tx = sign * clamp(0.92 * maxX - jx, 0, maxX);
-        var ty = clamp(TIERS[t] * f.hh + jy, -maxY, maxY);
-        out[idx] = { tx: Math.round(tx), ty: Math.round(ty), rot: sign * Math.round(jitter(18)), sc: 1 };
-      }
-    }
-    return out;
+    var left = [], right = [];
+    SLOTS.forEach(function(s){
+      var x = s[0], y = s[1];
+      var dx = -Math.abs(jitter(26)), dy = jitter(30), rot = Math.round(jitter(22));
+      left.push ({tx: Math.round(-x - dx), ty: Math.round(y + dy), rot:-rot, sc:1});
+      right.push({tx: Math.round( x + dx), ty: Math.round(y + dy), rot: rot, sc:1});
+    });
+    return left.concat(right);
   }
 
   var K = 1;
-  function scaleFactor(){
-    var w = field.getBoundingClientRect().width || window.innerWidth;
-    return Math.max(0.6, Math.min(1.35, w / 1120));
-  }
+  function scaleFactor(){ return Math.max(0.62, Math.min(1.5, window.innerWidth / 1160)); }
 
   var cutEls = CUTS.map(function(c, i){
     var el = document.createElement('img');
@@ -439,7 +396,7 @@
       cutEls[i] = ph;
       resize();
     };
-    field.appendChild(el);
+    play.appendChild(el);
     return el;
   });
 
@@ -450,17 +407,17 @@
       el.style.height = h + 'px';
       if (el.classList.contains('cutout--ph')) el.style.width = Math.round(h * 1.35) + 'px';
     });
-    if (spread){ spread = makeSpread(); applyState(true); }   // keep it in-frame on resize
   }
   resize();
   window.addEventListener('resize', resize);
 
+  var spread = null;
   function applyState(on){
     cutEls.forEach(function(el, i){
       if (on && spread){
         var s = spread[i];
         el.style.transitionDelay = (60 * i) + 'ms';
-        el.style.transform = 'translate(-50%,-50%) translate(' + s.tx + 'px,' + s.ty + 'px) rotate(' + s.rot + 'deg) scale(1)';
+        el.style.transform = 'translate(-50%,-50%) translate(' + (s.tx * K) + 'px,' + (s.ty * K) + 'px) rotate(' + s.rot + 'deg) scale(' + s.sc + ')';
         el.style.opacity = '1';
       } else {
         el.style.transitionDelay = (40 * (5 - i)) + 'ms';
@@ -484,14 +441,14 @@
     var wrap = document.createElement('div');
     wrap.className = 'scrib scrib--' + s.i;
     wrap.innerHTML = '<svg width="' + s.size + '" height="' + s.size + '" viewBox="0 0 40 40"><path d="' + s.d + '"></path></svg>';
-    field.appendChild(wrap);
+    play.appendChild(wrap);
     return {el:wrap, i:s.i};
   });
   function r(a,b){ return a + Math.random() * (b - a); }
   function rollScribs(){
     scribEls.forEach(function(o){
-      var x = (o.i % 2) ? r(90, 95) : r(5, 10);
-      var y = r(9, 88);
+      var x = (o.i % 2) ? r(94.6, 96.0) : r(4.0, 5.4);
+      var y = r(8, 88);
       var rot = Math.round(r(-28, 28));
       o.el.style.left = (Math.round(x * 10) / 10) + '%';
       o.el.style.top  = (Math.round(y * 10) / 10) + '%';
