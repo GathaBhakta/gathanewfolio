@@ -63,13 +63,11 @@
     display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
     padding:1.3cqw 4.1cqw;gap:3.4cqw;
     background:transparent;
-    transition:background 260ms var(--ease), box-shadow 260ms var(--ease);
   }
-  /* over a solid non-cream section, the bar takes the hero's cream */
-  .nav--solid{
-    background:var(--cream);
-    box-shadow:0 1px 0 rgba(44,32,24,.12);
-  }
+  /* over a solid non-cream section the bar stays transparent —
+     only the wordmark, links and mark pick up the hero's cream */
+  .nav--solid .nav__group{ color:var(--cream); }
+  .nav--solid .nav__mark path{ fill:var(--cream); }
 
   /* ── hero (sticky) ────────────────────────────── */
   .hero{
@@ -88,10 +86,11 @@
     letter-spacing:.2em;text-transform:uppercase;color:var(--pink-ink);
   }
   .nav__group--right{justify-content:flex-end}
+  .nav__group{transition:color 260ms var(--ease)}
   .nav__group a{transition:color 160ms var(--ease)}
   .nav__group a:hover{color:var(--ink)}
   .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;animation:gspin 40s linear infinite}
-  .nav__mark path{fill:var(--pink)}
+  .nav__mark path{fill:var(--pink);transition:fill 260ms var(--ease)}
 
   /* ── hero centrepiece + hover playground ──────── */
   .play{
