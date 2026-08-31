@@ -351,12 +351,14 @@
   onScroll();
 
   /* ── flying cutouts ─────────────────────────── */
+  // h = on-screen height in px. matcha / nycmodel / Gatha 1 are narrow crops,
+  // so they carry a taller box to match the visual mass of the wider cut-outs.
   var CUTS = [
     {file:'cheesecake.webp',      label:'cheesecake', h:109},
     {file:'CHAICROISSANT.webp',   label:'chai croissant', h:120},
-    {file:'matcha.webp',          label:'matcha', h:133},
-    {file:'nycmodel.webp',        label:'new york', h:106},
-    {file:'Gatha 1.webp',         label:'gatha', h:123},
+    {file:'matcha.webp',          label:'matcha', h:184},
+    {file:'nycmodel.webp',        label:'new york', h:116},
+    {file:'Gatha 1.webp',         label:'gatha', h:190},
     {file:'wip logo 1.webp',      label:'mark', h:101}
   ];
   var SLOTS = [[430,-206],[455,8],[415,212]];
