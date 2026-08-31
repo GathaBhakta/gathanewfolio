@@ -64,6 +64,8 @@
     display:grid;grid-template-rows:auto 1fr;
     background:var(--cream);
     z-index:2;
+    transform-origin:50% 42%;
+    will-change:transform,opacity;
   }
 
   .nav{
@@ -341,13 +343,25 @@
   "use strict";
   var stage = document.getElementById('stage');
   var play  = document.getElementById('play');
+  var hero  = document.querySelector('.hero');
   var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-  /* ── pink → white scrollbar flip ─────────────── */
+  /* ── scroll: scrollbar flip + hero recede ────── */
+  // As the pink work panel slides up, the hero eases back — a barely-there
+  // scale-down (max 3.5%) and a fade, tracked live to the scroll position.
+  var pending = false;
+  function paintHero(){
+    pending = false;
+    var p = Math.min(1, stage.scrollTop / (stage.clientHeight * 0.62));
+    hero.style.opacity = (1 - p * 0.5).toFixed(3);
+    hero.style.transform = reduce ? 'none' : 'scale(' + (1 - p * 0.03).toFixed(4) + ')';
+  }
   function onScroll(){
     stage.setAttribute('data-sb', stage.scrollTop > stage.clientHeight * 0.5 ? 'white' : 'pink');
+    if (!pending){ pending = true; requestAnimationFrame(paintHero); }
   }
   stage.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', function(){ if (!pending){ pending = true; requestAnimationFrame(paintHero); } });
   onScroll();
 
   /* ── flying cutouts ─────────────────────────── */
