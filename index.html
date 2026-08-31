@@ -98,6 +98,7 @@
     max-width:84cqw;
     z-index:1;
   }
+  /* stickers + scribbles ride ABOVE the hairline claim box */
   .claim__tick{position:absolute;width:7px;height:7px;background:var(--pink)}
   .claim__tick--tl{left:-4px;top:-4px}
   .claim__tick--tr{right:-4px;top:-4px}
@@ -133,8 +134,8 @@
     transform:translate(-50%,-50%) scale(.55);
     opacity:0;
     transition:transform 760ms var(--ease-out),opacity 620ms var(--ease);
-    filter:drop-shadow(0 10px 22px rgba(44,32,24,.16));
-    z-index:0;
+    filter:drop-shadow(0 12px 26px rgba(44,32,24,.20));
+    z-index:3;
   }
   .cutout--ph{
     display:flex;align-items:flex-end;justify-content:center;
@@ -151,7 +152,7 @@
     position:absolute;
     transform:translate(-50%,-50%);
     transition:left 1400ms var(--ease),top 1400ms var(--ease),transform 1400ms var(--ease);
-    pointer-events:none;z-index:0;
+    pointer-events:none;z-index:2;
   }
   .scrib svg{display:block;overflow:visible}
   .scrib path{
