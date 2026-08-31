@@ -176,72 +176,142 @@
   .scrib--1 path{animation:gscribble 4.75s ease-in-out .25s infinite}
   .scrib--4 path{animation:gscribble 5.8s ease-in-out 1s infinite}
 
-  /* ── selected work — one screen-framed pink panel ─────────
-     .work is sized to the viewport (width + height); every measure
-     inside is a container query unit on that frame, so the whole
-     section scales with the screen. */
+  /* ── selected work — 7b × 7c hybrid ───────────────────────
+     One screen-framed panel. A filtered filmstrip you walk with the
+     arrows or the wheel; hovering a card tints the whole field to that
+     project's wash, springs four cut-outs onto the thumbnail corners
+     (7c) and peels a fifth off to trail the cursor (7b). Every measure
+     is a container-query unit on the viewport-sized .work. */
   .work{
     position:relative;z-index:3;
     width:100%;
-    height:100dvh;min-height:500px;
-    background:var(--pink);
-    padding:clamp(24px,5cqh,72px) clamp(20px,4.1cqw,72px) clamp(20px,3.6cqh,52px);
+    height:100dvh;min-height:520px;
     container-type:size;
+    overflow:hidden;
+  }
+  .work__field{
+    position:relative;height:100%;
+    background:var(--pink);
+    transition:background 900ms var(--ease);
+    padding:clamp(22px,4.6cqh,64px) 0 clamp(18px,3.4cqh,48px);
     display:flex;flex-direction:column;
     overflow:hidden;
   }
   .work__frame{
     width:min(1200px,100%);margin-inline:auto;
-    flex:1;display:flex;flex-direction:column;
+    padding-inline:clamp(20px,4.1cqw,68px);
+    flex:1;display:flex;flex-direction:column;min-height:0;
   }
   .work__head{
     display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2cqw;
-    border-bottom:1px solid rgba(44,32,24,.28);padding-bottom:clamp(10px,1.6cqh,22px);
+    border-bottom:1px solid rgba(44,32,24,.28);padding-bottom:clamp(8px,1.4cqh,18px);
   }
   .work__eyebrow{
-    font-family:var(--gb-sans);font-weight:600;
-    font-size:clamp(9px,1.05cqw,13px);line-height:1;
+    font:600 clamp(9px,1cqw,13px)/1 var(--gb-sans);
     letter-spacing:.24em;text-transform:uppercase;color:var(--ink);
   }
+  .work__mark{width:clamp(13px,1.5cqw,20px);height:clamp(13px,1.5cqw,20px);display:block;animation:gspin 40s linear infinite}
+  .work__mark path{fill:rgba(250,246,239,.9)}
   .work__count{
     text-align:right;
-    font-family:var(--gb-sans);font-weight:400;
-    font-size:clamp(9px,1.05cqw,13px);line-height:1;
-    letter-spacing:.16em;text-transform:uppercase;color:rgba(44,32,24,.7);
-  }
-  .work__pip{width:clamp(6px,.7cqw,9px);height:clamp(6px,.7cqw,9px);border-radius:50%;background:var(--cream)}
-
-  .work__list{ flex:1;display:flex;flex-direction:column;justify-content:center; }
-
-  .row{
-    display:grid;grid-template-columns:clamp(26px,3.4cqw,52px) 1fr auto;align-items:baseline;gap:2cqw;
-    padding:clamp(12px,2.7cqh,36px) 0;border-bottom:1px solid rgba(44,32,24,.18);
-    text-decoration:none;
-    transition:padding-left 260ms var(--ease),background 260ms var(--ease);
-  }
-  .row:hover{padding-left:1.4cqw;background:rgba(250,246,239,.28)}
-  .row__no{
-    font-family:var(--gb-sans);font-weight:400;
-    font-size:clamp(9px,1cqw,12px);line-height:1;
-    letter-spacing:.16em;color:rgba(44,32,24,.6);
-  }
-  .row__title{
-    font-family:var(--gb-serif);
-    font-size:clamp(19px,2.7cqw,40px);line-height:1.14;color:var(--ink);
-  }
-  .row__meta{
-    font-family:var(--gb-sans);font-weight:400;
-    font-size:clamp(9px,1cqw,12px);line-height:1.4;
+    font:400 clamp(9px,1cqw,12px)/1 var(--gb-sans);
     letter-spacing:.16em;text-transform:uppercase;color:rgba(44,32,24,.65);
-    text-align:right;
+  }
+
+  .work__chips{
+    display:flex;flex-wrap:wrap;gap:1cqw;
+    padding:clamp(14px,2.2cqh,26px) 0 clamp(14px,2cqh,24px);
+  }
+  .work__chips button{
+    cursor:pointer;
+    padding:clamp(6px,.9cqh,12px) clamp(12px,1.6cqw,22px);
+    border-radius:999px;border:1px solid rgba(44,32,24,.3);background:rgba(250,246,239,.45);
+    font:600 clamp(9px,.92cqw,12px)/1 var(--gb-sans);
+    letter-spacing:.18em;text-transform:uppercase;color:var(--ink);
+    transition:background 300ms var(--ease),color 300ms var(--ease),border-color 300ms var(--ease);
+  }
+  .work__chips button[aria-pressed="true"]{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+
+  .work__strip-wrap{
+    flex:1;min-height:0;display:flex;align-items:center;
+    overflow:clip;overflow-clip-margin:4cqw;
+  }
+  .work__strip{display:flex;width:max-content;transition:transform 620ms var(--ease)}
+
+  .qc{
+    flex:0 0 auto;
+    width:clamp(240px,30cqw,440px);margin-right:clamp(16px,2.4cqw,40px);
+    display:flex;flex-direction:column;gap:1cqw;
+    cursor:pointer;
+    opacity:.55;transform:scale(.92);transform-origin:left center;
+    overflow:clip;overflow-clip-margin:4cqw;
+    transition:width 560ms var(--ease),margin-right 560ms var(--ease),
+               opacity 420ms ease,transform 560ms cubic-bezier(.34,1.56,.64,1);
+  }
+  .qc.is-current{opacity:1;transform:scale(1)}
+  .qc.is-hidden{width:0;margin-right:0;opacity:0;pointer-events:none}
+  .qc__thumb{
+    position:relative;height:clamp(118px,17cqw,244px);border-radius:4px;
+    border:1px solid rgba(44,32,24,.22);background:rgba(250,246,239,.7);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .qc__img{height:72%;width:auto;object-fit:contain}
+  .qc__corner{
+    position:absolute;width:clamp(42px,4.6cqw,66px);height:clamp(42px,4.6cqw,66px);
+    object-fit:contain;pointer-events:none;z-index:5;
+    transform:translate(-50%,-50%) scale(.25);opacity:0;
+    transition:transform 620ms cubic-bezier(.34,1.56,.64,1),opacity 340ms ease;
+  }
+  .qc__corner[data-c="0"]{left:0;top:18%}
+  .qc__corner[data-c="1"]{left:100%;top:10%}
+  .qc__corner[data-c="2"]{left:8%;top:100%}
+  .qc__corner[data-c="3"]{left:100%;top:80%}
+  .qc.is-hot .qc__corner{opacity:1}
+  .qc.is-hot .qc__corner[data-c="0"]{transform:translate(-50%,-50%) scale(1) rotate(-14deg);transition-delay:0ms}
+  .qc.is-hot .qc__corner[data-c="1"]{transform:translate(-50%,-50%) scale(1) rotate(11deg);transition-delay:80ms}
+  .qc.is-hot .qc__corner[data-c="2"]{transform:translate(-50%,-50%) scale(1) rotate(8deg);transition-delay:160ms}
+  .qc.is-hot .qc__corner[data-c="3"]{transform:translate(-50%,-50%) scale(1) rotate(-9deg);transition-delay:240ms}
+  .qc__meta{
+    display:flex;align-items:baseline;justify-content:space-between;
+    font:400 clamp(9px,.92cqw,12px)/1 var(--gb-sans);
+    letter-spacing:.18em;text-transform:uppercase;color:rgba(44,32,24,.65);
+  }
+  .qc__title{
+    margin:0;font-family:var(--gb-serif);font-weight:400;
+    font-size:clamp(16px,2cqw,28px);line-height:1.14;color:var(--ink);
+  }
+  .qc__desc{
+    margin:0;font:300 clamp(10px,1cqw,14px)/1.6 var(--gb-sans);color:rgba(44,32,24,.7);
+  }
+
+  .work__nav{display:flex;align-items:center;gap:1.2cqw;padding-top:clamp(12px,1.8cqh,22px)}
+  .work__arrow{
+    cursor:pointer;
+    width:clamp(30px,3.4cqw,46px);height:clamp(30px,3.4cqw,46px);
+    border-radius:50%;border:1px solid rgba(44,32,24,.35);background:transparent;
+    display:flex;align-items:center;justify-content:center;
+    font:400 clamp(12px,1.2cqw,17px)/1 var(--gb-sans);color:var(--ink);
+    transition:background 240ms var(--ease),opacity 240ms var(--ease);
+  }
+  .work__arrow:hover{background:rgba(250,246,239,.6)}
+  .work__arrow[disabled]{opacity:.32;cursor:default}
+  .work__prog{flex:1;height:1px;background:rgba(44,32,24,.25);position:relative;margin-left:1.4cqw}
+  .work__prog i{position:absolute;left:0;top:-1px;height:3px;background:var(--ink);width:0;transition:width 620ms var(--ease)}
+
+  .work__lead{
+    position:absolute;left:0;top:0;
+    width:clamp(46px,5cqw,74px);height:clamp(46px,5cqw,74px);object-fit:contain;
+    pointer-events:none;z-index:8;
+    transform:translate(-50%,-50%) scale(.4);opacity:0;
+    transition:transform 420ms cubic-bezier(.34,1.56,.64,1),opacity 300ms ease;
+    filter:drop-shadow(0 10px 20px rgba(44,32,24,.2));
   }
 
   .colophon{
-    padding-top:clamp(12px,2.2cqh,26px);
+    padding-top:clamp(12px,2cqh,24px);
     display:flex;justify-content:space-between;align-items:baseline;gap:2cqw;
-    font-family:var(--gb-sans);font-weight:400;
-    font-size:clamp(9px,1cqw,12px);letter-spacing:.16em;text-transform:uppercase;
-    color:rgba(44,32,24,.6);
+    font:400 clamp(9px,1cqw,12px)/1 var(--gb-sans);
+    letter-spacing:.16em;text-transform:uppercase;color:rgba(44,32,24,.6);
   }
   .colophon a:hover{color:var(--ink)}
 
@@ -262,16 +332,25 @@
     .claim__lede{font-size:15px;max-width:38ch}
     .claim__areas{font-size:9px;gap:10px;flex-wrap:wrap;justify-content:center}
     .cutout{display:none}
-    .work{padding:64px 20px 96px}
-    .row{grid-template-columns:24px 1fr;gap:6px 12px}
-    .row__meta{grid-column:2;text-align:left}
-    .colophon{flex-direction:column;gap:6px;padding:0 20px 48px}
+    .work__field{padding:48px 0 40px}
+    .work__frame{padding-inline:20px}
+    .work__eyebrow,.work__count{font-size:10px}
+    .work__chips{gap:8px}
+    .work__chips button{font-size:10px;padding:7px 13px}
+    .qc{width:78vw;margin-right:16px;gap:10px}
+    .qc__thumb{height:44vw}
+    .qc__corner{width:52px;height:52px}
+    .qc__title{font-size:clamp(18px,5.4vw,26px)}
+    .qc__desc{font-size:13px}
+    .work__arrow{width:38px;height:38px;font-size:15px}
+    .work__lead{display:none}
+    .colophon{flex-direction:column;gap:6px;font-size:10px}
   }
 
   @media (prefers-reduced-motion:reduce){
-    .nav__mark{animation:none}
+    .nav__mark,.work__mark{animation:none}
     .scrib path{animation:none;stroke-dashoffset:0}
-    .cutout{transition:opacity 300ms linear}
+    .cutout,.qc__corner,.work__lead{transition:opacity 200ms linear}
   }
 </style>
 </head>
@@ -317,45 +396,34 @@
   </section>
 
   <section class="work" id="work" data-solidbg>
-    <div class="work__frame">
-      <div class="work__head">
-        <span class="work__eyebrow">Selected work</span>
-        <span class="work__pip"></span>
-        <span class="work__count">Five of nine</span>
-      </div>
+    <div class="work__field" id="workField">
+      <div class="work__frame">
+        <div class="work__head">
+          <span class="work__eyebrow">Selected work</span>
+          <svg class="work__mark" viewBox="0 0 342 342" aria-hidden="true">
+            <path d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path>
+          </svg>
+          <span class="work__count" id="workCount">01 / 05 · scroll or drag</span>
+        </div>
 
-      <div class="work__list">
-        <a class="row" href="#">
-          <span class="row__no">01</span>
-          <span class="row__title">House of small rooms</span>
-          <span class="row__meta">Interior · 2024</span>
-        </a>
-        <a class="row" href="#">
-          <span class="row__no">02</span>
-          <span class="row__title">A copilot that admits it is unsure</span>
-          <span class="row__meta">AI · 0-to-1 product · 2026</span>
-        </a>
-        <a class="row" href="#">
-          <span class="row__no">03</span>
-          <span class="row__title">A museum game for ten-year-olds</span>
-          <span class="row__meta">Education · 2025</span>
-        </a>
-        <a class="row" href="#">
-          <span class="row__no">04</span>
-          <span class="row__title">Where platform growth actually comes from</span>
-          <span class="row__meta">Research · growth · 2025</span>
-        </a>
-        <a class="row" href="#">
-          <span class="row__no">05</span>
-          <span class="row__title">Ward rounds, rebuilt</span>
-          <span class="row__meta">Healthcare · 2025</span>
-        </a>
-      </div>
+        <div class="work__chips" id="workChips"></div>
 
-      <footer class="colophon">
-        <span>Gatha Bhakta — portfolio 2026</span>
-        <a href="mailto:hello@gathaabhakta.com">hello@gathaabhakta.com</a>
-      </footer>
+        <div class="work__strip-wrap" id="workStripWrap">
+          <div class="work__strip" id="workStrip"></div>
+        </div>
+
+        <div class="work__nav">
+          <button class="work__arrow" id="workPrev" type="button" aria-label="Previous project">&#8592;</button>
+          <button class="work__arrow" id="workNext" type="button" aria-label="Next project">&#8594;</button>
+          <div class="work__prog"><i id="workProg"></i></div>
+        </div>
+
+        <footer class="colophon">
+          <span>Gatha Bhakta — portfolio 2026</span>
+          <a href="mailto:hello@gathaabhakta.com">hello@gathaabhakta.com</a>
+        </footer>
+      </div>
+      <img class="work__lead" id="workLead" alt="">
     </div>
   </section>
 
@@ -523,6 +591,150 @@
   }
   rollScribs();
   if (!reduce) setInterval(rollScribs, 6500);
+
+  /* ── work section — 7b × 7c hybrid carousel ─────────────
+     filtered filmstrip · arrows + wheel walk it · hovering a card
+     tints the field, springs 4 cut-outs onto the thumb corners (7c)
+     and trails a 5th on the cursor (7b) */
+  (function workCarousel(){
+    var field   = document.getElementById('workField');
+    var strip   = document.getElementById('workStrip');
+    var wrap    = document.getElementById('workStripWrap');
+    var chipBox = document.getElementById('workChips');
+    var countEl = document.getElementById('workCount');
+    var progEl  = document.getElementById('workProg');
+    var prevB   = document.getElementById('workPrev');
+    var nextB   = document.getElementById('workNext');
+    var lead    = document.getElementById('workLead');
+    if (!field) return;
+
+    var A = 'assets/', enc = encodeURIComponent;
+    var PROJECTS = [
+      {no:'01', img:'nycmodel.webp',      tag:'Interior',   meta:'Interior · 2024',            title:'House of small rooms',                     desc:'A 62 m² flat re-planned as nine thresholds instead of four rooms.',  tint:'#EDD8CC'},
+      {no:'02', img:'matcha.webp',        tag:'AI',         meta:'AI · 0-to-1 · 2026',         title:'A copilot that admits it is unsure',        desc:'Confidence made legible, so people stop trusting the wrong answer.',      tint:'#D8E8D4'},
+      {no:'03', img:'CHAICROISSANT.webp', tag:'Education',   meta:'Education · 2025',           title:'A museum game for ten-year-olds',           desc:'Forty minutes in a gallery, played on one shared tablet.',                tint:'#FADCEB'},
+      {no:'04', img:'cheesecake.webp',    tag:'Research',    meta:'Research · growth · 2025',   title:'Where platform growth actually comes from', desc:'Nine months of interviews turned into three decisions.',                  tint:'#F2EDE4'},
+      {no:'05', img:'Gatha 1.webp',       tag:'Healthcare', meta:'Healthcare · 2025',          title:'Ward rounds, rebuilt',                      desc:"Eleven minutes saved per round, on the ward's own hardware.",             tint:'#E2ECE6'}
+    ];
+    var TAGS = ['All','Interior','AI','Education','Research','Healthcare'];
+    var CORNER_SEQ = ['matcha.webp','CHAICROISSANT.webp','cheesecake.webp','Gatha 1.webp','wip logo 1.webp','nycmodel.webp'];
+
+    var tag = 0, car = 0, hot = null;
+    var cur = { x:0, y:0, on:false };
+
+    var chipEls = TAGS.map(function(t, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = t;
+      b.addEventListener('click', function(){ tag = i; car = 0; hot = null; render(); });
+      chipBox.appendChild(b);
+      return b;
+    });
+
+    var cardEls = PROJECTS.map(function(p, i){
+      var el = document.createElement('article');
+      el.className = 'qc';
+      var corners = '';
+      for (var k = 0; k < 4; k++){
+        corners += '<img class="qc__corner" data-c="' + k + '" alt="" src="' + A + enc(CORNER_SEQ[(i + k) % 6]) + '">';
+      }
+      el.innerHTML =
+        '<div class="qc__thumb"><img class="qc__img" alt="" src="' + A + enc(p.img) + '">' + corners + '</div>' +
+        '<div class="qc__meta"><span>' + p.no + '</span><span>' + p.meta + '</span></div>' +
+        '<h3 class="qc__title">' + p.title + '</h3>' +
+        '<p class="qc__desc">' + p.desc + '</p>';
+      el.addEventListener('mouseenter', function(){ if (!el.classList.contains('is-hidden')){ hot = i; render(); } });
+      el.addEventListener('click', function(){
+        var pos = filtered().indexOf(i);
+        if (pos !== -1) car = pos;
+        hot = i; render();
+      });
+      strip.appendChild(el);
+      return el;
+    });
+
+    function filtered(){
+      var out = [];
+      for (var i = 0; i < PROJECTS.length; i++){
+        if (tag === 0 || PROJECTS[i].tag === TAGS[tag]) out.push(i);
+      }
+      return out;
+    }
+    function pad(x){ return String(x).padStart(2, '0'); }
+
+    function step(d){
+      var n = filtered().length;
+      car = Math.max(0, Math.min(n - 1, car + d));
+      render();
+    }
+
+    function render(){
+      var list = filtered(), n = list.length;
+      if (car > n - 1) car = Math.max(0, n - 1);
+
+      chipEls.forEach(function(b, i){ b.setAttribute('aria-pressed', i === tag ? 'true' : 'false'); });
+
+      cardEls.forEach(function(el, i){
+        var pos = list.indexOf(i);
+        el.classList.toggle('is-hidden', pos === -1);
+        el.classList.toggle('is-current', pos === car);
+        el.classList.toggle('is-hot', hot === i);
+      });
+
+      var first = cardEls[list[0]];
+      var stepPx = first.offsetWidth + parseFloat(getComputedStyle(first).marginRight || 0);
+      strip.style.transform = 'translateX(' + (-car * stepPx) + 'px)';
+
+      field.style.background = hot != null ? PROJECTS[hot].tint : '';
+
+      countEl.textContent = pad(n ? Math.min(car + 1, n) : 0) + ' / ' + pad(n) + ' · scroll or drag';
+      progEl.style.width = n ? ((car + 1) / n * 100) + '%' : '0';
+      prevB.disabled = car <= 0;
+      nextB.disabled = car >= n - 1;
+
+      paintLead();
+    }
+
+    function paintLead(){
+      var base = 'translate(-50%,-50%) translate(' + cur.x + 'px,' + cur.y + 'px) ';
+      if (hot != null && cur.on){
+        if (lead.src.indexOf(enc(PROJECTS[hot].img)) === -1) lead.src = A + enc(PROJECTS[hot].img);
+        lead.style.opacity = '1';
+        lead.style.transform = base + 'scale(1) rotate(' + (hot % 2 ? 10 : -10) + 'deg)';
+      } else {
+        lead.style.opacity = '0';
+        lead.style.transform = base + 'scale(.4)';
+      }
+    }
+
+    var rafPend = false;
+    field.addEventListener('mousemove', function(e){
+      var r = field.getBoundingClientRect();
+      cur.x = e.clientX - r.left; cur.y = e.clientY - r.top; cur.on = true;
+      if (!rafPend){ rafPend = true; requestAnimationFrame(function(){ rafPend = false; paintLead(); }); }
+    });
+    field.addEventListener('mouseleave', function(){ cur.on = false; hot = null; render(); });
+
+    var wheelAt = 0;
+    wrap.addEventListener('wheel', function(e){
+      var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (Math.abs(d) < 4) return;
+      var n = filtered().length;
+      var canGo = d > 0 ? car < n - 1 : car > 0;
+      if (!canGo) return;                       // at an end → wheel scrolls the page
+      e.preventDefault();
+      var now = Date.now();
+      if (now - wheelAt < 340) return;
+      wheelAt = now;
+      step(d > 0 ? 1 : -1);
+    }, { passive:false });
+
+    prevB.addEventListener('click', function(){ step(-1); });
+    nextB.addEventListener('click', function(){ step(1); });
+    window.addEventListener('resize', render);
+
+    render();
+  })();
 })();
 </script>
 </body>
