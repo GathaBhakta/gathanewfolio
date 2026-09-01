@@ -48,8 +48,13 @@ inline-size`, proximity scroll-snap). Its children, in order:
   (`clamp(46px,5.2cqw,72px)`), not measured in JS.
 - The script is plain ES5-style `var` + `function` for `file://` use.
   Helpers: `asset(name)` → `assets/<encoded name>`, `byId`, `$`.
-- Sticker art is WebP (~370 KB total) re-encoded from the design
-  project's source PNGs; scribbles are hand-authored pixel SVGs.
+- Hero sticker photos are WebP (~370 KB total) re-encoded from the design
+  project's source PNGs. The work panel's pixel-art clippies (`wizzy`,
+  `chat`, `spark2`) are transparent PNG @2x — flat-colour pixel grids that
+  compress tiny (~16 KB for all three) and beat Figma's per-pixel `<path>`
+  SVG export (which was 330 KB and janked the carousel). `image-rendering:
+  pixelated` on `[src$=".png"]` keeps their edges crisp. Hero scribbles
+  are hand-authored pixel SVGs (`cross-grid`, `pixel-heart`).
 
 ## Working here
 

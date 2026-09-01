@@ -310,6 +310,10 @@
     margin-bottom:clamp(3px,.5cqw,8px);
   }
   .qc__img{height:72%;width:auto;object-fit:contain}
+  /* pixel-art clippies (PNG) — keep the grid crisp, don't let the browser smooth it */
+  .qc__img[src$=".png"],
+  .qc__corner[src$=".png"],
+  .work__lead[src$=".png"]{image-rendering:pixelated}
   .qc__corner{
     position:absolute;width:clamp(42px,4.6cqw,66px);height:clamp(42px,4.6cqw,66px);
     object-fit:contain;pointer-events:none;z-index:5;
@@ -763,7 +767,7 @@
 
     var PROJECTS = [
       { no:'01', img:'nycmodel.webp',      tag:'Interior',   meta:'Interior · 2024',          title:'House of small rooms',                     desc:'A 62 m² flat re-planned as nine thresholds instead of four rooms.',  tint:'#EDD8CC' },
-      { no:'02', img:'wizzy.svg',          tag:'AI',         meta:'AI · 0-to-1 · 2026',       title:'Create a digital twin for your loved ones', desc:'Founding design for an AI digital twin creator application.',        tint:'#E7DEF5', corners:['chat.svg','spark2.svg','spark2.svg','chat.svg'] },
+      { no:'02', img:'wizzy.png',          tag:'AI',         meta:'AI · 0-to-1 · 2026',       title:'Create a digital twin for your loved ones', desc:'Founding design for an AI digital twin creator application.',        tint:'#E7DEF5', corners:['chat.png','spark2.png','spark2.png','chat.png'] },
       { no:'03', img:'CHAICROISSANT.webp', tag:'Education',   meta:'Education · 2025',         title:'A museum game for ten-year-olds',           desc:'Forty minutes in a gallery, played on one shared tablet.',            tint:'#FADCEB' },
       { no:'04', img:'cheesecake.webp',    tag:'Research',    meta:'Research · growth · 2025', title:'Where platform growth actually comes from', desc:'Nine months of interviews turned into three decisions.',              tint:'#F2EDE4' },
       { no:'05', img:'Gatha 1.webp',       tag:'Healthcare', meta:'Healthcare · 2025',        title:'Ward rounds, rebuilt',                      desc:"Eleven minutes saved per round, on the ward's own hardware.",         tint:'#E2ECE6' }
