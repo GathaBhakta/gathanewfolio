@@ -763,7 +763,7 @@
 
     var PROJECTS = [
       { no:'01', img:'nycmodel.webp',      tag:'Interior',   meta:'Interior · 2024',          title:'House of small rooms',                     desc:'A 62 m² flat re-planned as nine thresholds instead of four rooms.',  tint:'#EDD8CC' },
-      { no:'02', img:'matcha.webp',        tag:'AI',         meta:'AI · 0-to-1 · 2026',       title:'A copilot that admits it is unsure',        desc:'Confidence made legible, so people stop trusting the wrong answer.',  tint:'#D8E8D4' },
+      { no:'02', img:'wizzy.svg',          tag:'AI',         meta:'AI · 0-to-1 · 2026',       title:'Create a digital twin for your loved ones', desc:'Founding design for an AI digital twin creator application.',        tint:'#E7DEF5', corners:['chat.svg','spark2.svg','spark2.svg','chat.svg'] },
       { no:'03', img:'CHAICROISSANT.webp', tag:'Education',   meta:'Education · 2025',         title:'A museum game for ten-year-olds',           desc:'Forty minutes in a gallery, played on one shared tablet.',            tint:'#FADCEB' },
       { no:'04', img:'cheesecake.webp',    tag:'Research',    meta:'Research · growth · 2025', title:'Where platform growth actually comes from', desc:'Nine months of interviews turned into three decisions.',              tint:'#F2EDE4' },
       { no:'05', img:'Gatha 1.webp',       tag:'Healthcare', meta:'Healthcare · 2025',        title:'Ward rounds, rebuilt',                      desc:"Eleven minutes saved per round, on the ward's own hardware.",         tint:'#E2ECE6' }
@@ -835,7 +835,8 @@
       el.className = 'qc';
       var corners = '';
       for (var k = 0; k < 4; k++){
-        corners += '<img class="qc__corner" data-c="' + k + '" alt="" src="' + asset(CORNER_SEQ[(i + k) % 6]) + '">';
+        var src = p.corners ? p.corners[k % p.corners.length] : CORNER_SEQ[(i + k) % 6];
+        corners += '<img class="qc__corner" data-c="' + k + '" alt="" src="' + asset(src) + '">';
       }
       el.innerHTML =
         '<div class="qc__thumb"><img class="qc__img" alt="" src="' + asset(p.img) + '">' + corners + '</div>' +
