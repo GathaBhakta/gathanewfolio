@@ -1,31 +1,37 @@
 # gathanewfolio
 
-Homepage hero for **Gatha Bhakta** — implemented from the "Gatha Hero" Claude
-Design project (turn 4, direction **4a**: *"I design across screens and spaces."*).
-
-Plain static site — no build step. Open `index.html` in a browser, or serve the
-folder:
+Homepage for **Gatha Bhakta** — a single static `index.html` (inline CSS +
+JS, no build). Implemented from the "Gatha Portfolio v4" Claude Design
+project.
 
 ```
-npx serve .
+open index.html          # or: npx serve .
 ```
 
-## What's here
+## What's on the page
 
-- **Sticky cream hero** with a hairline-framed claim, pink corner ticks, a
-  slowly spinning quatrefoil mark in the nav.
-- **Hover playground** — moving the pointer over the centre flings six sticker
-  cut-outs out from behind the headline on a staggered spring; leaving pulls
-  them back. Drop the real art into [`assets/`](assets/README.md) (labelled
-  placeholders show until then).
-- **Re-rolling scribbles** — three hand-drawn doodles (star / heart / star) that
-  redraw themselves and jump to new spots near the edges every 6.5 s.
-- **Selected work** — a pink section that scrolls up over the hero; the
-  scrollbar flips pink → white as you cross into it.
+- **Petal intro** — the quatrefoil mark blooms centre-screen, then its
+  four petals scatter out to become the corners of the claim box while the
+  hero fades up. Click the nav mark to replay it. Respects
+  `prefers-reduced-motion`.
+- **Sticky hero** — hairline claim frame, spinning mark. Move the pointer
+  near the frame and six sticker cut-outs spring out from behind it; seven
+  pixel-art star/heart scribbles pulse in a loose ring and jump to fresh
+  spots every few seconds.
+- **Sticky nav** — transparent; its links and mark recolour to stay
+  legible over each section (cream over the pink work panel, a computed
+  AA-contrast tint over a hovered card's wash).
+- **Selected work** — a viewport-framed pink panel: multi-select filter
+  chips and a filmstrip you walk with the arrows or the wheel. Hovering a
+  card washes the field with that project's colour, springs cut-outs onto
+  the thumbnail corners and trails one on the cursor.
 
-Respects `prefers-reduced-motion` and collapses to a single column under 720 px.
+Everything is sized in container-query units, so the whole page scales
+with the viewport. Collapses to a single column under 720 px.
 
-## Fonts
+See [`CLAUDE.md`](CLAUDE.md) for the structure and conventions.
 
-Lora + DM Sans via Google Fonts (the design overrides the system's JejuMyeongjo
-serif with Lora for the hero).
+## Assets
+
+`assets/` — six WebP stickers (re-encoded from the design project's PNGs)
+and two hand-authored pixel-art SVGs (`cross-grid.svg`, `pixel-heart.svg`).
