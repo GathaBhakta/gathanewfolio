@@ -34,7 +34,7 @@ See [`CLAUDE.md`](CLAUDE.md) for the structure and conventions.
 ## Assets
 
 `assets/` — six WebP photo stickers (re-encoded from the design project's
-PNGs), three Wizaur pixel-art clippies as transparent PNG (`wizzy.png`,
-`chat.png`, `spark2.png` — the work panel's project-02 thumbnail and its
-corner cut-outs), and two hand-authored pixel-art SVGs (`cross-grid.svg`,
-`pixel-heart.svg`).
+PNGs); the work panel's project-02 Wizaur clippies (`wizzy.png` as a
+transparent PNG thumbnail, `chat.svg` + `spark2.svg` as the corner
+cut-outs); and two hand-authored pixel-art SVGs for the hero scribbles
+(`cross-grid.svg`, `pixel-heart.svg`).
