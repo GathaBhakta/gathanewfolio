@@ -56,6 +56,8 @@ inline-size`, proximity scroll-snap). Its children, in order:
   cut-outs `chat` / `spark2` are kept as SVG (~30–36 KB each) — few enough
   nodes to stay smooth, and they scale cleanly at the small corner size.
   Hero scribbles are hand-authored pixel SVGs (`cross-grid`, `pixel-heart`).
+- The favicon is `assets/favicon.svg` — the quatrefoil mark on a `--pink`
+  ground — linked from `<head>` as `rel="icon" type="image/svg+xml"`.
 
 ## Working here
 
