@@ -266,13 +266,13 @@
      T2 up by the card|iso seam, T4 out in the isometric column. Sizes are
      the design's absolute widths, min()-capped so they never grow. */
   .tape--1{left:0;    top:-27.7%; width:min(11.57cqw,150px);aspect-ratio:400/272;
-           transform:translate(-50%,-50%) rotate(-2deg);background-image:url(assets/tape-1.webp)}
+           transform:translate(-50%,-50%);background-image:url(assets/tape-1.webp)}
   .tape--2{left:90.3%;top:-24%;   width:min(7.99cqw,104px); aspect-ratio:348/410;
-           transform:translate(-50%,-50%) rotate(3deg);  background-image:url(assets/tape-2.webp)}
+           transform:translate(-50%,-50%);background-image:url(assets/tape-2.webp)}
   .tape--3{left:0;    top:133.6%; width:min(10.1cqw,131px); aspect-ratio:382/572;
-           transform:translate(-50%,-50%) rotate(1deg);  background-image:url(assets/tape-3.webp)}
+           transform:translate(-50%,-50%);background-image:url(assets/tape-3.webp)}
   .tape--4{left:78.9%;top:97.3%;  width:min(10.47cqw,136px);aspect-ratio:344/446;
-           transform:translate(-50%,-50%) rotate(-2deg); background-image:url(assets/tape-4.webp)}
+           transform:translate(-50%,-50%);background-image:url(assets/tape-4.webp)}
   .stage--intro .tape{display:none}
 
   /* stickers — spring in, then draggable anywhere on the hero */
@@ -708,7 +708,7 @@
        cut-outs sit in square boxes and keep their own aspect ratio
        (object-fit:contain), so nothing is cropped. */
     var STICKERS = [
-      { src:'fig-s2.webp',           l:25.75, t:17.82, w:13.48, sq:1, rot:-2 },  // NYC model
+      { src:'fig-s2.webp',           l:25.75, t:17.82, w:16.85, sq:1, rot:-2 },  // NYC model
       { src:'sticker-logomark.webp', l:36.31, t:18.35, w:6.65,        rot:4 },
       { src:'fig-s5.webp',           l:70.31, t:16.92, w:10.00, sq:1, rot:-6 },  // heart paperclip
       { src:'fig-s1.webp',           l:75.35, t:20.05, w:13.48, sq:1, rot:3 },   // Gatha avatar
