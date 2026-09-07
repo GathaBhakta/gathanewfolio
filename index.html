@@ -106,14 +106,14 @@
     will-change:transform,opacity;
   }
   /* the grid collage is a full-bleed splash — ruler / graph / dot / checker
-     / isometric reach every screen edge. Only the claim card, tapes and
-     stickers stay size-capped (they'd balloon on wide screens otherwise):
-     tapes + stickers ride this centred 1280 band. */
+     / isometric reach every screen edge. The stickers ride this centred
+     1280 band and sit above everything else on the canvas. */
   .hero__frame{
     position:absolute;top:0;bottom:0;left:50%;
     width:100%;max-width:1280px;
     transform:translateX(-50%);
     pointer-events:none;
+    z-index:40;
   }
 
   /* the full-bleed frame. The middle column IS the claim card
@@ -124,8 +124,8 @@
     position:absolute;inset:0;display:grid;
     grid-template-columns:
       clamp(20px, 3.125cqw, 46px)
-      minmax(120px, 0.8fr)
-      clamp(540px, 56cqw, 900px)
+      minmax(120px, 0.82fr)
+      clamp(520px, 54cqw, 840px)
       minmax(150px, 1fr);
     grid-template-rows:7.37% 19.22% 46.196% 27.21%;
     transition:opacity 800ms var(--ease);
@@ -198,9 +198,11 @@
     position:absolute;inset:0;background:var(--card);border:1px solid #D9CEBD;
     transition:border-color 640ms var(--ease),background-color 640ms var(--ease);
   }
+  /* the claim block is shifted in from the design's left-anchored numbers
+     (+~9%) so it reads centred in the wider card, hierarchy unchanged. */
   .claim{position:absolute;inset:0}
   .claim__eyebrow{
-    position:absolute;left:12.29%;top:11.72%;
+    position:absolute;left:21%;top:11.72%;
     font-family:var(--gb-serif);font-weight:400;font-size:5cqw;line-height:1;
     color:var(--ink-mid);white-space:nowrap;
   }
@@ -208,10 +210,10 @@
     position:absolute;font-family:var(--gb-serif);font-weight:500;font-size:13.34cqw;line-height:1;
     color:var(--ink);white-space:nowrap;
   }
-  .claim__w1{left:11.77%;top:21.89%}
-  .claim__w2{left:46.25%;top:47.09%}
+  .claim__w1{left:21%;top:21.89%}
+  .claim__w2{left:50.5%;top:47.09%}
   .claim__amp{
-    position:absolute;left:37.4%;top:40.11%;z-index:3;
+    position:absolute;left:42.5%;top:40.11%;z-index:3;
     font-family:var(--gb-serif);font-style:italic;font-weight:400;font-size:18.8cqw;line-height:1;
     color:var(--pink);
     transform:rotate(2.61deg);transform-origin:0 0;
@@ -219,12 +221,12 @@
     filter:drop-shadow(0 .41cqw .41cqw rgba(0,0,0,.25));
   }
   .claim__note{
-    position:absolute;left:6%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
+    position:absolute;left:14%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
     font-family:var(--gb-serif);font-weight:400;font-size:2.5cqw;line-height:1.29;
     color:#000000;white-space:nowrap;
   }
   .claim__areas{
-    position:absolute;left:11.35%;top:84.3%;z-index:2;display:flex;align-items:center;gap:.94cqw;
+    position:absolute;left:19%;top:84.3%;z-index:2;display:flex;align-items:center;gap:.94cqw;
     font-family:var(--gb-sans);font-weight:400;font-size:2.08cqw;line-height:1;
     color:var(--ink-soft);white-space:nowrap;
   }
@@ -259,14 +261,18 @@
      children of .cell--claim (positioned off the card edges), T4 of
      .cell--iso. Their inner half tucks behind the opaque card. */
   .tape{position:absolute;pointer-events:none;opacity:.72;background-repeat:no-repeat;background-size:100% 100%}
-  .tape--1{left:0;top:-28%;width:15%;aspect-ratio:400/272;transform:translate(-50%,0) rotate(-1deg);
-           background-image:url(assets/tape-1.webp)}
-  .tape--2{left:100%;top:-18%;width:12.5%;aspect-ratio:348/410;transform:translate(-52%,0) rotate(2deg);
-           background-image:url(assets/tape-2.webp)}
-  .tape--3{left:0;top:64%;width:15.5%;aspect-ratio:382/572;transform:translate(-50%,0) rotate(1deg);
-           background-image:url(assets/tape-3.webp)}
-  .tape--4{right:0;top:24%;width:33%;aspect-ratio:344/446;transform:translate(3%,0) rotate(-2deg);
-           background-image:url(assets/tape-4.webp)}
+  /* left / top are the tape's CENTRE (translate -50%,-50%). Positions are the
+     design's own — T1/T3 centred on the graph|card seam (card left edge),
+     T2 up by the card|iso seam, T4 out in the isometric column. Sizes are
+     the design's absolute widths, min()-capped so they never grow. */
+  .tape--1{left:0;    top:-27.7%; width:min(11.57cqw,150px);aspect-ratio:400/272;
+           transform:translate(-50%,-50%) rotate(-2deg);background-image:url(assets/tape-1.webp)}
+  .tape--2{left:90.3%;top:-24%;   width:min(7.99cqw,104px); aspect-ratio:348/410;
+           transform:translate(-50%,-50%) rotate(3deg);  background-image:url(assets/tape-2.webp)}
+  .tape--3{left:0;    top:133.6%; width:min(10.1cqw,131px); aspect-ratio:382/572;
+           transform:translate(-50%,-50%) rotate(1deg);  background-image:url(assets/tape-3.webp)}
+  .tape--4{left:78.9%;top:97.3%;  width:min(10.47cqw,136px);aspect-ratio:344/446;
+           transform:translate(-50%,-50%) rotate(-2deg); background-image:url(assets/tape-4.webp)}
   .stage--intro .tape{display:none}
 
   /* stickers — spring in, then draggable anywhere on the hero */
@@ -323,7 +329,7 @@
     .grid{grid-template-columns:1fr;grid-template-rows:var(--nav-h) 1fr}
     .cell:not(.cell--claim){display:none}
     .cell--claim{grid-area:2 / 1 / 3 / 2}
-    .ruler,.claim__tick,.tapes,.stk{display:none}
+    .ruler,.claim__tick,.tape,.stk{display:none}
     .card{border:0}
     .claim__eyebrow{font-size:5cqw;top:8%}
     .claim__w1,.claim__w2{font-size:13cqw}
@@ -706,7 +712,7 @@
       { src:'sticker-logomark.webp', l:36.31, t:18.35, w:6.65,        rot:4 },
       { src:'fig-s5.webp',           l:70.31, t:16.92, w:10.00, sq:1, rot:-6 },  // heart paperclip
       { src:'fig-s1.webp',           l:75.35, t:20.05, w:13.48, sq:1, rot:3 },   // Gatha avatar
-      { src:'sticker-baby.webp',     l:24.48, t:85.23, w:8.80,        rot:-3 },
+      { src:'sticker-baby.webp',     l:24.48, t:85.23, w:11.00,       rot:-3 },
       { src:'fig-s4.webp',           l:90.22, t:68.67, w:13.48, sq:1, rot:2 },   // cheesecake
       { src:'fig-s3.webp',           l:76.39, t:88.18, w:13.48, sq:1, rot:-4 },  // matcha
       { src:'sticker-lotus.webp',    l:94.27, t:87.29, w:7.52,        rot:2 },
