@@ -51,9 +51,6 @@
     position:relative;
     background:var(--cream);
     container-type:inline-size;
-    /* petal size is CSS-driven off the viewport, like every other measure */
-    --petal:clamp(26px,3.3cqw,58px);
-    --petal-off:calc(var(--petal) / -2);
     scrollbar-width:thin;
     scrollbar-color:var(--pink) rgba(44,32,24,.05);
     scroll-snap-type:y proximity;   /* nudge the work panel fully onto the frame */
@@ -103,9 +100,20 @@
     margin-top:calc(-1 * var(--nav-h, 0px));   /* nav overlays; the frame fills the viewport */
     background:var(--cream);
     overflow:hidden;
+    display:flex;justify-content:center;
     z-index:2;
     transform-origin:50% 50%;
     will-change:transform,opacity;
+  }
+  /* the composition is authored at 1280 — past that it stops growing and
+     sits centred, so wide screens stay balanced instead of ballooning.
+     cqw units below all resolve against this frame, not the viewport. */
+  .hero__frame{
+    position:relative;
+    width:100%;max-width:1280px;height:100%;
+    container-type:inline-size;
+    --petal:clamp(24px,3.1cqw,50px);
+    --petal-off:calc(var(--petal) / -2);
   }
 
   /* the frame */
@@ -120,7 +128,7 @@
   /* ruler edge — pink rules along the left margin, lifted under the nav */
   .ruler{
     position:absolute;left:0;top:calc(7.37% - 30px);bottom:0;width:3.125%;z-index:2;
-    opacity:.5;background-repeat:repeat-y;background-position:0 -18px;
+    opacity:.42;background-repeat:repeat-y;background-position:0 -18px;
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
     transition:opacity 800ms var(--ease);
@@ -129,7 +137,7 @@
   /* graph-paper column — same lift, so the sheet dissolves into the nav */
   .cell--graph{overflow:visible;cursor:crosshair}
   .cell--graph .pat{
-    position:absolute;inset:-30px 0 0 0;opacity:.5;
+    position:absolute;inset:-30px 0 0 0;opacity:.42;
     background-repeat:repeat;background-position:0 -18px;
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
@@ -145,7 +153,7 @@
   .cell--graph:hover .xh--node{opacity:1}
 
   /* dot-field bands */
-  .cell--dot .pat{position:absolute;inset:0;opacity:.5;background-repeat:repeat;background-position:0 0}
+  .cell--dot .pat{position:absolute;inset:0;opacity:.42;background-repeat:repeat;background-position:0 0}
   .cell--dot .hot{
     position:absolute;inset:0;opacity:0;transition:opacity 420ms var(--ease);
     background-image:radial-gradient(circle at 1px 1px,rgba(240,171,206,.95) 1.8px,transparent 2.4px);
@@ -163,7 +171,7 @@
 
   /* isometric column */
   .cell--iso{background:transparent}
-  .iso__grid{opacity:.5}
+  .iso__grid{opacity:.42}
   .cell--iso svg{display:block;width:100%;height:100%}
 
   /* claim card */
@@ -492,6 +500,7 @@
   </nav>
 
   <section class="hero">
+   <div class="hero__frame">
     <div class="ruler"></div>
     <div class="grid">
       <div class="cell cell--graph" style="grid-area:2 / 2 / 5 / 3">
@@ -528,6 +537,7 @@
       </div>
     </div>
     <div class="tapes"></div>
+   </div>
   </section>
 
   <section class="work" id="work" data-solidbg>
@@ -615,31 +625,41 @@
       ).replace(/'/g, '%27') + "')";
     }
 
+    /* module = one major square; the tile is 2× so the major repeats
+       without doubling. Dialled down from the design's 44 to keep the
+       grid quiet on the real page. */
+    var GS = 38, TILE = GS * 2;
+    function minors(len){
+      var q = GS / 4, out = [];
+      for (var m = 0; m < 2; m++) for (var k = 1; k < 4; k++) out.push((m * GS + k * q + 0.25).toFixed(2));
+      return out;
+    }
+
     var GRAPH_TILE = (function(){
-      var b = '', minor = [11.25, 22.25, 33.25, 55.25, 66.25, 77.25], i;
+      var b = '', minor = minors(), i;
       for (i = 0; i < minor.length; i++){
-        b += '<line x1="0" y1="' + minor[i] + '" x2="88" y2="' + minor[i] + '" stroke="' + GRID_LINE + '" stroke-width="0.5"/>';
-        b += '<line x1="' + minor[i] + '" y1="0" x2="' + minor[i] + '" y2="88" stroke="' + GRID_LINE + '" stroke-width="0.5"/>';
+        b += '<line x1="0" y1="' + minor[i] + '" x2="' + TILE + '" y2="' + minor[i] + '" stroke="' + GRID_LINE + '" stroke-width="0.5"/>';
+        b += '<line x1="' + minor[i] + '" y1="0" x2="' + minor[i] + '" y2="' + TILE + '" stroke="' + GRID_LINE + '" stroke-width="0.5"/>';
       }
-      b += '<line x1="0" y1="0.5" x2="88" y2="0.5" stroke="' + GRID_LINE + '"/>';
-      b += '<line x1="0" y1="44.5" x2="88" y2="44.5" stroke="' + GRID_LINE + '"/>';
-      b += '<line x1="0.5" y1="0" x2="0.5" y2="88" stroke="' + GRID_LINE + '"/>';
-      b += '<line x1="44.5" y1="0" x2="44.5" y2="88" stroke="' + GRID_LINE + '"/>';
-      return svgUrl(88, 88, b);
+      b += '<line x1="0" y1="0.5" x2="' + TILE + '" y2="0.5" stroke="' + GRID_LINE + '"/>';
+      b += '<line x1="0" y1="' + (GS + 0.5) + '" x2="' + TILE + '" y2="' + (GS + 0.5) + '" stroke="' + GRID_LINE + '"/>';
+      b += '<line x1="0.5" y1="0" x2="0.5" y2="' + TILE + '" stroke="' + GRID_LINE + '"/>';
+      b += '<line x1="' + (GS + 0.5) + '" y1="0" x2="' + (GS + 0.5) + '" y2="' + TILE + '" stroke="' + GRID_LINE + '"/>';
+      return svgUrl(TILE, TILE, b);
     })();
 
     var RULER_TILE = (function(){
-      var b = '', minor = [11.25, 22.25, 33.25, 55.25, 66.25, 77.25], i;
+      var b = '', minor = minors(), i;
       for (i = 0; i < minor.length; i++){
-        b += '<line x1="0.5" y1="' + minor[i] + '" x2="21.5" y2="' + minor[i] + '" stroke="' + RULE_MINOR + '" stroke-width="0.5"/>';
+        b += '<line x1="0.5" y1="' + minor[i] + '" x2="18.5" y2="' + minor[i] + '" stroke="' + RULE_MINOR + '" stroke-width="0.5"/>';
       }
-      b += '<line x1="1" y1="0" x2="1" y2="88" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
-      b += '<line x1="0.5" y1="1" x2="34.5" y2="1" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
-      b += '<line x1="0.5" y1="45" x2="34.5" y2="45" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
-      return svgUrl(54, 88, b);
+      b += '<line x1="1" y1="0" x2="1" y2="' + TILE + '" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
+      b += '<line x1="0.5" y1="1" x2="30.5" y2="1" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
+      b += '<line x1="0.5" y1="' + (GS + 1) + '" x2="30.5" y2="' + (GS + 1) + '" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
+      return svgUrl(48, TILE, b);
     })();
 
-    var DOT_TILE = svgUrl(22, 22, '<circle cx="1" cy="1" r="1" fill="' + GRID_LINE + '"/>');
+    var DOT_TILE = svgUrl(19, 19, '<circle cx="1" cy="1" r="1" fill="' + GRID_LINE + '"/>');
 
     /* tapes — exact boxes off the design file (frame 1728×1117) */
     var TAPES = [
@@ -649,18 +669,19 @@
       { l:90.05, t:61.06, w:10.47, h:19.96, img:'tape-4.webp' }
     ];
 
-    /* stickers — centre point + box, all off the design file.
-       the five photo cut-outs sit in 233×233 squares (13.48% wide) */
+    /* stickers — centre point + box, off the design file. The photo
+       cut-outs sit in square boxes and keep their own aspect ratio
+       (object-fit:contain), so nothing is cropped. */
     var STICKERS = [
-      { src:'fig-s2.webp',           l:25.75, t:17.82, w:13.48, sq:1, rot:-2 },
+      { src:'fig-s2.webp',           l:25.75, t:17.82, w:13.48, sq:1, rot:-2 },  // NYC model
       { src:'sticker-logomark.webp', l:36.31, t:18.35, w:6.65,        rot:4 },
-      { src:'fig-s5.webp',           l:70.31, t:16.92, w:13.48, sq:1, rot:-6 },
-      { src:'fig-s1.webp',           l:75.35, t:20.05, w:13.48, sq:1, rot:3 },
+      { src:'fig-s5.webp',           l:70.31, t:16.92, w:10.00, sq:1, rot:-6 },  // heart paperclip
+      { src:'fig-s1.webp',           l:75.35, t:20.05, w:13.48, sq:1, rot:3 },   // Gatha avatar
       { src:'sticker-baby.webp',     l:24.48, t:85.23, w:8.80,        rot:-3 },
-      { src:'fig-s4.webp',           l:90.22, t:68.67, w:13.48, sq:1, rot:2 },
-      { src:'fig-s3.webp',           l:76.39, t:88.18, w:13.48, sq:1, rot:-4 },
+      { src:'fig-s4.webp',           l:90.22, t:68.67, w:13.48, sq:1, rot:2 },   // cheesecake
+      { src:'fig-s3.webp',           l:76.39, t:88.18, w:13.48, sq:1, rot:-4 },  // matcha
       { src:'sticker-lotus.webp',    l:94.27, t:87.29, w:7.52,        rot:2 },
-      { src:'sticker-ipod.webp',     l:60.20, t:87.60, w:9.00,        rot:-3 }
+      { src:'sticker-ipod.webp',     l:68.00, t:89.50, w:9.00,        rot:-3 }
     ];
 
     function tapesHtml(){
@@ -676,8 +697,9 @@
       }).join('');
     }
 
+    var frame = $('.hero__frame');
     $('.tapes').innerHTML = tapesHtml();
-    hero.insertAdjacentHTML('beforeend', stickersHtml());
+    frame.insertAdjacentHTML('beforeend', stickersHtml());
 
     /* pattern tiles — assigned as style properties so no data URI
        has to survive HTML attribute quoting */
@@ -757,7 +779,7 @@
       var lay = function(){
         var w = check.clientWidth, h = check.clientHeight;
         if (!w || !h) return;
-        var cols = Math.max(4, Math.round(w / 44)), rows = Math.max(2, Math.round(h / 44)), n = cols * rows;
+        var cols = Math.max(4, Math.round(w / 38)), rows = Math.max(2, Math.round(h / 38)), n = cols * rows;
         if (n === built) return;
         built = n;
         check.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
@@ -787,7 +809,7 @@
     if (isoCell) (function(){
       var svg = isoCell.querySelector('.iso');
       var gGrid = svg.querySelector('.iso__grid'), gBlk = svg.querySelector('.iso__blocks');
-      var S = 44, W = 0, H = 0, cx = 0, cy = 0;
+      var S = 38, W = 0, H = 0, cx = 0, cy = 0;
       var blocks = {}, cur = null, live = false, loop = 0, last = 0, MAXH = S * 2.2;
 
       function P(a, b){ return [cx + 0.866 * S * (a - b), cy + 0.5 * S * (a + b)]; }

@@ -26,8 +26,11 @@ inline-size`, proximity scroll-snap). Its children, in order:
    mark switch colour: to cream on the base pink panel, or — when a card's
    pastel wash is showing — to a WCAG-AA monochrome of that wash computed
    by `navInkOn()` and published as `--nav-ink`.
-3. **`.hero`** — sticky, full viewport, `overflow:hidden`. Turn **7A**: one
-   Swiss `.grid` (`3.125% / 19.097% / 55.556% / 22.222%` cols, four rows)
+3. **`.hero`** — sticky, full viewport, `overflow:hidden`, flex-centres a
+   `.hero__frame` (`max-width:1280px`, `container-type:inline-size` — every
+   `cqw` below resolves against it, so the composition stops growing past
+   1280 and sits centred). Turn **7A**: one Swiss `.grid`
+   (`3.125% / 19.097% / 55.556% / 22.222%` cols, four rows)
    holding six regions measured off the final comp — `.ruler` edge (left
    margin, absolute), `.cell--graph` paper column, two `.cell--dot` bands,
    the `.cell--claim` card ("Gatha designs both — Screens & Spaces", all
