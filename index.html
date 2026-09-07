@@ -116,16 +116,17 @@
     pointer-events:none;
   }
 
-  /* the full-bleed frame: side columns clamp to a sane width so the graph
-     sheet and the isometric block stay legible at the edges; the middle
-     column flexes and carries the claim card, centred and capped. */
+  /* the full-bleed frame. The middle column IS the claim card
+     (clamp(540,56cqw,900) — design width at ~1280, capped at 900); the
+     graph and isometric columns each take a share of whatever's left, so
+     they always run flush to the card edge with no cream gap. */
   .grid{
     position:absolute;inset:0;display:grid;
     grid-template-columns:
       clamp(20px, 3.125cqw, 46px)
-      clamp(150px, 19.097cqw, 400px)
-      minmax(0, 1fr)
-      clamp(188px, 22.222cqw, 480px);
+      minmax(120px, 0.8fr)
+      clamp(540px, 56cqw, 900px)
+      minmax(150px, 1fr);
     grid-template-rows:7.37% 19.22% 46.196% 27.21%;
     transition:opacity 800ms var(--ease);
   }
@@ -177,19 +178,18 @@
   .wc--on{background:rgba(240,171,206,.5);transition:background-color 90ms linear}
 
   /* isometric column */
-  .cell--iso{background:transparent}
+  .cell--iso{background:transparent;overflow:visible}
   .iso__grid{opacity:.5}
   .cell--iso svg{display:block;width:100%;height:100%}
 
-  /* claim card — floats in the middle column, capped at 940 and centred, so
-     it fills the splash without a cream gap to the graph / iso columns.
-     Its own width is the type container, so the claim scales with the card
-     (which is itself capped) — proportional to the design, never runaway. */
-  .cell--claim{overflow:visible;z-index:6;display:flex;align-items:stretch;justify-content:center}
+  /* claim card — fills the middle grid column edge to edge (its own width
+     is the type container, so the claim scales with the card, which the
+     column already caps at 900 — proportional to the design, never runaway).
+     The cell carries the dot field and the seam tapes. */
+  .cell--claim{position:relative;overflow:visible;z-index:6}
   .cell--claim .pat{position:absolute;inset:0;opacity:.5;background-repeat:repeat;background-position:0 0}
   .claimbox{
-    position:relative;height:100%;
-    width:min(96%, 940px);
+    position:relative;height:100%;width:100%;
     container-type:inline-size;
     --petal:clamp(22px,5.6cqw,46px);
     --petal-off:calc(var(--petal) / -2);
@@ -253,10 +253,21 @@
   .claim__note{transition-delay:220ms}
   .claim__areas{transition-delay:280ms}
 
-  /* tapes — laid with the background, never animated */
-  .tapes{position:absolute;inset:0;z-index:3;pointer-events:none}
-  .tape{position:absolute;background-repeat:no-repeat;background-size:100% 100%;background-position:50% 50%}
-  .stage--intro .tapes{display:none}
+  /* tapes — static, laid on the grid seams (never animated). T1/T3 bridge
+     the graph column and the card; T2 bridges the card and the iso column;
+     T4 sits out at the right edge over the isometric block. T1/T2/T3 are
+     children of .cell--claim (positioned off the card edges), T4 of
+     .cell--iso. Their inner half tucks behind the opaque card. */
+  .tape{position:absolute;pointer-events:none;opacity:.72;background-repeat:no-repeat;background-size:100% 100%}
+  .tape--1{left:0;top:-28%;width:15%;aspect-ratio:400/272;transform:translate(-50%,0) rotate(-1deg);
+           background-image:url(assets/tape-1.webp)}
+  .tape--2{left:100%;top:-18%;width:12.5%;aspect-ratio:348/410;transform:translate(-52%,0) rotate(2deg);
+           background-image:url(assets/tape-2.webp)}
+  .tape--3{left:0;top:64%;width:15.5%;aspect-ratio:382/572;transform:translate(-50%,0) rotate(1deg);
+           background-image:url(assets/tape-3.webp)}
+  .tape--4{right:0;top:24%;width:33%;aspect-ratio:344/446;transform:translate(3%,0) rotate(-2deg);
+           background-image:url(assets/tape-4.webp)}
+  .stage--intro .tape{display:none}
 
   /* stickers — spring in, then draggable anywhere on the hero */
   .stk{
@@ -529,6 +540,9 @@
       <div class="cell cell--dot cell--dot2" style="grid-area:4 / 4 / 5 / 5"><div class="pat"></div><div class="hot"></div></div>
       <div class="cell cell--claim" style="grid-area:3 / 3 / 4 / 4">
         <div class="pat"></div>
+        <div class="tape tape--1"></div>
+        <div class="tape tape--2"></div>
+        <div class="tape tape--3"></div>
         <div class="claimbox">
         <div class="card"></div>
         <span class="claim__tick claim__tick--tl"><svg viewBox="0 0 171 171" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg></span>
@@ -547,6 +561,7 @@
       </div>
       <div class="cell cell--check" style="grid-area:4 / 3 / 5 / 4"><div class="check"></div></div>
       <div class="cell cell--iso" style="grid-area:2 / 4 / 4 / 5" data-edge="1">
+        <div class="tape tape--4"></div>
         <svg class="iso" aria-hidden="true">
           <defs>
             <radialGradient id="hhTop" cx="50%" cy="50%" r="62%"><stop offset="0%" stop-color="#F7D7E7"/><stop offset="58%" stop-color="#FCEEF4"/><stop offset="100%" stop-color="#FBF8F2"/></radialGradient>
@@ -557,9 +572,7 @@
         </svg>
       </div>
     </div>
-    <div class="hero__frame">
-      <div class="tapes"></div>
-    </div>
+    <div class="hero__frame"></div>
   </section>
 
   <section class="work" id="work" data-solidbg>
@@ -683,13 +696,7 @@
 
     var DOT_TILE = svgUrl(19, 19, '<circle cx="1" cy="1" r="1" fill="' + GRID_LINE + '"/>');
 
-    /* tapes — exact boxes off the design file (frame 1728×1117) */
-    var TAPES = [
-      { l:16.20, t:7.70,  w:11.57, h:12.18, img:'tape-1.webp' },
-      { l:68.40, t:8.24,  w:7.99,  h:14.56, img:'tape-2.webp' },
-      { l:17.59, t:76.60, w:10.10, h:23.40, img:'tape-3.webp' },
-      { l:90.05, t:61.06, w:10.47, h:19.96, img:'tape-4.webp' }
-    ];
+    /* tapes are static markup on the grid seams — see .tape--1..4 in the CSS */
 
     /* stickers — centre point + box, off the design file. The photo
        cut-outs sit in square boxes and keep their own aspect ratio
@@ -706,12 +713,6 @@
       { src:'sticker-ipod.webp',     l:68.00, t:89.50, w:9.00,        rot:-3 }
     ];
 
-    function tapesHtml(){
-      return TAPES.map(function(t){
-        return '<div class="tape" style="left:' + t.l + '%;top:' + t.t + '%;width:' + t.w + '%;height:' + t.h +
-          '%;background-image:url(' + asset(t.img) + ')"></div>';
-      }).join('');
-    }
     function stickersHtml(){
       return STICKERS.map(function(s, i){
         return '<img class="stk' + (s.sq ? ' stk--sq' : '') + '" alt="" draggable="false" src="' + asset(s.src) +
@@ -720,7 +721,6 @@
     }
 
     var frame = $('.hero__frame');
-    $('.tapes').innerHTML = tapesHtml();
     frame.insertAdjacentHTML('beforeend', stickersHtml());
 
     /* pattern tiles — assigned as style properties so no data URI
