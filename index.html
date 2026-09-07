@@ -198,11 +198,12 @@
     position:absolute;inset:0;background:var(--card);border:1px solid #D9CEBD;
     transition:border-color 640ms var(--ease),background-color 640ms var(--ease);
   }
-  /* the claim block is shifted in from the design's left-anchored numbers
-     (+~9%) so it reads centred in the wider card, hierarchy unchanged. */
+  /* claim block. eyebrow / Screens / areas share a left margin, and the
+     areas row is dead-centred, so the card's left and right text padding
+     read equal; Spaces + & step out on the diagonal as in the design. */
   .claim{position:absolute;inset:0}
   .claim__eyebrow{
-    position:absolute;left:21%;top:11.72%;
+    position:absolute;left:13%;top:11.72%;
     font-family:var(--gb-serif);font-weight:400;font-size:5cqw;line-height:1;
     color:var(--ink-mid);white-space:nowrap;
   }
@@ -210,10 +211,10 @@
     position:absolute;font-family:var(--gb-serif);font-weight:500;font-size:13.34cqw;line-height:1;
     color:var(--ink);white-space:nowrap;
   }
-  .claim__w1{left:21%;top:21.89%}
-  .claim__w2{left:50.5%;top:47.09%}
+  .claim__w1{left:13%;top:21.89%}
+  .claim__w2{left:47%;top:47.09%}
   .claim__amp{
-    position:absolute;left:42.5%;top:40.11%;z-index:3;
+    position:absolute;left:39%;top:40.11%;z-index:3;
     font-family:var(--gb-serif);font-style:italic;font-weight:400;font-size:18.8cqw;line-height:1;
     color:var(--pink);
     transform:rotate(2.61deg);transform-origin:0 0;
@@ -221,12 +222,12 @@
     filter:drop-shadow(0 .41cqw .41cqw rgba(0,0,0,.25));
   }
   .claim__note{
-    position:absolute;left:14%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
+    position:absolute;left:14.5%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
     font-family:var(--gb-serif);font-weight:400;font-size:2.5cqw;line-height:1.29;
     color:#000000;white-space:nowrap;
   }
   .claim__areas{
-    position:absolute;left:19%;top:84.3%;z-index:2;display:flex;align-items:center;gap:.94cqw;
+    position:absolute;left:50%;top:84.3%;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:.94cqw;
     font-family:var(--gb-sans);font-weight:400;font-size:2.08cqw;line-height:1;
     color:var(--ink-soft);white-space:nowrap;
   }
@@ -337,7 +338,7 @@
     .claim__w2{left:30%;top:44%}
     .claim__amp{font-size:22cqw;left:6%;top:33%}
     .claim__note{font-size:3.6cqw;width:52%;left:44%;top:62%;text-align:left}
-    .claim__areas{font-size:2.3cqw;white-space:normal;flex-wrap:wrap;bottom:6%}
+    .claim__areas{font-size:2.3cqw;left:6%;transform:none;white-space:normal;flex-wrap:wrap;bottom:6%}
   }
 
   /* ── selected work — 7b × 7c hybrid ───────────────────────
@@ -713,10 +714,10 @@
       { src:'fig-s5.webp',           l:70.31, t:16.92, w:10.00, sq:1, rot:-6 },  // heart paperclip
       { src:'fig-s1.webp',           l:75.35, t:20.05, w:13.48, sq:1, rot:3 },   // Gatha avatar
       { src:'sticker-baby.webp',     l:24.48, t:85.23, w:11.00,       rot:-3 },
-      { src:'fig-s4.webp',           l:90.22, t:68.67, w:13.48, sq:1, rot:2 },   // cheesecake
+      { src:'fig-s4.webp',           l:90.22, t:68.67, w:15.50, sq:1, rot:2 },   // cheesecake
       { src:'fig-s3.webp',           l:76.39, t:88.18, w:13.48, sq:1, rot:-4 },  // matcha
-      { src:'sticker-lotus.webp',    l:94.27, t:87.29, w:7.52,        rot:2 },
-      { src:'sticker-ipod.webp',     l:68.00, t:89.50, w:9.00,        rot:-3 }
+      { src:'sticker-lotus.webp',    l:94.27, t:87.29, w:9.02,        rot:2 },
+      { src:'sticker-ipod.webp',     l:68.00, t:89.50, w:10.35,       rot:-3 }
     ];
 
     function stickersHtml(){
