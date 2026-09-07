@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ArtSwipe — National Gallery of Art · Gatha Bhakta</title>
+<meta name="description" content="Case study: a swipe-to-sort attribution game for the National Gallery of Art, where a wrong guess becomes a reason to visit.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap">
+<style>
+  :root{
+    --cream:#FAF6EF;
+    --paper:#FDFBF7;
+    --parchment:#F2EDE4;
+    --pink:#F0ABCE;
+    --pink-ink:#C97FA6;
+    --pink-wash:#FADCEB;
+    --lav-wash:#E7DEF5;
+    --sage-wash:#E2ECE6;
+    --ink:#2C2018;
+    --ink-mid:#5A4535;
+    --ink-soft:#8C7260;
+    --border:#D9CEBD;
+    --border-soft:#E8DFD3;
+    --gb-serif:"Lora","JejuMyeongjo",Georgia,serif;
+    --gb-sans:"DM Sans",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+    --ease:cubic-bezier(.2,0,.2,1);
+    --nav-h:clamp(46px,5.2vw,72px);
+    --col:min(680px, 100% - 48px);
+    --col-wide:min(920px, 100% - 48px);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--cream);color:var(--ink);
+    font-family:var(--gb-sans);font-weight:400;font-size:clamp(15px,1.05vw,17px);line-height:1.7;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  a{color:var(--pink-ink);text-decoration:none;border-bottom:1px solid rgba(201,127,166,.35)}
+  a:hover{color:var(--ink);border-color:var(--ink)}
+  strong{font-weight:600;color:var(--ink)}
+  em{font-style:italic}
+  h1,h2,h3{font-family:var(--gb-serif);font-weight:500;color:var(--ink);margin:0}
+
+  /* ── nav (fixed, transparent, contrast-flips over the video) ── */
+  .nav{
+    position:fixed;left:0;right:0;top:0;z-index:20;
+    height:var(--nav-h);
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:1.1vw 4.1vw;gap:3vw;
+    background:transparent;
+  }
+  .nav__group{
+    display:flex;gap:clamp(14px,2.6vw,38px);
+    font-family:var(--gb-sans);font-weight:600;
+    font-size:clamp(9px,.95vw,12px);line-height:1;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--pink-ink);
+    transition:color 300ms var(--ease);
+  }
+  .nav__group--right{justify-content:flex-end}
+  .nav__group a{border:0;color:inherit;transition:opacity 160ms var(--ease)}
+  .nav__group a:hover{opacity:.6;color:inherit}
+  .nav__mark{width:2.2vw;height:2.2vw;min-width:22px;min-height:22px;display:block;border:0;animation:gspin 40s linear infinite}
+  .nav__mark path{fill:var(--pink);transition:fill 300ms var(--ease)}
+  @keyframes gspin{to{transform:rotate(360deg)}}
+  .nav--dark .nav__group{color:var(--cream)}
+  .nav--dark .nav__mark path{fill:var(--cream)}
+  @media (prefers-reduced-motion:reduce){ .nav__mark{animation:none} }
+
+  /* ── full-bleed video hero ── */
+  .vhero{
+    position:relative;
+    height:100svh;min-height:560px;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    overflow:hidden;
+    background:#17110d;   /* holds the frame before the video paints */
+    cursor:url(assets/cursor.svg) 10 10, auto;
+  }
+  .vhero__video{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;object-position:center;
+    z-index:0;
+  }
+  .vhero__scrim{
+    position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:
+      linear-gradient(to top, rgba(18,12,9,.92) 0%, rgba(18,12,9,.64) 28%, rgba(18,12,9,.22) 56%, rgba(18,12,9,0) 82%),
+      linear-gradient(to bottom, rgba(18,12,9,.52) 0%, rgba(18,12,9,0) 22%);
+  }
+  .vhero__content{
+    position:relative;z-index:2;
+    width:var(--col-wide);margin:0 auto;
+    padding:0 0 clamp(56px,9vh,120px);
+    color:var(--cream);
+    text-shadow:0 1px 20px rgba(0,0,0,.35);
+  }
+  .vhero__eyebrow{
+    margin:0 0 clamp(14px,2vh,22px);
+    font-weight:600;font-size:clamp(10px,.95vw,12px);
+    letter-spacing:.24em;text-transform:uppercase;color:rgba(250,246,239,.72);
+  }
+  .vhero__title{
+    margin:0;max-width:15ch;
+    font-family:var(--gb-serif);font-weight:500;
+    font-size:clamp(30px,5vw,64px);line-height:1.08;letter-spacing:-.02em;
+    color:var(--cream);text-wrap:balance;
+  }
+  .vhero__meta{
+    margin:clamp(18px,3vh,30px) 0 0;
+    font-family:var(--gb-serif);font-size:clamp(14px,1.5vw,19px);color:rgba(250,246,239,.8);
+  }
+  .vhero__cue{
+    position:absolute;left:50%;bottom:clamp(16px,3vh,28px);transform:translateX(-50%);
+    z-index:2;
+    font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:rgba(250,246,239,.6);
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  .vhero__cue::after{content:"";width:1px;height:26px;background:rgba(250,246,239,.5);animation:cue 1.9s var(--ease) infinite}
+  @keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+  @media (prefers-reduced-motion:reduce){ .vhero__cue::after{animation:none} }
+
+  /* ── article ── */
+  main{padding:clamp(56px,9vh,110px) 0 0}
+  .section{padding:clamp(40px,7vh,80px) 0}
+  .section + .section{border-top:1px solid var(--border-soft)}
+  .col{width:var(--col);margin:0 auto}
+  .col-wide{width:var(--col-wide);margin:0 auto}
+
+  .kicker{
+    font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--pink-ink);margin:0 0 clamp(14px,2.4vh,20px);
+  }
+  .claim{
+    font-family:var(--gb-serif);font-weight:500;
+    font-size:clamp(21px,2.6vw,30px);line-height:1.32;color:var(--ink);
+    margin:0 0 clamp(18px,3vh,28px);max-width:22ch;
+  }
+  .prose p{margin:0 0 1em;color:var(--ink-mid)}
+  .prose p:last-child{margin-bottom:0}
+  .prose p strong{color:var(--ink)}
+
+  /* facts card */
+  .facts{
+    background:var(--parchment);border:1px solid var(--border);border-radius:8px;
+    padding:clamp(22px,3vw,32px);margin-top:clamp(24px,4vh,36px);
+  }
+  .facts dl{margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(14px,2vw,22px) clamp(20px,3vw,36px)}
+  .facts dt{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 4px}
+  .facts dd{margin:0;font-size:.94em;color:var(--ink)}
+  .facts .facts__owned{grid-column:1 / -1;margin-top:6px;padding-top:clamp(16px,2.4vh,20px);border-top:1px solid var(--border)}
+  .facts .facts__owned dd{color:var(--ink-mid);line-height:1.6}
+  @media (max-width:560px){ .facts dl{grid-template-columns:1fr} }
+
+  /* stat row */
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(18px,2.6vw,30px);margin:clamp(24px,4vh,34px) 0 0}
+  .stat b{display:block;font-family:var(--gb-serif);font-weight:500;font-size:clamp(26px,3.4vw,38px);line-height:1;color:var(--pink-ink)}
+  .stat span{display:block;margin-top:8px;font-size:.8em;color:var(--ink-soft)}
+  @media (max-width:600px){ .stats{grid-template-columns:1fr 1fr} }
+
+  /* quote */
+  blockquote{
+    margin:clamp(18px,3vh,26px) 0;padding:0 0 0 clamp(16px,2vw,22px);
+    border-left:2px solid var(--pink);
+    font-family:var(--gb-serif);font-style:italic;font-size:clamp(16px,1.7vw,20px);line-height:1.5;color:var(--ink);
+  }
+  blockquote cite{
+    display:block;margin-top:10px;
+    font-family:var(--gb-sans);font-style:normal;font-size:12px;letter-spacing:.04em;color:var(--ink-soft);
+  }
+
+  /* table */
+  .tbl{width:100%;overflow-x:auto;margin:clamp(20px,3vh,28px) 0}
+  table{width:100%;border-collapse:collapse;font-size:.9em;min-width:480px}
+  th{
+    font-family:var(--gb-sans);font-weight:600;text-align:left;
+    padding:12px 16px;background:var(--parchment);color:var(--ink-soft);
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    border-bottom:1px solid var(--border);
+  }
+  td{padding:14px 16px;border-bottom:1px solid var(--border-soft);vertical-align:top;color:var(--ink-mid)}
+  tr:last-child td{border-bottom:0}
+
+  /* figure / diagram */
+  .figure{margin:clamp(26px,4vh,40px) 0}
+  .figure img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--border)}
+  .figure figcaption,.diagram figcaption{
+    margin-top:12px;font-size:12px;color:var(--ink-soft);line-height:1.5;max-width:56ch;
+  }
+  .diagram{margin:clamp(26px,4vh,40px) 0}
+  .diagram svg{display:block;width:100%;height:auto}
+
+  /* reflections */
+  .refl{counter-reset:r}
+  .refl li{list-style:none;display:flex;gap:clamp(14px,2vw,22px);margin:0 0 clamp(16px,2.6vh,22px)}
+  .refl li::before{
+    counter-increment:r;content:counter(r);
+    font-family:var(--gb-serif);font-size:18px;color:var(--pink-ink);flex:0 0 24px;line-height:1.5;
+  }
+  .refl li p{margin:0;color:var(--ink-mid)}
+
+  /* footer */
+  .foot{
+    border-top:1px solid var(--border-soft);
+    padding:clamp(48px,8vh,90px) 0;text-align:center;
+  }
+  .foot a{font-size:.9em}
+  .foot__mark{width:26px;height:26px;display:block;margin:0 auto clamp(16px,2.4vh,22px);border:0}
+  .foot__mark path{fill:var(--pink)}
+  .foot__meta{margin-top:16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+
+  @media (max-width:720px){
+    :root{--col:calc(100% - 40px);--col-wide:calc(100% - 40px)}
+    .nav{padding:12px 20px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__group">
+    <a href="index.html#work">Work</a>
+    <a href="index.html">Home</a>
+  </div>
+  <a class="nav__mark" href="index.html" aria-label="Gatha Bhakta — home">
+    <svg viewBox="0 0 342 342" aria-hidden="true"><path d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg>
+  </a>
+  <div class="nav__group nav__group--right">
+    <a href="mailto:gahtabhakta@gmail.com">Contact</a>
+  </div>
+</nav>
+
+<header class="vhero" data-navdark>
+  <video class="vhero__video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="assets/pre-animation.mp4" type="video/mp4">
+  </video>
+  <div class="vhero__scrim"></div>
+  <div class="vhero__content">
+    <p class="vhero__eyebrow">National Gallery of Art — Case study</p>
+    <h1 class="vhero__title">Turning a wrong guess into a reason to visit</h1>
+    <p class="vhero__meta">ArtSwipe · Lead Designer · 10 weeks · 2024</p>
+  </div>
+  <div class="vhero__cue">Scroll</div>
+</header>
+
+<main>
+
+  <section class="section">
+    <div class="col">
+      <p class="kicker">TL;DR</p>
+      <p class="claim">A swipe-to-sort attribution game where a wrong guess becomes a link to a visit, not a dead end.</p>
+      <div class="prose">
+        <p>NGA needed a game that grew engagement on nga.gov <em>and</em> got people through the museum doors. I designed <strong>ArtSwipe</strong> — cards appear one at a time, you swipe toward the artist you think made the work, and getting it wrong opens the artwork's NGA page, flagged if it's currently on view.</p>
+        <p>75% of usability testers preferred it over Artle, NGA's existing game, across 9 within-subjects tests I proposed to capture preference and playability in one session. The metric that mattered most — did this actually get people into the gallery — was never instrumented. I named that gap at handoff instead of projecting a number I didn't have.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>75%</b><span>tester preference over Artle</span></div>
+        <div class="stat"><b>9</b><span>within-subjects usability tests</span></div>
+        <div class="stat"><b>10&nbsp;wks</b><span>concept to client delivery</span></div>
+        <div class="stat"><b>1&nbsp;of&nbsp;2</b><span>concepts selected by NGA — mine</span></div>
+      </div>
+
+      <div class="facts">
+        <dl>
+          <div><dt>Client</dt><dd>National Gallery of Art, Digital Product &amp; Experience</dd></div>
+          <div><dt>Timeline</dt><dd>10 weeks</dd></div>
+          <div><dt>Team</dt><dd>4-person design team, 2 concepts in parallel</dd></div>
+          <div><dt>My role</dt><dd>Lead Designer, ArtSwipe</dd></div>
+          <div><dt>Business driver</dt><dd>NGA's game-strategy OKR — grow site engagement and gallery foot traffic post-revamp</dd></div>
+          <div><dt>Tools</dt><dd>Figma, FigJam, Zoom</dd></div>
+          <div class="facts__owned"><dt>What I owned</dt><dd>Originated and pitched the ArtSwipe concept, selected by NGA for development. Led the reframe of the brief from a DAU target to a retention-and-footfall problem. Ran competitive analysis and usability testing on NGA's existing game to set design constraints. Designed the interaction model and mid-fi prototypes, proposed and ran the testing methodology, and delivered the concept directly to NGA stakeholders. Partnered with our researcher on the data schema underpinning the game.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col">
+      <p class="kicker">The real stakes</p>
+      <p class="claim">"Build another game" was the stated brief. The gap it left was the actual one.</p>
+      <div class="prose">
+        <p>NGA's site pulled 16.9M visits in 2023, more than doubling in two years. Fun Seekers — people looking for interactive content — were named the target audience, 57% of all users were on mobile, and most Fun Seekers were already playing Artle daily. What that habit didn't do: connect to the gallery itself, or to learning anything durable about the art.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col">
+      <p class="kicker">The reframe</p>
+      <p class="claim">DAU is the result, not the lever.</p>
+      <div class="prose">
+        <p>I reframed the brief around retention mechanics instead of first-session engagement, because a game that's fun once doesn't move daily numbers — a game people mention to a friend does. That's the Wordle model: the social loop <em>is</em> the distribution channel.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Discovery — what Artle told us</p>
+      <p class="claim">Artle's problem wasn't difficulty. It was that difficulty was never legible.</p>
+      <div class="prose">
+        <p>Feedback came too late to course-correct, and the interaction rewarded a correct outcome, never the attempt. I ran a competitive analysis and moderated usability tests on Artle before sketching anything, and turned three findings into non-negotiable constraints: clear signifiers of how a player was doing mid-session; feedback delayed instead of instant, so players couldn't cheat; and an interaction that rewards the act of guessing — Artle's players were reverse-image-searching answers because the game gave them nothing else to hold onto.</p>
+        <p>User interviews sharpened the target: people play casual art games on a subway ride or a lunch break, not like a 100-hour RPG. Sessions had to be short by design, competition had to be personal, and the job-to-be-done wasn't "learn about art" — it was "feel less clueless about art, without feeling stupid." That last point came straight from the room:</p>
+      </div>
+      <blockquote>"I feel nothing because I just looked up the image."<cite>Jesse, on playing Artle</cite></blockquote>
+      <blockquote>"Makes me feel stupid or unaware… this looks like it's for people with an art-history background."<cite>Rhea, on playing Artle</cite></blockquote>
+      <div class="prose"><p>Two different failure modes — indifference and exclusion — same root cause: the game gave players no way in.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Building within NGA's real constraints</p>
+      <p class="claim">A browser game with limited backend support — not a funded app build.</p>
+      <div class="prose">
+        <p>That ruled out anything flashier than it needed to be: no 3D, no AR/VR, no GPS mechanics tying gameplay to a spot in the gallery. Every interaction had to run on a lightweight frontend with minimal backend load.</p>
+        <p>The constraint didn't just eliminate options — it pointed toward the answer. A mechanic already in muscle memory, needing zero custom infrastructure to feel good, was both the UX-right and the engineering-realistic choice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Concept — why ArtSwipe</p>
+      <p class="claim">One mechanic, three problems solved.</p>
+      <div class="prose">
+        <p>Our 4-person team split into two working groups, each developing a concept in parallel. ArtSwipe was mine — pitched, refined, and selected by NGA for development. Across both groups we brainstormed 8 concepts, all constrained to NGA's existing collection: everything from an "Art Heist" narrative game to a 3D gallery map.</p>
+        <p>ArtSwipe won because swiping is already in muscle memory from dating apps, so onboarding cost is near zero; attributing art to an artist forces you to notice style, not guess randomly, so the "guess" is quietly educational; and the host picking a theme before a card appears loads the social hook before the first swipe.</p>
+      </div>
+
+      <div class="diagram">
+        <svg viewBox="0 0 820 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="8 concepts filtered through one test to arrive at ArtSwipe">
+          <g font-family="DM Sans, sans-serif" font-size="12">
+            <rect x="16" y="46" width="150" height="150" rx="10" fill="#F2EDE4" stroke="#D9CEBD"/>
+            <text x="91" y="112" text-anchor="middle" fill="#2C2018">8 concepts</text>
+            <text x="91" y="130" text-anchor="middle" fill="#8C7260" font-size="11">constrained to NGA's</text>
+            <text x="91" y="145" text-anchor="middle" fill="#8C7260" font-size="11">existing collection</text>
+            <line x1="176" y1="121" x2="222" y2="121" stroke="#C97FA6" stroke-width="1.5"/>
+            <rect x="228" y="18" width="196" height="48" rx="8" fill="#FADCEB"/>
+            <text x="326" y="47" text-anchor="middle" fill="#2C2018">Near-zero onboarding cost</text>
+            <rect x="228" y="98" width="196" height="48" rx="8" fill="#E7DEF5"/>
+            <text x="326" y="127" text-anchor="middle" fill="#2C2018">Comparison forces style-noticing</text>
+            <rect x="228" y="178" width="196" height="48" rx="8" fill="#E2ECE6"/>
+            <text x="326" y="207" text-anchor="middle" fill="#2C2018">Social hook loads before first play</text>
+            <line x1="424" y1="42" x2="486" y2="121" stroke="#C97FA6" stroke-width="1.5"/>
+            <line x1="424" y1="122" x2="486" y2="121" stroke="#C97FA6" stroke-width="1.5"/>
+            <line x1="424" y1="202" x2="486" y2="121" stroke="#C97FA6" stroke-width="1.5"/>
+          </g>
+          <g font-family="Lora, serif" font-size="17">
+            <rect x="490" y="76" width="314" height="92" rx="10" fill="#2C2018"/>
+            <text x="647" y="118" text-anchor="middle" fill="#FAF6EF" font-style="italic">ArtSwipe</text>
+            <text x="647" y="140" text-anchor="middle" fill="#F0ABCE" font-family="DM Sans, sans-serif" font-size="11" font-style="normal">selected by NGA — not my own pod</text>
+          </g>
+        </svg>
+        <figcaption>Eight concepts, one filter: the mechanic that solved onboarding, learning and distribution at once.</figcaption>
+      </div>
+
+      <div class="prose">
+        <p>Single-player or multiplayer via a shared link, no account required. The host picks a theme — Women Artists, Black Artists, Latinx Artists, LGBTQ+ Artists, or Randomize — and one of two difficulty levels, deliberately just two: more granularity creates decision fatigue at the exact moment you need someone to just start playing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Design decisions</p>
+      <p class="claim">Mid-fi first, on purpose — not a shortcut.</p>
+      <div class="prose"><p>It surfaced structural problems before we spent time on visual polish.</p></div>
+      <div class="tbl">
+        <table>
+          <tr><th>Issue</th><th>Cause</th><th>Fix</th></tr>
+          <tr><td>Players anticipated one card, blindsided by the stack</td><td>No depth cue</td><td>Deck shown with visible depth — sets correct anticipation upfront</td></tr>
+          <tr><td>Feedback gave away answers, invited cheating</td><td>Result shown instantly</td><td>Delayed reveal, visual pause state</td></tr>
+        </table>
+      </div>
+      <div class="prose"><p>9 within-subjects tests, Artle vs. ArtSwipe back to back — my proposed method, and the source of the 75% number.</p></div>
+      <div class="tbl">
+        <table>
+          <tr><th>Trade-off</th><th>Call</th></tr>
+          <tr><td>Difficulty naming</td><td>Research showed players felt "stupid," not challenged. Default level: <strong>Normal</strong>, not "Easy." Hard strips artist name and style notes. Flagged by NGA's UX designer as an accessibility win.</td></tr>
+          <tr><td>Collection scope</td><td>The mechanic needs artists with a strong visual signature. It doesn't scale to a one-painting artist — an open question NGA raised themselves.</td></tr>
+          <tr><td>Content-ops dependency</td><td>The gallery link only stays honest if NGA keeps "on view" tags current. Out of scope here — flagged at handoff, not hidden.</td></tr>
+          <tr><td>Invite drop-off</td><td>Inviting a friend means leaving the browser tab. No response in 3 minutes → auto-prompt into single-player, so the loop doesn't stall.</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Systems thinking — the data model</p>
+      <p class="claim">The interaction and the data it depends on, designed at the same time.</p>
+      <div class="prose">
+        <p>The end-screen link only works if the underlying data can support it. I partnered with our researcher to define the schema behind it — not in sequence, in parallel.</p>
+      </div>
+      <div class="diagram">
+        <svg viewBox="0 0 760 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Data model: Game references Player, Card and Stack; Card carries its own NGA URLs">
+          <g font-family="DM Sans, sans-serif" font-size="12">
+            <rect x="288" y="12" width="184" height="88" rx="8" fill="#F2EDE4" stroke="#D9CEBD"/>
+            <text x="380" y="33" text-anchor="middle" font-weight="600" fill="#2C2018">Game</text>
+            <text x="303" y="53" fill="#8C7260">difficulty, theme,</text>
+            <text x="303" y="68" fill="#8C7260">game_stack: Stack</text>
+            <text x="303" y="83" fill="#8C7260">player: Player</text>
+            <line x1="330" y1="100" x2="150" y2="146" stroke="#C97FA6" stroke-width="1.5"/>
+            <line x1="380" y1="100" x2="380" y2="146" stroke="#C97FA6" stroke-width="1.5"/>
+            <line x1="430" y1="100" x2="610" y2="146" stroke="#C97FA6" stroke-width="1.5"/>
+            <rect x="58" y="146" width="184" height="88" rx="8" fill="#FADCEB"/>
+            <text x="150" y="167" text-anchor="middle" font-weight="600" fill="#2C2018">Player</text>
+            <text x="73" y="187" fill="#2C2018">player_number</text>
+            <text x="73" y="202" fill="#2C2018">score</text>
+            <rect x="288" y="146" width="184" height="88" rx="8" fill="#E7DEF5"/>
+            <text x="380" y="167" text-anchor="middle" font-weight="600" fill="#2C2018">Card</text>
+            <text x="303" y="187" fill="#2C2018">nga_artwork_url</text>
+            <text x="303" y="202" fill="#2C2018">nga_artist_url, gallery</text>
+            <rect x="518" y="146" width="184" height="88" rx="8" fill="#E2ECE6"/>
+            <text x="610" y="167" text-anchor="middle" font-weight="600" fill="#2C2018">Stack</text>
+            <text x="533" y="187" fill="#2C2018">card_stack: Card[]</text>
+            <text x="533" y="202" fill="#2C2018">push() pop() isEmpty()</text>
+          </g>
+        </svg>
+        <figcaption>Card carries its own NGA artwork and artist URLs, so the end-screen gallery link isn't a content task bolted on later — it's structural.</figcaption>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Scale risk</p>
+      <p class="claim">Multiplayer works because it's friction-by-design. That friction disappears the moment the game gets popular.</p>
+      <div class="prose">
+        <p>A link from someone you know, not a public lobby — no room verification, no identity layer. A link leaking into a public forum is the likely failure mode once reach grows, not an edge case. I flagged room-access controls as a v2 priority.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col-wide">
+      <p class="kicker">Outcome</p>
+      <p class="claim">75% of testers preferred ArtSwipe over Artle.</p>
+      <blockquote>"We thought a lot about ArtSwipe — this was a novel approach, something we never thought of."<cite>Martin Franzini, Chief of Digital Product &amp; Experience, NGA</cite></blockquote>
+      <blockquote>"I really appreciate the nuances you were thinking of — with the indicators, we are big on accessibility."<cite>Deanna Wood, UX Designer, NGA</cite></blockquote>
+      <blockquote>"Can't believe you did this in the amount of time you had."<cite>Memo Saenz, Product Manager, NGA</cite></blockquote>
+      <div class="prose">
+        <p><strong>What I didn't claim.</strong> Gallery-visit attribution — the metric that actually mattered — needs in-app behavior connected to physical entry data. That instrumentation sat outside this engagement's scope. Projecting a number for it would have been more comfortable than admitting I didn't have one. I named the metric, named why it wasn't tracked, and left it there.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="col">
+      <p class="kicker">Reflections</p>
+      <ol class="refl">
+        <li><p><strong>Reframing the brief is the job.</strong> The OKR said "grow engagement." The real brief was a retention problem and a footfall problem — naming that early shaped every decision after it.</p></li>
+        <li><p><strong>Test the logic before the pixels.</strong> All three critical issues at mid-fi were structural, not visual. Hi-fi would have hidden them until they were expensive to fix.</p></li>
+        <li><p><strong>Design decisions carry backend cost.</strong> The most meaningful feature was also the one with the longest-lived dependency — flagging that at handoff is part of the job.</p></li>
+        <li><p><strong>Don't project metrics you didn't measure.</strong> 75% and three stakeholder quotes are real. Knowing which number I couldn't give you is a stronger signal than making one up.</p></li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <a class="foot__mark" href="index.html" aria-label="Gatha Bhakta — home">
+    <svg viewBox="0 0 342 342" aria-hidden="true"><path d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg>
+  </a>
+  <a href="index.html#work">← Back to selected work</a>
+  <div class="foot__meta">Gatha Bhakta — National Gallery of Art, 2024</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var nav = document.querySelector('.nav');
+  var vhero = document.querySelector('.vhero');
+  var video = document.querySelector('.vhero__video');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* nav flips to cream while the dark video is behind it, back to pink-ink
+     over the cream article — the flip point is the video's lower edge
+     meeting the nav's mid-line */
+  var pending = false;
+  function paint(){
+    pending = false;
+    var flip = vhero.getBoundingClientRect().bottom > nav.offsetHeight * 0.5;
+    nav.classList.toggle('nav--dark', flip);
+  }
+  function onScroll(){ if (!pending){ pending = true; requestAnimationFrame(paint); } }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll);
+  paint();
+
+  /* reduced motion: hold the first frame instead of looping */
+  if (reduce && video){
+    var hold = function(){ try { video.pause(); } catch(e){} };
+    video.addEventListener('loadeddata', hold);
+    hold();
+  }
+})();
+</script>
+</body>
+</html>
