@@ -3,19 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gatha Bhakta — I design across screens and spaces</title>
+<title>Gatha Bhakta — designs both screens and spaces</title>
 <meta name="description" content="Gatha is a product designer and an architect. Work across education, healthcare, AI and 0-to-1 design.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap">
 <style>
   :root{
     --cream:#FAF6EF;
-    --petal:20px;
-    --petal-off:-10px;
+    --card:#FAF6EF;
+    --line:#D0C4B0;
+    --tan:140,114,96;
     --pink:#F0ABCE;
     --pink-ink:#C97FA6;
+    --pink-rule:#E9A8C6;
     --ink:#2C2018;
     --ink-mid:#5A4535;
     --ink-soft:#8C7260;
@@ -49,6 +51,9 @@
     position:relative;
     background:var(--cream);
     container-type:inline-size;
+    /* petal size is CSS-driven off the viewport, like every other measure */
+    --petal:clamp(26px,3.3cqw,58px);
+    --petal-off:calc(var(--petal) / -2);
     scrollbar-width:thin;
     scrollbar-color:var(--pink) rgba(44,32,24,.05);
     scroll-snap-type:y proximity;   /* nudge the work panel fully onto the frame */
@@ -73,8 +78,6 @@
     background:transparent;
     transition:opacity 520ms var(--ease);
   }
-  /* over a solid non-cream section the bar stays transparent —
-     only the links and the mark pick up a legible on-panel ink */
   .nav__group{
     display:flex;gap:3.8cqw;
     font-family:var(--gb-sans);font-weight:600;
@@ -85,62 +88,167 @@
   .nav__group--right{justify-content:flex-end}
   .nav__group a{transition:color 160ms var(--ease)}
   .nav__group a:hover{color:var(--ink)}
-  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;animation:gspin 40s linear infinite}
+  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;cursor:pointer;animation:gspin 40s linear infinite}
   .nav__mark path{fill:var(--pink);transition:fill 260ms var(--ease)}
   .nav--solid .nav__group{ color:var(--nav-ink,var(--cream)); }
   .nav--solid .nav__mark path{ fill:var(--nav-ink,var(--cream)); }
 
-  /* ── hero (sticky) ────────────────────────────── */
+  /* ── hero (sticky) ────────────────────────────────────────────────
+     7A · the locked Swiss grid. Six regions on one frame, measured off
+     the final comp: ruler edge · graph-paper column · dot-field bands ·
+     claim card · checker base · isometric column. All copy is live text. */
   .hero{
     position:sticky;top:0;
     height:100dvh;min-height:600px;
-    margin-top:calc(-1 * var(--nav-h, 0px));   /* nav overlays; hero centres in the full viewport */
+    margin-top:calc(-1 * var(--nav-h, 0px));   /* nav overlays; the frame fills the viewport */
     background:var(--cream);
+    overflow:hidden;
     z-index:2;
     transform-origin:50% 50%;
     will-change:transform,opacity;
   }
 
-  /* ── hero centrepiece + hover playground ──────── */
-  .play{
-    position:relative;
-    height:100%;
-    display:flex;align-items:center;justify-content:center;
-    padding:0 3cqw;
+  /* the frame */
+  .grid{
+    position:absolute;inset:0;display:grid;
+    grid-template-columns:3.125% 19.097% 55.556% 22.222%;
+    grid-template-rows:7.37% 19.22% 46.196% 27.21%;
+    transition:opacity 800ms var(--ease);
+  }
+  .cell{position:relative;overflow:hidden;transition:opacity 820ms var(--ease)}
+
+  /* ruler edge — pink rules along the left margin, lifted under the nav */
+  .ruler{
+    position:absolute;left:0;top:calc(7.37% - 30px);bottom:0;width:3.125%;z-index:2;
+    opacity:.5;background-repeat:repeat-y;background-position:0 -18px;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
+            mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
+    transition:opacity 800ms var(--ease);
   }
 
-  .claim{
-    position:relative;
-    border:1px solid var(--border);border-radius:4px;
-    padding:3.4cqw 4.2cqw;
-    display:flex;flex-direction:column;align-items:center;gap:1.9cqw;
-    background:rgba(250,246,239,.72);
-    max-width:66cqw;
-    z-index:1;
+  /* graph-paper column — same lift, so the sheet dissolves into the nav */
+  .cell--graph{overflow:visible;cursor:crosshair}
+  .cell--graph .pat{
+    position:absolute;inset:-30px 0 0 0;opacity:.5;
+    background-repeat:repeat;background-position:0 -18px;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
+            mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
+  }
+  .xh{position:absolute;background:var(--pink-ink);opacity:0;transition:opacity 200ms var(--ease);z-index:3;pointer-events:none}
+  .xh--v{top:0;bottom:0;width:1px;transform:translateX(var(--cx,0px))}
+  .xh--h{left:0;right:0;height:1px;transform:translateY(var(--cy,0px))}
+  .xh--node{
+    width:9px;height:9px;background:transparent;border:1.5px solid var(--pink-rule);border-radius:50%;
+    transform:translate(calc(var(--cx,0px) - 4.5px),calc(var(--cy,0px) - 4.5px));
+  }
+  .cell--graph:hover .xh{opacity:.7}
+  .cell--graph:hover .xh--node{opacity:1}
+
+  /* dot-field bands */
+  .cell--dot .pat{position:absolute;inset:0;opacity:.5;background-repeat:repeat;background-position:0 0}
+  .cell--dot .hot{
+    position:absolute;inset:0;opacity:0;transition:opacity 420ms var(--ease);
+    background-image:radial-gradient(circle at 1px 1px,rgba(240,171,206,.95) 1.8px,transparent 2.4px);
+    background-size:22px 22px;
+    -webkit-mask-image:radial-gradient(circle 170px at var(--mx,50%) var(--my,50%),#000 0%,rgba(0,0,0,.55) 45%,transparent 72%);
+            mask-image:radial-gradient(circle 170px at var(--mx,50%) var(--my,50%),#000 0%,rgba(0,0,0,.55) 45%,transparent 72%);
+  }
+  .cell--dot:hover .hot{opacity:1}
+
+  /* checker base */
+  .check{position:absolute;inset:0;display:grid}
+  .wc{background:transparent;transition:background-color 900ms var(--ease)}
+  .wc--odd{background:#F2EDE4}
+  .wc--on{background:rgba(240,171,206,.5);transition:background-color 90ms linear}
+
+  /* isometric column */
+  .cell--iso{background:transparent}
+  .iso__grid{opacity:.5}
+  .cell--iso svg{display:block;width:100%;height:100%}
+
+  /* claim card */
+  .cell--claim{overflow:visible;z-index:6}
+  .card{
+    position:absolute;inset:0;background:var(--card);border:1px solid #D9CEBD;
     transition:border-color 640ms var(--ease),background-color 640ms var(--ease);
   }
+  .claim{position:absolute;inset:0}
+  .claim__eyebrow{
+    position:absolute;left:12.29%;top:11.72%;
+    font-family:var(--gb-serif);font-weight:400;font-size:2.778cqw;line-height:1;
+    color:var(--ink-mid);white-space:nowrap;
+  }
+  .claim__w1,.claim__w2{
+    position:absolute;font-family:var(--gb-serif);font-weight:500;font-size:7.407cqw;line-height:1;
+    color:var(--ink);white-space:nowrap;
+  }
+  .claim__w1{left:11.77%;top:21.89%}
+  .claim__w2{left:46.25%;top:47.09%}
+  .claim__amp{
+    position:absolute;left:35.37%;top:40.11%;z-index:3;
+    font-family:var(--gb-serif);font-style:italic;font-weight:400;font-size:10.44cqw;line-height:1;
+    color:var(--pink);
+    transform:rotate(2.61deg);transform-origin:0 0;
+    -webkit-text-stroke:.405cqw #FFFFFF;paint-order:stroke fill;
+    filter:drop-shadow(0 .23cqw .23cqw rgba(0,0,0,.25));
+  }
+  .claim__note{
+    position:absolute;left:8.02%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
+    font-family:var(--gb-serif);font-weight:400;font-size:1.389cqw;line-height:1.29;
+    color:#000000;white-space:nowrap;
+  }
+  .claim__areas{
+    position:absolute;left:11.35%;top:84.3%;z-index:2;display:flex;align-items:center;gap:.52cqw;
+    font-family:var(--gb-sans);font-weight:400;font-size:1.157cqw;line-height:1;
+    color:var(--ink-soft);white-space:nowrap;
+  }
+  .claim__areas i{color:var(--pink);font-style:normal;font-size:1.3cqw;line-height:0}
 
   /* the four corner ticks are the mark's four petals, each SVG
      view-boxed onto one quarter of the 342×342 quatrefoil */
   .claim__tick{
-    position:absolute;
-    width:var(--petal);height:var(--petal);
-    display:block;z-index:2;
-    transform:rotate(var(--rot,0deg));
-    transform-origin:50% 50%;
+    position:absolute;width:var(--petal);height:var(--petal);display:block;z-index:7;
+    transform:rotate(var(--rot));transform-origin:50% 50%;
   }
   .claim__tick svg{display:block;width:100%;height:100%;overflow:hidden}
   .claim__tick path{fill:var(--pink)}
-  .claim__tick--tl{left:var(--petal-off);top:var(--petal-off)}
-  .claim__tick--tr{right:var(--petal-off);top:var(--petal-off)}
-  .claim__tick--bl{left:var(--petal-off);bottom:var(--petal-off)}
-  .claim__tick--br{right:var(--petal-off);bottom:var(--petal-off)}
+  .claim__tick--tl{left:var(--petal-off);top:var(--petal-off);--rot:0deg}
+  .claim__tick--tr{right:var(--petal-off);top:var(--petal-off);--rot:0deg}
+  .claim__tick--bl{left:var(--petal-off);bottom:var(--petal-off);--rot:0deg}
+  .claim__tick--br{right:var(--petal-off);bottom:var(--petal-off);--rot:0deg}
   .claim__tick--fly{transition:transform 1120ms cubic-bezier(.2,.94,.24,1)}
 
+  .claim__eyebrow,.claim__w1,.claim__w2,.claim__amp,.claim__note,.claim__areas{
+    transition:opacity 700ms var(--ease),transform 700ms var(--ease-out);
+  }
+  .claim__w1{transition-delay:60ms}
+  .claim__amp{transition-delay:120ms}
+  .claim__w2{transition-delay:170ms}
+  .claim__note{transition-delay:220ms}
+  .claim__areas{transition-delay:280ms}
+
+  /* tapes — laid with the background, never animated */
+  .tapes{position:absolute;inset:0;z-index:3;pointer-events:none}
+  .tape{position:absolute;background-repeat:no-repeat;background-size:100% 100%;background-position:50% 50%}
+  .stage--intro .tapes{display:none}
+
+  /* stickers — spring in, then draggable anywhere on the hero */
+  .stk{
+    position:absolute;z-index:12;display:block;height:auto;opacity:0;cursor:grab;
+    touch-action:none;user-select:none;-webkit-user-drag:none;
+    transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) rotate(calc(var(--rot,0deg) + var(--gr,0deg))) scale(.22);
+    transition:transform 620ms cubic-bezier(.34,1.56,.64,1),opacity 340ms ease;
+  }
+  .stk--sq{aspect-ratio:1;height:auto;object-fit:contain}
+  .stk--in{opacity:1;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) rotate(calc(var(--rot,0deg) + var(--gr,0deg))) scale(var(--gs,1))}
+  .stk--drag{transition:none;cursor:grabbing;z-index:30;--gr:5deg;--gs:1.07;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+  .stk--drag.stk--ccw{--gr:-5deg}
+  .stk--settle{transition:transform 540ms cubic-bezier(.34,1.5,.64,1);z-index:30}
+
   /* ── intro: the mark blooms centre-screen, then its petals scatter
-     out to become the claim-box corners while the hero fades up ── */
+     out to become the claim-card corners while the frame fades up ── */
   .intro{
-    position:fixed;inset:0;z-index:6;pointer-events:none;
+    position:fixed;inset:0;z-index:9;pointer-events:none;
     display:flex;align-items:center;justify-content:center;
   }
   .intro__mark{
@@ -159,74 +267,33 @@
 
   /* hero content held back while the intro plays */
   .stage--intro .nav{opacity:0;pointer-events:none}
-  .stage--intro .claim{border-color:transparent;background:transparent}
-  .stage--intro .claim h1,
-  .stage--intro .claim__lede,
-  .stage--intro .claim__areas,
-  .stage--intro .scrib{opacity:0;transform:translateY(12px)}
-  .claim h1,.claim__lede,.claim__areas{
-    transition:opacity 700ms var(--ease),transform 700ms var(--ease-out);
-  }
-  .claim__lede{transition-delay:90ms}
-  .claim__areas{transition-delay:180ms}
-  .scrib{transition-property:left,top,transform,opacity}
+  .stage--intro .cell--graph,
+  .stage--intro .cell--dot,
+  .stage--intro .cell--check,
+  .stage--intro .cell--iso{opacity:0}
+  .stage--intro .ruler{opacity:0}
+  .stage--intro .card{border-color:transparent;background:transparent}
+  .stage--intro .claim__eyebrow,
+  .stage--intro .claim__w1,
+  .stage--intro .claim__w2,
+  .stage--intro .claim__amp,
+  .stage--intro .claim__note,
+  .stage--intro .claim__areas{opacity:0;transform:translateY(12px)}
 
-  .claim h1{
-    margin:0;
-    font-family:var(--gb-serif-display);font-weight:400;
-    font-size:clamp(40px,6.4cqw,104px);
-    line-height:1.06;letter-spacing:-.025em;
-    color:var(--ink);text-align:center;max-width:76cqw;
-  }
-  .claim__lede{
-    margin:0;
-    font-family:var(--gb-serif);
-    font-size:clamp(16px,2.1cqw,30px);
-    line-height:1.45;color:var(--ink-mid);
-    text-align:center;max-width:52cqw;
-  }
-  .claim__areas{
-    display:flex;align-items:center;gap:1.6cqw;
-    font-family:var(--gb-sans);font-weight:600;
-    font-size:clamp(9px,1cqw,13px);line-height:1;
-    letter-spacing:.24em;text-transform:uppercase;color:var(--ink);
-  }
-  .claim__dot{width:6px;height:6px;border-radius:50%;background:var(--pink)}
-
-  /* ── flying cutouts (hero) ───────────────────── */
-  .cutout{
-    position:absolute;left:50%;top:50%;
-    width:auto;object-fit:contain;pointer-events:none;
-    transform:translate(-50%,-50%) scale(.25);
-    opacity:0;
-    transition:transform 620ms cubic-bezier(.34,1.56,.64,1),opacity 340ms ease;
-    filter:drop-shadow(0 12px 26px rgba(44,32,24,.20));
-    z-index:3;
-  }
-  .cutout--ph{
-    display:flex;align-items:flex-end;justify-content:center;
-    border-radius:10px;
-    background:#FDFBF7;border:1px solid var(--border);
-    box-shadow:inset 0 0 0 4px #fff;
-    font-family:var(--gb-serif);font-style:italic;
-    color:var(--ink-soft);font-size:12px;
-    padding:8px 12px;
-  }
-
-  /* ── scribbles (pixel-art star / heart) ──────── */
-  .scrib{
-    position:absolute;
-    transform:translate(-50%,-50%);
-    transition:left 1400ms var(--ease),top 1400ms var(--ease),transform 1400ms var(--ease);
-    pointer-events:none;z-index:2;
-  }
-  .scrib img{
-    display:block;width:100%;height:100%;image-rendering:pixelated;
-    animation:gpulse 5s ease-in-out infinite;
-  }
-  @keyframes gpulse{
-    0%,100%{opacity:.55;transform:scale(.92)}
-    50%{opacity:1;transform:scale(1.06)}
+  /* narrow: the frame collapses, the card carries the screen */
+  @container (max-width:820px){
+    .grid{grid-template-columns:1fr;grid-template-rows:var(--nav-h) 1fr}
+    .cell:not(.cell--claim){display:none}
+    .cell--claim{grid-area:2 / 1 / 3 / 2}
+    .ruler,.claim__tick,.tapes,.stk{display:none}
+    .card{border:0}
+    .claim__eyebrow{font-size:5cqw;top:8%}
+    .claim__w1,.claim__w2{font-size:13cqw}
+    .claim__w1{top:20%}
+    .claim__w2{left:30%;top:44%}
+    .claim__amp{font-size:22cqw;left:6%;top:33%}
+    .claim__note{font-size:3.6cqw;width:52%;left:44%;top:62%;text-align:left}
+    .claim__areas{font-size:2.3cqw;white-space:normal;flex-wrap:wrap;bottom:6%}
   }
 
   /* ── selected work — 7b × 7c hybrid ───────────────────────
@@ -380,11 +447,6 @@
     .hero{min-height:560px}
     .nav{padding:12px 20px;gap:16px}
     .nav__group{gap:16px;font-size:9px}
-    .claim{padding:34px 24px;gap:16px;max-width:88vw}
-    .claim h1{font-size:clamp(30px,9vw,44px);max-width:none}
-    .claim__lede{font-size:15px;max-width:38ch}
-    .claim__areas{font-size:9px;gap:10px;flex-wrap:wrap;justify-content:center}
-    .cutout{display:none}
     .work__field{padding:48px 0 40px}
     .work__frame{padding-inline:20px}
     .work__eyebrow,.work__count{font-size:10px}
@@ -402,7 +464,6 @@
 
   @media (prefers-reduced-motion:reduce){
     .nav__mark{animation:none}
-    .scrib img{animation:none;opacity:1;transform:none}
     .cutout,.qc__corner,.work__lead{transition:opacity 200ms linear}
   }
 </style>
@@ -431,29 +492,42 @@
   </nav>
 
   <section class="hero">
-    <div class="play" id="play">
-      <div class="claim">
+    <div class="ruler"></div>
+    <div class="grid">
+      <div class="cell cell--graph" style="grid-area:2 / 2 / 5 / 3">
+        <div class="pat"></div>
+        <div class="xh xh--v"></div><div class="xh xh--h"></div><div class="xh xh--node"></div>
+      </div>
+      <div class="cell cell--dot" style="grid-area:2 / 3 / 3 / 4"><div class="pat"></div><div class="hot"></div></div>
+      <div class="cell cell--dot cell--dot2" style="grid-area:4 / 4 / 5 / 5"><div class="pat"></div><div class="hot"></div></div>
+      <div class="cell cell--claim" style="grid-area:3 / 3 / 4 / 4">
+        <div class="card"></div>
         <span class="claim__tick claim__tick--tl"><svg viewBox="0 0 171 171" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg></span>
         <span class="claim__tick claim__tick--tr"><svg viewBox="171 0 171 171" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg></span>
         <span class="claim__tick claim__tick--bl"><svg viewBox="0 171 171 171" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg></span>
         <span class="claim__tick claim__tick--br"><svg viewBox="171 171 171 171" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M-0.000100708 116.548C-2.1472e-05 86.7444 24.1604 62.5842 53.9637 62.584L62.6769 62.584L62.6769 54.0338C62.677 24.2303 86.8379 0.0693126 116.641 0.0692465C145.768 0.0694926 169.504 23.1454 170.567 52.0119C171.596 23.1135 195.348 0.00156942 224.497 0.00157481C254.3 0.00186074 278.461 24.1623 278.461 53.9654V62.6786L287.011 62.6793C316.814 62.6795 340.974 86.8397 340.975 116.643C340.974 145.773 317.893 169.512 289.022 170.57C317.925 171.593 341.043 195.345 341.043 224.498C341.043 254.302 316.882 278.463 287.078 278.463L278.366 278.464V287.012C278.366 316.816 254.205 340.977 224.401 340.977C195.271 340.977 171.532 317.896 170.474 289.025C169.451 317.928 145.698 341.044 116.545 341.045C86.742 341.044 62.5817 316.884 62.5816 287.081L62.5816 278.368L54.0314 278.368C24.2281 278.367 0.0677928 254.207 0.0675703 224.404C0.067575 195.277 23.1426 171.54 52.0088 170.476C23.1111 169.447 -2.29986e-07 145.697 -0.000100708 116.548ZM75.496 170.253C127.6 170.488 169.767 212.708 169.767 264.758C169.767 264.9 169.765 265.043 169.764 265.186C169.767 265.186 169.77 265.187 169.773 265.187C169.771 264.9 169.767 264.613 169.767 264.326C169.767 212.368 211.976 170.248 264.042 170.248C264.33 170.248 264.617 170.252 264.904 170.255C264.903 169.963 264.902 169.671 264.898 169.38C264.613 169.382 264.327 169.385 264.041 169.385C212.265 169.385 170.239 127.733 169.773 76.1751C169.771 76.1751 169.768 76.175 169.765 76.1751C169.531 128.025 127.455 170.011 75.4967 170.246L75.496 170.253ZM170.537 170.508V170.539H170.505V170.508H170.537Z"></path></svg></span>
-
-        <h1>I design across screens and spaces.</h1>
-
-        <p class="claim__lede">Gatha is a product designer and an architect.</p>
-
-        <div class="claim__areas">
-          <span>Education</span>
-          <span class="claim__dot"></span>
-          <span>Healthcare</span>
-          <span class="claim__dot"></span>
-          <span>AI</span>
-          <span class="claim__dot"></span>
-          <span>0-to-1 design</span>
+        <div class="claim">
+          <div class="claim__eyebrow">Gatha designs both</div>
+          <div class="claim__w1">Screens</div>
+          <p class="claim__note">5+ years designing<br>digital products and<br>architectural spaces</p>
+          <div class="claim__amp">&amp;</div>
+          <div class="claim__w2">Spaces</div>
+          <div class="claim__areas"><span>EDUCATION</span><i>&bull;</i><span>HEALTHCARE</span><i>&bull;</i><span>ARTIFICIAL INTELLIGENCE</span><i>&bull;</i><span>0 &rarr; 1 FOUNDING DESIGN</span></div>
         </div>
       </div>
-      <!-- cutouts + scribbles injected here -->
+      <div class="cell cell--check" style="grid-area:4 / 3 / 5 / 4"><div class="check"></div></div>
+      <div class="cell cell--iso" style="grid-area:2 / 4 / 4 / 5" data-edge="1">
+        <svg class="iso" aria-hidden="true">
+          <defs>
+            <radialGradient id="hhTop" cx="50%" cy="50%" r="62%"><stop offset="0%" stop-color="#F7D7E7"/><stop offset="58%" stop-color="#FCEEF4"/><stop offset="100%" stop-color="#FBF8F2"/></radialGradient>
+            <linearGradient id="hhL" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F2DCE6"/><stop offset="100%" stop-color="#E9E0D2"/></linearGradient>
+            <linearGradient id="hhR" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CEDA"/><stop offset="100%" stop-color="#DDD1BE"/></linearGradient>
+          </defs>
+          <g class="iso__grid"></g><g class="iso__blocks"></g>
+        </svg>
+      </div>
     </div>
+    <div class="tapes"></div>
   </section>
 
   <section class="work" id="work" data-solidbg>
@@ -497,13 +571,9 @@
   function byId(id){ return document.getElementById(id); }
 
   var stage = byId('stage');
-  var play  = byId('play');
   var hero  = $('.hero');
   var nav   = $('.nav');
-  var claimEl = $('.claim');
   var solids = document.querySelectorAll('[data-solidbg]');
-  var introDone = false;
-  var spread = null;
 
   /* ── scroll: scrollbar flip · hero recede · nav contrast ──
      As the pink work panel slides up the hero eases back (a fade and
@@ -520,7 +590,6 @@
     hero.style.opacity = (1 - p * 0.5).toFixed(3);
     hero.style.transform = reduce ? 'none' : 'scale(' + (1 - p * 0.03).toFixed(4) + ')';
 
-    // flip at the nav's mid-line so the transition reads cleanly
     var mid = nav.offsetHeight * 0.5, onSolid = false;
     for (var i = 0; i < solids.length; i++){
       var r = solids[i].getBoundingClientRect();
@@ -533,167 +602,318 @@
   window.addEventListener('resize', onScroll);
   onScroll();
 
-  /* ── hero: flying cut-outs ──────────────────────────────
-     Six sticker photos that spring out from behind the claim box
-     when the pointer grazes its edge, and retract when it leaves. */
-  var CUTS = [
-    { file:'cheesecake.webp',    label:'cheesecake',     h:109 },
-    { file:'CHAICROISSANT.webp', label:'chai croissant', h:120 },
-    { file:'matcha.webp',        label:'matcha',         h:184 },
-    { file:'nycmodel.webp',      label:'new york',       h:116 },
-    { file:'Gatha 1.webp',       label:'gatha',          h:190 },
-    { file:'wip logo 1.webp',    label:'mark',           h:101 }
-  ];
-  var SLOTS = [[430, -206], [455, 8], [415, 212]];   // px offsets on a 1160-wide hero, per tier
-  var K = 1;
+  /* ── hero — 7A locked grid ─────────────────────────────────────────
+     Exact tiles from the design file. Graph + ruler are the attached
+     SVGs, re-tiled to 88px so the 44px major module repeats without
+     doubling. Everything sizes off the viewport. */
+  (function heroGrid(){
+    var GRID_LINE = '#E0D4C8', RULE_MINOR = '#E2B3CB', RULE_MAJOR = '#D96EA4';
 
-  function jitter(n){ return (Math.random() - 0.5) * n; }
-  function scaleFactor(){ return Math.max(0.62, Math.min(1.5, window.innerWidth / 1160)); }
+    function svgUrl(w, h, body){
+      return "url('data:image/svg+xml," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" fill="none">' + body + '</svg>'
+      ).replace(/'/g, '%27') + "')";
+    }
 
-  function makeSpread(){
-    var left = [], right = [];
-    SLOTS.forEach(function(s){
-      var dx = -Math.abs(jitter(26)), dy = jitter(30), rot = Math.round(jitter(22));
-      left.push ({ tx: Math.round(-s[0] - dx), ty: Math.round(s[1] + dy), rot: -rot });
-      right.push({ tx: Math.round( s[0] + dx), ty: Math.round(s[1] + dy), rot:  rot });
-    });
-    return left.concat(right);
-  }
-
-  var cutEls = CUTS.map(function(c, i){
-    var el = document.createElement('img');
-    el.className = 'cutout';
-    el.alt = '';
-    el.src = asset(c.file);
-    el.dataset.baseH = c.h;
-    el.onerror = function(){
-      // graceful placeholder until the sticker art is present in /assets
-      var ph = document.createElement('div');
-      ph.className = 'cutout cutout--ph';
-      ph.dataset.baseH = c.h;
-      ph.textContent = c.label;
-      el.replaceWith(ph);
-      cutEls[i] = ph;
-      resizeCuts();
-    };
-    play.appendChild(el);
-    return el;
-  });
-
-  function resizeCuts(){
-    K = scaleFactor();
-    cutEls.forEach(function(el){
-      var h = (el.dataset.baseH | 0) * K;
-      el.style.height = h + 'px';
-      if (el.classList.contains('cutout--ph')) el.style.width = Math.round(h * 1.35) + 'px';
-    });
-    if (spread) applyCuts(true);
-  }
-
-  // pull a sticker's horizontal offset back in if the spread would push
-  // its box off the screen — leaves a 32px gutter
-  function clampX(el, tx){
-    var half = (el.offsetWidth || (el.dataset.baseH | 0) * K * 1.4) / 2;
-    var lim = Math.max(0, window.innerWidth / 2 - half - 32);
-    return Math.max(-lim, Math.min(lim, tx));
-  }
-
-  function applyCuts(on){
-    cutEls.forEach(function(el, i){
-      if (on && spread){
-        var s = spread[i];
-        el.style.transitionDelay = (80 * i) + 'ms';
-        el.style.transform = 'translate(-50%,-50%) translate(' + clampX(el, s.tx * K) + 'px,' + (s.ty * K) + 'px) rotate(' + s.rot + 'deg) scale(1)';
-        el.style.opacity = '1';
-      } else {
-        el.style.transitionDelay = (50 * (5 - i)) + 'ms';
-        el.style.transform = 'translate(-50%,-50%) scale(.25)';
-        el.style.opacity = '0';
+    var GRAPH_TILE = (function(){
+      var b = '', minor = [11.25, 22.25, 33.25, 55.25, 66.25, 77.25], i;
+      for (i = 0; i < minor.length; i++){
+        b += '<line x1="0" y1="' + minor[i] + '" x2="88" y2="' + minor[i] + '" stroke="' + GRID_LINE + '" stroke-width="0.5"/>';
+        b += '<line x1="' + minor[i] + '" y1="0" x2="' + minor[i] + '" y2="88" stroke="' + GRID_LINE + '" stroke-width="0.5"/>';
       }
+      b += '<line x1="0" y1="0.5" x2="88" y2="0.5" stroke="' + GRID_LINE + '"/>';
+      b += '<line x1="0" y1="44.5" x2="88" y2="44.5" stroke="' + GRID_LINE + '"/>';
+      b += '<line x1="0.5" y1="0" x2="0.5" y2="88" stroke="' + GRID_LINE + '"/>';
+      b += '<line x1="44.5" y1="0" x2="44.5" y2="88" stroke="' + GRID_LINE + '"/>';
+      return svgUrl(88, 88, b);
+    })();
+
+    var RULER_TILE = (function(){
+      var b = '', minor = [11.25, 22.25, 33.25, 55.25, 66.25, 77.25], i;
+      for (i = 0; i < minor.length; i++){
+        b += '<line x1="0.5" y1="' + minor[i] + '" x2="21.5" y2="' + minor[i] + '" stroke="' + RULE_MINOR + '" stroke-width="0.5"/>';
+      }
+      b += '<line x1="1" y1="0" x2="1" y2="88" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
+      b += '<line x1="0.5" y1="1" x2="34.5" y2="1" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
+      b += '<line x1="0.5" y1="45" x2="34.5" y2="45" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
+      return svgUrl(54, 88, b);
+    })();
+
+    var DOT_TILE = svgUrl(22, 22, '<circle cx="1" cy="1" r="1" fill="' + GRID_LINE + '"/>');
+
+    /* tapes — exact boxes off the design file (frame 1728×1117) */
+    var TAPES = [
+      { l:16.20, t:7.70,  w:11.57, h:12.18, img:'tape-1.webp' },
+      { l:68.40, t:8.24,  w:7.99,  h:14.56, img:'tape-2.webp' },
+      { l:17.59, t:76.60, w:10.10, h:23.40, img:'tape-3.webp' },
+      { l:90.05, t:61.06, w:10.47, h:19.96, img:'tape-4.webp' }
+    ];
+
+    /* stickers — centre point + box, all off the design file.
+       the five photo cut-outs sit in 233×233 squares (13.48% wide) */
+    var STICKERS = [
+      { src:'fig-s2.webp',           l:25.75, t:17.82, w:13.48, sq:1, rot:-2 },
+      { src:'sticker-logomark.webp', l:36.31, t:18.35, w:6.65,        rot:4 },
+      { src:'fig-s5.webp',           l:70.31, t:16.92, w:13.48, sq:1, rot:-6 },
+      { src:'fig-s1.webp',           l:75.35, t:20.05, w:13.48, sq:1, rot:3 },
+      { src:'sticker-baby.webp',     l:24.48, t:85.23, w:8.80,        rot:-3 },
+      { src:'fig-s4.webp',           l:90.22, t:68.67, w:13.48, sq:1, rot:2 },
+      { src:'fig-s3.webp',           l:76.39, t:88.18, w:13.48, sq:1, rot:-4 },
+      { src:'sticker-lotus.webp',    l:94.27, t:87.29, w:7.52,        rot:2 },
+      { src:'sticker-ipod.webp',     l:60.20, t:87.60, w:9.00,        rot:-3 }
+    ];
+
+    function tapesHtml(){
+      return TAPES.map(function(t){
+        return '<div class="tape" style="left:' + t.l + '%;top:' + t.t + '%;width:' + t.w + '%;height:' + t.h +
+          '%;background-image:url(' + asset(t.img) + ')"></div>';
+      }).join('');
+    }
+    function stickersHtml(){
+      return STICKERS.map(function(s, i){
+        return '<img class="stk' + (s.sq ? ' stk--sq' : '') + '" alt="" draggable="false" src="' + asset(s.src) +
+          '" style="left:' + s.l + '%;top:' + s.t + '%;width:' + s.w + '%;--rot:' + s.rot + 'deg;transition-delay:' + (i * 90) + 'ms">';
+      }).join('');
+    }
+
+    $('.tapes').innerHTML = tapesHtml();
+    hero.insertAdjacentHTML('beforeend', stickersHtml());
+
+    /* pattern tiles — assigned as style properties so no data URI
+       has to survive HTML attribute quoting */
+    var rl = $('.ruler');
+    if (rl) rl.style.backgroundImage = RULER_TILE;
+    var gp = $('.cell--graph .pat');
+    if (gp) gp.style.backgroundImage = GRAPH_TILE;
+    [].slice.call(document.querySelectorAll('.cell--dot .pat')).forEach(function(p){ p.style.backgroundImage = DOT_TILE; });
+
+    /* stickers — spring in on the intro, then drag anywhere on the hero */
+    var stks = [].slice.call(document.querySelectorAll('.stk'));
+    stks.forEach(function(el){ el.style.removeProperty('--dx'); el.style.removeProperty('--dy'); });
+    stks.forEach(function(el, si){
+      if (si % 2) el.classList.add('stk--ccw');
+      var dx = 0, dy = 0, sx = 0, sy = 0, id = null;
+      el.addEventListener('pointerdown', function(e){
+        id = e.pointerId; sx = e.clientX; sy = e.clientY;
+        dx = parseFloat(el.style.getPropertyValue('--dx')) || 0;
+        dy = parseFloat(el.style.getPropertyValue('--dy')) || 0;
+        el.style.transitionDelay = '0ms';
+        el.classList.remove('stk--settle');
+        el.classList.add('stk--drag');
+        el.setPointerCapture(id);
+        e.preventDefault();
+      });
+      el.addEventListener('pointermove', function(e){
+        if (id === null || e.pointerId !== id) return;
+        el.style.setProperty('--dx', (dx + e.clientX - sx) + 'px');
+        el.style.setProperty('--dy', (dy + e.clientY - sy) + 'px');
+      });
+      var up = function(){
+        if (id === null) return;
+        el.classList.remove('stk--drag');
+        el.classList.add('stk--settle');
+        clearTimeout(el._st);
+        el._st = setTimeout(function(){ el.classList.remove('stk--settle'); }, 560);
+        try { el.releasePointerCapture(id); } catch (err) {}
+        id = null;
+      };
+      el.addEventListener('pointerup', up);
+      el.addEventListener('pointercancel', up);
     });
-  }
 
-  resizeCuts();
-  window.addEventListener('resize', resizeCuts);
-
-  // distance from a point to the claim box edge (negative = inside)
-  var EDGE_IN = 46, EDGE_OUT = 104;   // hysteresis band around the border
-  function edgeDist(x, y){
-    var r = claimEl.getBoundingClientRect();
-    var dx = Math.max(r.left - x, x - r.right, 0);
-    var dy = Math.max(r.top - y, y - r.bottom, 0);
-    if (dx || dy) return Math.sqrt(dx * dx + dy * dy);
-    return -Math.min(x - r.left, r.right - x, y - r.top, r.bottom - y);
-  }
-  play.addEventListener('mousemove', function(e){
-    if (!introDone) return;
-    var d = edgeDist(e.clientX, e.clientY);
-    if (!spread && d < EDGE_IN){ spread = makeSpread(); applyCuts(true); }
-    else if (spread && d > EDGE_OUT){ applyCuts(false); spread = null; }
-  });
-  play.addEventListener('mouseleave', function(){ applyCuts(false); spread = null; });
-
-  /* ── hero: pixel-art scribbles ──────────────────────────
-     Seven star/heart pixels in a loose ring around the claim box;
-     they pulse in place and re-roll to fresh spots every few seconds. */
-  var STAR  = { src:asset('cross-grid.svg'),  w:54, h:54 };
-  var HEART = { src:asset('pixel-heart.svg'), w:50, h:57 };
-  var SCRIBS = [
-    { art:STAR,  x:[3.6, 6.2],   y:[30, 44], dur:4.4,  del:0   },
-    { art:HEART, x:[4.2, 6.8],   y:[58, 74], dur:5.4,  del:0.8 },
-    { art:HEART, x:[93.4, 96.2], y:[26, 40], dur:4.75, del:0.25 },
-    { art:STAR,  x:[93.0, 95.8], y:[56, 72], dur:5.8,  del:1   },
-    { art:STAR,  x:[19, 34],     y:[5, 12],  dur:4.9,  del:1.5 },
-    { art:HEART, x:[64, 80],     y:[6, 13],  dur:6.2,  del:0.5 },
-    { art:STAR,  x:[38, 62],     y:[87, 94], dur:5.1,  del:1.9 }
-  ];
-  var scribEls = SCRIBS.map(function(s, n){
-    var wrap = document.createElement('div');
-    wrap.className = 'scrib scrib--' + n;
-    wrap.style.width = s.art.w + 'px';
-    wrap.style.height = s.art.h + 'px';
-    wrap.innerHTML = '<img src="' + s.art.src + '" alt="" width="' + s.art.w + '" height="' + s.art.h +
-      '" style="animation-duration:' + s.dur + 's;animation-delay:' + s.del + 's">';
-    play.appendChild(wrap);
-    return { el:wrap, cfg:s };
-  });
-  function rand(a, b){ return a + Math.random() * (b - a); }
-  function rollScribs(){
-    scribEls.forEach(function(o){
-      var x = Math.round(rand(o.cfg.x[0], o.cfg.x[1]) * 10) / 10;
-      var y = Math.round(rand(o.cfg.y[0], o.cfg.y[1]) * 10) / 10;
-      o.el.style.left = x + '%';
-      o.el.style.top  = y + '%';
-      o.el.style.transform = 'translate(-50%,-50%) rotate(' + Math.round(rand(-24, 24)) + 'deg)';
+    /* dot field — the patch follows the cursor inside its band */
+    [].slice.call(document.querySelectorAll('.cell--dot')).forEach(function(dot){
+      var hot = dot.querySelector('.hot'), raf = 0, px = 0, py = 0;
+      if (!hot) return;
+      dot.addEventListener('mousemove', function(e){
+        var r = dot.getBoundingClientRect();
+        px = e.clientX - r.left; py = e.clientY - r.top;
+        if (raf) return;
+        raf = requestAnimationFrame(function(){
+          raf = 0;
+          hot.style.setProperty('--mx', px + 'px');
+          hot.style.setProperty('--my', py + 'px');
+        });
+      });
     });
-  }
-  rollScribs();
-  if (!reduce) setInterval(rollScribs, 6500);
 
-  /* ── intro: the mark blooms centre-screen, then its four petals fly
-     out to the corners of the claim box while the hero fades up ── */
-  (function intro(){
-    var el = byId('intro');
-    if (!el) return;
+    /* graph paper — crosshair */
+    var graph = $('.cell--graph');
+    if (graph){
+      var xv = graph.querySelector('.xh--v'), xz = graph.querySelector('.xh--h'), xn = graph.querySelector('.xh--node');
+      graph.addEventListener('mousemove', function(e){
+        var r = graph.getBoundingClientRect();
+        var cx = Math.round(e.clientX - r.left), cy = Math.round(e.clientY - r.top);
+        xv.style.setProperty('--cx', cx + 'px');
+        xz.style.setProperty('--cy', cy + 'px');
+        if (xn){ xn.style.setProperty('--cx', cx + 'px'); xn.style.setProperty('--cy', cy + 'px'); }
+      });
+    }
+
+    /* checker base — 44px modules, cells paint as you pass */
+    var check = $('.check');
+    if (check){
+      var built = 0;
+      var lay = function(){
+        var w = check.clientWidth, h = check.clientHeight;
+        if (!w || !h) return;
+        var cols = Math.max(4, Math.round(w / 44)), rows = Math.max(2, Math.round(h / 44)), n = cols * rows;
+        if (n === built) return;
+        built = n;
+        check.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+        check.style.gridTemplateRows = 'repeat(' + rows + ',1fr)';
+        var f = document.createDocumentFragment();
+        for (var i = 0; i < n; i++){
+          var c = document.createElement('div');
+          c.className = 'wc' + ((Math.floor(i / cols) + (i % cols)) % 2 ? ' wc--odd' : '');
+          f.appendChild(c);
+        }
+        check.innerHTML = '';
+        check.appendChild(f);
+      };
+      lay(); requestAnimationFrame(lay); setTimeout(lay, 0); setTimeout(lay, 320);
+      if (window.ResizeObserver){ check._ro = new ResizeObserver(lay); check._ro.observe(check); }
+      check.addEventListener('mouseover', function(e){
+        var t = e.target;
+        if (!t.classList || !t.classList.contains('wc')) return;
+        t.classList.add('wc--on');
+        clearTimeout(t._t);
+        t._t = setTimeout(function(){ t.classList.remove('wc--on'); }, 260);
+      });
+    }
+
+    /* isometric column — dwell extrudes a pink-lit block, settles slowly */
+    var isoCell = $('.cell--iso');
+    if (isoCell) (function(){
+      var svg = isoCell.querySelector('.iso');
+      var gGrid = svg.querySelector('.iso__grid'), gBlk = svg.querySelector('.iso__blocks');
+      var S = 44, W = 0, H = 0, cx = 0, cy = 0;
+      var blocks = {}, cur = null, live = false, loop = 0, last = 0, MAXH = S * 2.2;
+
+      function P(a, b){ return [cx + 0.866 * S * (a - b), cy + 0.5 * S * (a + b)]; }
+      function inv(x, y){
+        var u = (y - cy) / (0.5 * S), v = (x - cx) / (0.866 * S);
+        return [(u + v) / 2, (u - v) / 2];
+      }
+      function measure(){
+        var w2 = isoCell.clientWidth, h2 = isoCell.clientHeight;
+        if (!w2 || !h2) return false;
+        if (w2 === W && h2 === H) return true;
+        W = w2; H = h2;
+        svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+        cx = W / 2; cy = H * 0.3;
+        var cs = [inv(0,0), inv(W,0), inv(0,H), inv(W,H)];
+        var aMin = 1e9, aMax = -1e9, bMin = 1e9, bMax = -1e9;
+        cs.forEach(function(c){
+          aMin = Math.min(aMin, c[0]); aMax = Math.max(aMax, c[0]);
+          bMin = Math.min(bMin, c[1]); bMax = Math.max(bMax, c[1]);
+        });
+        aMin = Math.floor(aMin) - 1; aMax = Math.ceil(aMax) + 1;
+        bMin = Math.floor(bMin) - 1; bMax = Math.ceil(bMax) + 1;
+        var s = '', a, b, p1, p2;
+        for (a = aMin; a <= aMax; a++){
+          p1 = P(a, bMin); p2 = P(a, bMax);
+          s += '<line x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke="#E0D4C8" stroke-width="1"/>';
+        }
+        for (b = bMin; b <= bMax; b++){
+          p1 = P(aMin, b); p2 = P(aMax, b);
+          s += '<line x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke="#E0D4C8" stroke-width="1"/>';
+        }
+        gGrid.innerHTML = s;
+        return true;
+      }
+      function ensure(){ return (W && H) ? true : measure(); }
+      function poly(pts, fill){
+        return '<polygon points="' + pts.map(function(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') +
+               '" fill="' + fill + '" stroke="rgba(201,127,166,.42)" stroke-width="1"/>';
+      }
+      function draw(){
+        if (!ensure()) return;
+        var keys = Object.keys(blocks).sort(function(k1, k2){
+          var A = k1.split(',').map(Number), B2 = k2.split(',').map(Number);
+          return (A[0] + A[1]) - (B2[0] + B2[1]);
+        });
+        var s = '';
+        keys.forEach(function(k){
+          var bl = blocks[k], h = bl.h;
+          if (h < .4) return;
+          var A = P(bl.i, bl.j), B = P(bl.i + 1, bl.j), C = P(bl.i + 1, bl.j + 1), Dp = P(bl.i, bl.j + 1);
+          var up = function(p){ return [p[0], p[1] - h]; };
+          s += poly([up(Dp), up(C), C, Dp], 'url(#hhL)');
+          s += poly([up(C), up(B), B, C], 'url(#hhR)');
+          s += poly([up(A), up(B), up(C), up(Dp)], 'url(#hhTop)');
+        });
+        gBlk.innerHTML = s;
+      }
+      function step(ts){
+        var dt = Math.min(48, ts - (last || ts)); last = ts;
+        var moving = false;
+        Object.keys(blocks).forEach(function(k){
+          var bl = blocks[k];
+          if (cur === k && live) bl.t = Math.min(MAXH, bl.t + dt * 0.075);
+          bl.h += (bl.t - bl.h) * Math.min(1, dt / (bl.t > bl.h ? 130 : 1500));
+          if (Math.abs(bl.t - bl.h) > .3) moving = true;
+          if (bl.t === 0 && bl.h < .4) delete blocks[k];
+        });
+        draw();
+        loop = (moving || (live && cur)) ? requestAnimationFrame(step) : 0;
+      }
+      function kick(){ if (!loop){ last = 0; loop = requestAnimationFrame(step); } }
+
+      isoCell.addEventListener('mousemove', function(e){
+        if (!ensure()) return;
+        var r = isoCell.getBoundingClientRect();
+        var c = inv(e.clientX - r.left, e.clientY - r.top);
+        var i = Math.floor(c[0]), j = Math.floor(c[1]), k = i + ',' + j;
+        live = true;
+        if (k !== cur){
+          if (cur && blocks[cur]) blocks[cur].t = 0;
+          cur = k;
+          if (!blocks[k]) blocks[k] = { i:i, j:j, h:0, t:S * 0.4 };
+          else blocks[k].t = Math.max(blocks[k].t, S * 0.4);
+        }
+        kick();
+      });
+      isoCell.addEventListener('mouseleave', function(){
+        live = false; cur = null;
+        Object.keys(blocks).forEach(function(k){ blocks[k].t = 0; });
+        kick();
+      });
+
+      measure();
+      requestAnimationFrame(function(){ if (measure()) draw(); });
+      setTimeout(function(){ if (measure()) draw(); }, 0);
+      setTimeout(function(){ if (measure()) draw(); }, 320);
+      setTimeout(function(){ if (measure()) draw(); }, 900);
+      if (window.ResizeObserver){
+        isoCell._ro = new ResizeObserver(function(){ if (measure()) draw(); });
+        isoCell._ro.observe(isoCell);
+      } else {
+        window.addEventListener('resize', function(){ if (measure()) draw(); });
+      }
+    })();
+
+    /* ── intro: the mark blooms centre-screen, then its four petals fly
+       out to the corners of the claim card while the frame fades up ── */
+    var intro = byId('intro');
     var ticks = [].slice.call(document.querySelectorAll('.claim__tick'));
     var DIRS = [[-1,-1],[1,-1],[-1,1],[1,1]];   // tl, tr, bl, br
     var timers = [];
     function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
 
-    // park each tick centre-screen, scaled up to petal size, invisible
     function park(){
-      var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      var r0 = stage.getBoundingClientRect();
+      var ccx = r0.left + r0.width / 2, ccy = r0.top + r0.height / 2;
       ticks.forEach(function(t, i){
         var r = t.getBoundingClientRect(), d = DIRS[i];
         t.classList.remove('claim__tick--fly');
         t.style.opacity = '0';
         t.style.transform =
-          'translate(' + Math.round(cx - (r.left + r.width / 2) + d[0] * 68) + 'px,' +
-                         Math.round(cy - (r.top + r.height / 2) + d[1] * 68) + 'px) ' +
-          'rotate(var(--rot,0deg)) scale(6.8)';
+          'translate(' + Math.round(ccx - (r.left + r.width / 2) + d[0] * 68) + 'px,' +
+                         Math.round(ccy - (r.top + r.height / 2) + d[1] * 68) + 'px) ' +
+          'rotate(var(--rot)) scale(6.8)';
       });
     }
-    // let them spring home to their corners
     function release(){
       ticks.forEach(function(t){
         t.classList.add('claim__tick--fly');
@@ -701,49 +921,46 @@
         t.style.transform = '';
       });
     }
-
-    function run(){
+    function playIntro(){
       timers.forEach(clearTimeout); timers = [];
-      introDone = false; applyCuts(false); spread = null;
-      el.classList.remove('intro--in', 'intro--out', 'intro--gone');
+      intro.classList.remove('intro--in', 'intro--out', 'intro--gone');
       stage.classList.add('stage--intro');
+      stks.forEach(function(s){ s.classList.remove('stk--in'); });
       park();
       var prevOverflow = stage.style.overflowY;
       stage.style.overflowY = 'hidden';
 
-      at(40,   function(){ el.classList.add('intro--in'); });
+      at(40,   function(){ intro.classList.add('intro--in'); });
       at(1300, function(){
-        // hand-off in one frame: the real ticks appear exactly where the
-        // clipped petals sit, so the shape simply continues — nothing fades
         ticks.forEach(function(t){ t.style.opacity = '1'; });
-        el.classList.add('intro--out');
+        intro.classList.add('intro--out');
       });
       at(1340, release);
       at(1560, function(){ stage.classList.remove('stage--intro'); });
+      at(1700, function(){ stks.forEach(function(s){ s.classList.add('stk--in'); }); });
       at(2200, function(){
-        introDone = true;
-        el.classList.add('intro--gone');
+        intro.classList.add('intro--gone');
         stage.style.overflowY = prevOverflow;
       });
     }
 
     if (reduce){
       ticks.forEach(function(t){ t.style.opacity = '1'; });
-      introDone = true;
-      el.classList.add('intro--gone');
-      return;
-    }
-
-    run();
-    var navMark = $('.nav__mark');
-    if (navMark){
-      navMark.style.cursor = 'pointer';
-      navMark.setAttribute('title', 'Replay intro');
-      navMark.addEventListener('click', function(){
-        var scrolled = stage.scrollTop > 4;
-        if (scrolled) stage.scrollTo({ top:0, behavior:'smooth' });
-        setTimeout(run, scrolled ? 420 : 0);
-      });
+      stks.forEach(function(s){ s.style.transitionDelay = '0ms'; s.classList.add('stk--in'); });
+      stage.classList.remove('stage--intro');
+      intro.classList.add('intro--gone');
+    } else {
+      stks.forEach(function(s){ s.classList.remove('stk--in'); });
+      playIntro();
+      var navMark = $('.nav__mark');
+      if (navMark){
+        navMark.setAttribute('title', 'Replay intro');
+        navMark.addEventListener('click', function(){
+          var scrolled = stage.scrollTop > 4;
+          if (scrolled) stage.scrollTo({ top:0, behavior:'smooth' });
+          setTimeout(playIntro, scrolled ? 420 : 0);
+        });
+      }
     }
   })();
 

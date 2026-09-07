@@ -1,30 +1,47 @@
 # assets/
 
-The hero's hover interaction flings six cut-out stickers out from behind the
-headline. The source art was supplied from the "Gatha Hero" Claude Design
-project and re-encoded here as WebP (longest edge 560 px, quality 82) — the
-originals were 200 KB–600 KB PNGs; the whole set is now ~370 KB.
+## Hero — 7A locked grid
 
-| file                  | used as        | on-screen height |
-|-----------------------|----------------|------------------|
-| `cheesecake.webp`     | left slot 1    | 109 px           |
-| `CHAICROISSANT.webp`  | left slot 2    | 120 px           |
-| `matcha.webp`         | left slot 3    | 133 px           |
-| `nycmodel.webp`       | right slot 1   | 106 px           |
-| `Gatha 1.webp`        | right slot 2   | 123 px           |
-| `wip logo 1.webp`     | right slot 3   | 101 px           |
+The hero (`hero-home` / turn 7A of the "Hero Explorations" Claude Design
+canvas) lays four wave/zigzag **tapes** and nine draggable **stickers** over
+a Swiss grid, at the exact frame coordinates from the design file. Source art
+came from `…/PERSONAL STUDY/UX/FINAL FOLDER` (+ `/TAPE`) and the design
+project's own `assets/`, re-encoded here as WebP.
 
-## Work-panel clippies
+| file                   | placed as (in `STICKERS` / `TAPES`, `index.html`) | source |
+|------------------------|---------------------------------------------------|--------|
+| `tape-1.webp`          | tape, top-left                                    | `FINAL FOLDER/TAPE/Frame 261.png` |
+| `tape-2.webp`          | tape, top-right                                   | `FINAL FOLDER/TAPE/Frame 262.png` |
+| `tape-3.webp`          | tape, lower-left                                  | `FINAL FOLDER/TAPE/Exclude.png` |
+| `tape-4.webp`          | tape, right                                       | `FINAL FOLDER/TAPE/Frame 259.png` |
+| `fig-s1.webp`          | square cut-out, top-right (Gatha avatar)          | `Gatha 1.webp`, centre-cropped |
+| `fig-s2.webp`          | square cut-out, upper-left (NYC model)            | `nycmodel.webp`, centre-cropped |
+| `fig-s3.webp`          | square cut-out, lower-right (chai + croissant)    | `CHAICROISSANT.webp`, centre-cropped |
+| `fig-s4.webp`          | square cut-out, mid-right (cheesecake)            | `cheesecake.webp`, centre-cropped |
+| `fig-s5.webp`          | square cut-out, top-right (pink heart paperclip)  | `FINAL FOLDER/CLIP HEART.png` |
+| `sticker-logomark.webp`| origami quatrefoil, centre                        | `FINAL FOLDER/logomark.png` |
+| `sticker-baby.webp`    | baby photo, lower-left                            | `FINAL FOLDER/GATHA BABY PIC.png` |
+| `sticker-lotus.webp`   | lotus, bottom-right                               | `FINAL FOLDER/LOTUS.png` |
+| `sticker-ipod.webp`    | iPod, bottom-centre (on the checker base)         | `FINAL FOLDER/ipod 3.png` |
 
-Wizaur pixel-art for project 02 in the selected-work carousel:
+The ruler edge, graph-paper column, dot-field bands, checker base and
+isometric column are all pure CSS/SVG generated in `index.html` — no assets.
 
-| file         | used as              | notes |
-|--------------|----------------------|-------|
-| `wizzy.png`  | card thumbnail       | transparent PNG @2x (776×992). Its Figma SVG drew every pixel block as its own `<path>` — 3,996 paths / 265 KB — and stuttered under the hover springs. Raster is 8.5 KB and one GPU texture. `.qc__img[src$=".png"]` gets `image-rendering:pixelated` to stay crisp. |
-| `chat.svg`   | corner cut-outs 0,3  | 36 KB, 552 paths — few enough to stay smooth at the small corner size, and scales cleanly. |
-| `spark2.svg` | corner cut-outs 1,2  | 30 KB, 444 paths. |
+Stickers spring in after the intro, then drag anywhere on the hero; every
+fresh load snaps them back to the design placement (drag offsets live only in
+memory). A missing sticker file just leaves a gap — nothing breaks.
 
-To replace one: drop a transparent-background image at the same path (any
-web format — update the extension in the `CUTS` array in `index.html` if it
-changes). If a file is missing the page shows a labelled placeholder chip in
-its slot and nothing breaks.
+## Work-panel photos + clippies
+
+Selected-work carousel. Card thumbnails and the hover cut-outs (`CORNER_SEQ`
+in `index.html`) reuse the project photos:
+
+| file                  | notes |
+|-----------------------|-------|
+| `nycmodel.webp` `CHAICROISSANT.webp` `cheesecake.webp` `Gatha 1.webp` `matcha.webp` `wip logo 1.webp` | card thumbs + corner cut-outs |
+| `wizzy.png`           | project-02 thumbnail — transparent PNG @2x. Its Figma SVG drew every pixel block as its own `<path>` (3,996 paths / 265 KB) and stuttered under the hover springs; raster is 8.5 KB. `.qc__img[src$=".png"]` keeps `image-rendering:pixelated`. |
+| `chat.svg`            | project-02 corner cut-outs 0,3 — 36 KB, 552 paths. |
+| `spark2.svg`          | project-02 corner cut-outs 1,2 — 30 KB, 444 paths. |
+
+`favicon.svg` — the quatrefoil mark on a `--pink` ground.
+`cross-grid.svg` / `pixel-heart.svg` — unused (were the old hero's pixel scribbles); kept for reference.
