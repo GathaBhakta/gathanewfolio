@@ -47,5 +47,7 @@ in `index.html`) reuse the project photos:
 | `chat.svg`            | project-02 corner cut-outs 0,3 — 36 KB, 552 paths. |
 | `spark2.svg`          | project-02 corner cut-outs 1,2 — 30 KB, 444 paths. |
 
+`cursor.svg` — pink-dot pointer, the hero's default cursor.
+`cursor-hover.svg` — pink ring, shown over the interactive grid regions (`.cell--dot` / `--check` / `--iso`); graph keeps `crosshair`, stickers keep `grab`.
 `favicon.svg` — the quatrefoil mark on a `--pink` ground.
 `cross-grid.svg` / `pixel-heart.svg` — unused (were the old hero's pixel scribbles); kept for reference.
