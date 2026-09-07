@@ -52,7 +52,10 @@
     display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
     padding:1.1vw 4.1vw;gap:3vw;
     background:transparent;
+    transition:transform 340ms var(--ease),opacity 240ms var(--ease);
   }
+  /* auto-hide while reading; reveal on scroll-up or a reach for the top edge */
+  .nav--hidden{transform:translateY(-115%);opacity:0;pointer-events:none}
   .nav__group{
     display:flex;gap:clamp(14px,2.6vw,38px);
     font-family:var(--gb-sans);font-weight:600;
@@ -478,19 +481,45 @@
   var video = document.querySelector('.vhero__video');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* nav flips to cream while the dark video is behind it, back to pink-ink
-     over the cream article — the flip point is the video's lower edge
-     meeting the nav's mid-line */
+  var REVEAL = 56;          // top strip (px) that counts as reaching for the nav
+  var lastY = window.pageYOffset;
+  var acc = 0;              // net scroll distance since the last direction change
+  var hidden = false;
+  var hoverTop = false;
   var pending = false;
-  function paint(){
-    pending = false;
-    var flip = vhero.getBoundingClientRect().bottom > nav.offsetHeight * 0.5;
-    nav.classList.toggle('nav--dark', flip);
+
+  function setHidden(v){
+    if (v === hidden) return;
+    hidden = v;
+    nav.classList.toggle('nav--hidden', v);
   }
-  function onScroll(){ if (!pending){ pending = true; requestAnimationFrame(paint); } }
+  function apply(){
+    pending = false;
+    var y = window.pageYOffset, dy = y - lastY;
+    lastY = y;
+    if ((dy > 0) !== (acc > 0)) acc = 0;   // direction flipped → reset the meter
+    acc += dy;
+
+    /* colour — cream while the dark video sits behind the bar, back to
+       pink-ink over the cream article */
+    nav.classList.toggle('nav--dark', vhero.getBoundingClientRect().bottom > nav.offsetHeight * 0.5);
+
+    /* visibility — shown at the top or on a top-edge hover; slides away
+       after ~40px of downward reading, returns after ~30px of scroll-up */
+    if (y <= 4 || hoverTop) setHidden(false);
+    else if (acc > 40) setHidden(true);
+    else if (acc < -30) setHidden(false);
+  }
+  function onScroll(){ if (!pending){ pending = true; requestAnimationFrame(apply); } }
   window.addEventListener('scroll', onScroll, { passive:true });
   window.addEventListener('resize', onScroll);
-  paint();
+  window.addEventListener('mousemove', function(e){
+    var t = e.clientY <= REVEAL;
+    if (t === hoverTop) return;
+    hoverTop = t;
+    if (t) setHidden(false);
+  }, { passive:true });
+  apply();
 
   /* reduced motion: hold the first frame instead of looping */
   if (reduce && video){
