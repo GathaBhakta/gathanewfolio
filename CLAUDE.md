@@ -26,24 +26,33 @@ inline-size`, proximity scroll-snap). Its children, in order:
    mark switch colour: to cream on the base pink panel, or — when a card's
    pastel wash is showing — to a WCAG-AA monochrome of that wash computed
    by `navInkOn()` and published as `--nav-ink`.
+2b. **`.ruler`** — a `.stage` child (sibling of `.nav`), `position:fixed`
+   pinned to the left edge full-height (contained by `.stage`, so it stays
+   put through the scroll like the nav). `paint()` toggles `.ruler--solid`
+   with the same `onSolid` test as the nav → a grayscale+brightness filter
+   lightens the pink rules over a solid section. Opacity holds at `.5`.
 3. **`.hero`** — sticky, full viewport, `overflow:hidden`,
-   `container-type:inline-size`. Turn **7A**, a **full-bleed splash**: one
-   Swiss `.grid` (`position:absolute;inset:0`) with **clamped side columns
-   + a flexible middle** (`clamp(…3.125cqw…) clamp(…19.097cqw…) minmax(0,1fr)
-   clamp(…22.222cqw…)`, four `%` rows) so the pattern regions reach every
-   screen edge at any width — `.ruler` edge (absolute, `left:0`),
-   `.cell--graph` paper column, `.cell--dot` bands, `.cell--check` base,
-   `.cell--iso` column. Ruler / graph / dot / checker tiles are SVG data
-   URIs built in JS (`heroGrid` IIFE, `GS=38` module); the iso column
-   extrudes pink-lit blocks on dwell. The `.cell--claim` (middle column)
-   carries the dot field and centres a `.claimbox` (`width:min(100%,720px)`)
-   holding the card + corner ticks + live text ("Gatha designs both —
-   Screens & Spaces", positioned in `%` of the box); every claim type
-   measure is `min(Ncqw, px)`-capped so it holds its design size past
-   ~1280 instead of growing with the splash. `.tape` × 4 and `.stk` × 9
-   ride a centred `.hero__frame` overlay (`max-width:1280px`,
-   `pointer-events:none`; `.stk` re-enables it to drag). Stickers spring in
-   after the intro and reset to placement every load (offsets in memory
+   `container:hero / inline-size`. Turn **7A**, a **full-bleed splash**: one
+   Swiss `.grid` (`position:absolute;inset:0`), columns
+   `0 | minmax(130px,1fr) | clamp(520px,54cqw,840px) | minmax(130px,1fr)`
+   (four `%` rows) — the **middle column *is* the claim card** and the two
+   `1fr` side columns split the rest, so the graph and isometric run flush
+   to the card with no gap and reach the screen edge. `.cell--graph` paper
+   column, `.cell--dot` bands, `.cell--check` base, `.cell--iso` column;
+   the ruler / graph / dot / checker tiles are SVG data URIs built in JS
+   (`heroGrid` IIFE, `GS=38` module); the iso column extrudes pink-lit
+   blocks on dwell. `.cell--claim` carries the dot field + the seam tapes
+   and holds a `.claimbox` (`width:100%`, `container-type:inline-size` — the
+   claim type sizes off the card, itself column-capped, so it stays
+   proportional to the design, never runaway). Live text ("Gatha designs
+   both — Screens & Spaces") is `%`-positioned in the box, balanced to
+   equal padding on all four sides; the italic `&` interlocks with "Spaces"
+   with a `var(--cream)` `-webkit-text-stroke` as the knockout. `.tape` × 4
+   (`.tape--1..4`, static CSS, children of `.cell--claim` / `.cell--iso`,
+   centred on the seams off the card edges). `.stk` × 9
+   ride a centred `.hero__frame` overlay (`max-width:1280px`, `z-index:40`
+   so they sit above the card, `pointer-events:none`; `.stk` re-enables it
+   to drag). Stickers spring in after the intro and reset every load (in memory
    only). On scroll the whole hero fades + scales down 3% under the work
    panel.
 4. **`.work`** — one screen-framed pink panel, the **7b × 7c hybrid**
