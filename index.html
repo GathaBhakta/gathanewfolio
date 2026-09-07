@@ -104,7 +104,11 @@
     z-index:2;
     transform-origin:50% 50%;
     will-change:transform,opacity;
+    /* pink-dot cursor across the canvas; interactive regions swap it below */
+    cursor:url(assets/cursor.svg) 15 15, auto;
   }
+  /* the grid reacts to the pointer — a ring cursor signals that before you act */
+  .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 17 17, auto}
   /* the grid collage is a full-bleed splash — ruler / graph / dot / checker
      / isometric reach every screen edge. The stickers ride this centred
      1280 band and sit above everything else on the canvas. */
@@ -212,9 +216,9 @@
     color:var(--ink);white-space:nowrap;
   }
   .claim__w1{left:13%;top:21.89%}
-  .claim__w2{left:47%;top:47.09%}
+  .claim__w2{left:50%;top:47.09%}
   .claim__amp{
-    position:absolute;left:39%;top:40.11%;z-index:3;
+    position:absolute;left:38.5%;top:40.11%;z-index:3;
     font-family:var(--gb-serif);font-style:italic;font-weight:400;font-size:18.8cqw;line-height:1;
     color:var(--pink);
     transform:rotate(2.61deg);transform-origin:0 0;
@@ -222,7 +226,7 @@
     filter:drop-shadow(0 .41cqw .41cqw rgba(0,0,0,.25));
   }
   .claim__note{
-    position:absolute;left:14.5%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
+    position:absolute;left:10.5%;top:54.45%;width:26.25%;margin:0;z-index:2;text-align:right;
     font-family:var(--gb-serif);font-weight:400;font-size:2.5cqw;line-height:1.29;
     color:#000000;white-space:nowrap;
   }
