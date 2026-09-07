@@ -105,10 +105,10 @@
     transform-origin:50% 50%;
     will-change:transform,opacity;
     /* pink-dot cursor across the canvas; interactive regions swap it below */
-    cursor:url(assets/cursor.svg) 15 15, auto;
+    cursor:url(assets/cursor.svg) 10 10, auto;
   }
   /* the grid reacts to the pointer — a ring cursor signals that before you act */
-  .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 17 17, auto}
+  .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 12 12, auto}
   /* the grid collage is a full-bleed splash — ruler / graph / dot / checker
      / isometric reach every screen edge. The stickers ride this centred
      1280 band and sit above everything else on the canvas. */
@@ -127,10 +127,10 @@
   .grid{
     position:absolute;inset:0;display:grid;
     grid-template-columns:
-      clamp(20px, 3.125cqw, 46px)
-      minmax(120px, 0.82fr)
+      0
+      minmax(130px, 1fr)
       clamp(520px, 54cqw, 840px)
-      minmax(150px, 1fr);
+      minmax(130px, 1fr);
     grid-template-rows:7.37% 19.22% 46.196% 27.21%;
     transition:opacity 800ms var(--ease);
   }
@@ -207,7 +207,7 @@
      read equal; Spaces + & step out on the diagonal as in the design. */
   .claim{position:absolute;inset:0}
   .claim__eyebrow{
-    position:absolute;left:13%;top:11.72%;
+    position:absolute;left:9.2%;top:11.72%;
     font-family:var(--gb-serif);font-weight:400;font-size:5cqw;line-height:1;
     color:var(--ink-mid);white-space:nowrap;
   }
@@ -215,8 +215,8 @@
     position:absolute;font-family:var(--gb-serif);font-weight:500;font-size:13.34cqw;line-height:1;
     color:var(--ink);white-space:nowrap;
   }
-  .claim__w1{left:13%;top:21.89%}
-  .claim__w2{left:49%;top:47.09%}
+  .claim__w1{left:9.2%;top:21.89%}
+  .claim__w2{left:48%;top:47.09%}
   .claim__amp{
     position:absolute;left:37.5%;top:40.11%;z-index:3;
     font-family:var(--gb-serif);font-style:italic;font-weight:400;font-size:18.8cqw;line-height:1;
@@ -231,7 +231,7 @@
   }
   .claim__areas{
     position:absolute;left:50%;top:84.3%;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:.94cqw;
-    font-family:var(--gb-sans);font-weight:400;font-size:2.08cqw;line-height:1;
+    font-family:var(--gb-sans);font-weight:400;font-size:1.95cqw;line-height:1;
     color:var(--ink-soft);white-space:nowrap;
   }
   .claim__areas i{color:var(--pink);font-style:normal;font-size:2.34cqw;line-height:0}
@@ -273,10 +273,10 @@
            transform:translate(-50%,-50%);background-image:url(assets/tape-1.webp)}
   .tape--2{left:101%;top:-24%;    width:min(7.99cqw,104px); aspect-ratio:348/410;
            transform:translate(-50%,-50%);background-image:url(assets/tape-2.webp)}
-  .tape--3{left:0;    top:118%;   width:min(8cqw,104px);    aspect-ratio:382/572;
-           transform:translate(-50%,-50%) rotate(90deg);background-image:url(assets/tape-3.webp)}
+  .tape--3{left:0;    top:133.6%; width:min(10.1cqw,131px); aspect-ratio:382/572;
+           transform:translate(-50%,-50%);background-image:url(assets/tape-3.webp)}
   .tape--4{left:78.9%;top:97.3%;  width:min(10.47cqw,136px);aspect-ratio:344/446;
-           transform:translate(-50%,-50%);background-image:url(assets/tape-4.webp)}
+           transform:translate(-50%,-50%) rotate(90deg);background-image:url(assets/tape-4.webp)}
   .stage--intro .tape{display:none}
 
   /* stickers — spring in, then draggable anywhere on the hero */
