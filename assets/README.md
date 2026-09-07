@@ -7,9 +7,10 @@ canvas) lays four wave/zigzag **tapes** and nine draggable **stickers** over
 a Swiss grid, at the exact frame coordinates from the design file. Source art
 came from `…/PERSONAL STUDY/UX/FINAL FOLDER` (+ `/TAPE`) and repo photos,
 re-encoded here as WebP. The photo cut-outs keep their own aspect ratio
-(`.stk--sq` letterboxes them in a square box — no cropping). The whole
-composition is authored at 1280 (`.hero__frame` max-width) and centres past
-that so wide screens stay balanced.
+(`.stk--sq` letterboxes them in a square box — no cropping). The grid
+collage is full-bleed; only the claim card, tapes and stickers stay
+size-capped (tapes + stickers ride a centred `.hero__frame`, max-width
+1280).
 
 | file                   | placed as (in `STICKERS` / `TAPES`, `index.html`) | source |
 |------------------------|---------------------------------------------------|--------|
