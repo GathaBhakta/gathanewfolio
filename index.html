@@ -104,11 +104,11 @@
     z-index:2;
     transform-origin:50% 50%;
     will-change:transform,opacity;
-    /* pink-dot cursor across the canvas; interactive regions swap it below */
-    cursor:url(assets/cursor.svg) 10 10, auto;
+    /* white-glow pink dot across the canvas; interactive regions swap it below */
+    cursor:url(assets/cursor.svg) 13 13, auto;
   }
-  /* the grid reacts to the pointer — a ring cursor signals that before you act */
-  .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 12 12, auto}
+  /* the grid reacts to the pointer — a ring reticle signals that before you act */
+  .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 15 15, auto}
   /* the grid collage is a full-bleed splash — ruler / graph / dot / checker
      / isometric reach every screen edge. The stickers ride this centred
      1280 band and sit above everything else on the canvas. */
