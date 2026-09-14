@@ -534,7 +534,10 @@
     touch-action:none;
     transform-origin:50% 50%;
     will-change:transform,opacity;
+    opacity:.92;transform:scale(.985);
+    transition:opacity 520ms var(--ease),transform 520ms var(--ease);
   }
+  .ft.ft--in{opacity:1;transform:scale(1)}
   /* the -18px Y offset isn't arbitrary — .ruler and .cell--graph share it
      in the hero to phase-lock the ruler's ticks to the paper grid; same
      tile module here (76px), so the same offset keeps them in sync as
@@ -556,6 +559,7 @@
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
     background-size:76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:url(#ftPunch);
   }
 
   .ft__nav{position:absolute;left:68.23%;top:calc(4.3% + var(--nav-h));display:grid;grid-template-columns:12.85cqw 8.97cqw auto;align-items:flex-start;white-space:nowrap}
@@ -582,6 +586,7 @@
     white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
     background-blend-mode:multiply;background-size:76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:url(#ftPunch);
   }
   .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw}
   .ft__stats{display:flex;gap:3.41cqw;align-items:flex-start}
@@ -634,11 +639,13 @@
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(24px,5.556cqw,88px);line-height:1;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
     background-size:76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:url(#ftPunch);
   }
   .ft__goverpts{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.778cqw,44px);line-height:1;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
     background-size:76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:url(#ftPunch);
   }
   .ft__goverimg{width:11.6cqw;height:auto;display:block}
 
@@ -666,6 +673,7 @@
   @media (prefers-reduced-motion:reduce){
     .nav__mark{animation:none}
     .cutout,.qc__corner,.work__lead{transition:opacity 200ms linear}
+    .ft{opacity:1;transform:none;transition:none}
   }
 </style>
 </head>
@@ -767,6 +775,21 @@
       <img class="work__lead" id="workLead" alt="">
     </div>
   </section>
+
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute;pointer-events:none">
+    <defs>
+      <!-- Figma Inner Shadow: X=2 Y=2 Blur=6.86 Spread=0 #A0376C @100% Normal.
+           stdDeviation = blur/2. -->
+      <filter id="ftPunch" x="-40%" y="-40%" width="180%" height="180%">
+        <feOffset in="SourceAlpha" dx="2" dy="2" result="o"></feOffset>
+        <feGaussianBlur in="o" stdDeviation="3.43" result="b"></feGaussianBlur>
+        <feComposite in="SourceAlpha" in2="b" operator="out" result="sh"></feComposite>
+        <feFlood flood-color="#A0376C" flood-opacity="1" result="col"></feFlood>
+        <feComposite in="col" in2="sh" operator="in" result="shadow"></feComposite>
+        <feMerge><feMergeNode in="SourceGraphic"></feMergeNode><feMergeNode in="shadow"></feMergeNode></feMerge>
+      </filter>
+    </defs>
+  </svg>
 
   <div class="ft-wrap" id="ftWrap">
   <footer class="ft" id="ft">
@@ -900,19 +923,17 @@
     nav.classList.toggle('nav--solid', onSolid);
 
     /* footer reveal — .ft is already pinned (see .ft-wrap above) by
-       the moment .work starts to leave, so what actually changes is
-       how much of .work's own box is still covering it. Read that
-       straight off .work's rect: fp goes 0 (work still full-screen)
-       → 1 (work fully gone) over exactly that one viewport of scroll.
-       Easing fp² before using it stretches the fade + 1.5% scale-in
-       so it visibly lags the raw scroll — arriving at roughly half
-       speed — while staying just about the only thing that moves. */
+       the moment .work starts to leave, so the only real signal is
+       how much of .work's box still covers it. Rather than writing
+       .ft's opacity/transform every scroll frame (which forces a
+       repaint of everything inside it — including the punched text's
+       filter — on every tick, which is what was actually stalling
+       scrolling), flip a single class once .work has mostly cleared
+       and let the CSS transition below do the animating natively. */
     if (footerSec && workSec){
       var workBottom = Math.max(0, Math.min(ch, workSec.getBoundingClientRect().bottom));
-      var fp = 1 - workBottom / ch;                             // 0 → 1 as work clears the screen
-      var eased = fp * fp;
-      footerSec.style.opacity = (0.92 + eased * 0.08).toFixed(3);
-      footerSec.style.transform = reduce ? 'none' : 'scale(' + (0.985 + eased * 0.015).toFixed(4) + ')';
+      var revealed = (1 - workBottom / ch) > 0.35;
+      footerSec.classList.toggle('ft--in', revealed);
     }
     if (rulerEl) rulerEl.classList.toggle('ruler--solid', onSolid);
   }
@@ -1530,25 +1551,9 @@
       if (el) el.style.backgroundImage = graphTile;
     });
 
-    /* "punched" pink text: same grid, but with a soft vignette baked into
-       each repeat of the tile itself (not a one-off gradient sized to the
-       element) — background-clip:text paints ONE rectangle behind the
-       *whole* multi-line block, so a gradient sized to that box only ever
-       shades the first line and leaves the rest flat. Repeating it every
-       76px instead gives every line the same treatment. This is also why
-       it stays a plain background-image: a real SVG filter() here forces
-       a full repaint of these layers on every opacity/transform tick, and
-       .ft's own scroll-driven fade never stops moving — that's what was
-       actually stalling scrolling, not the (now-fixed) idle game loop. */
-    var pb = '<radialGradient id="pg" cx="18%" cy="18%" r="78%">' +
-             '<stop offset="0%" stop-color="#A0376C" stop-opacity="0.55"/>' +
-             '<stop offset="65%" stop-color="#A0376C" stop-opacity="0"/>' +
-             '</radialGradient>' +
-             '<rect width="' + TILE + '" height="' + TILE + '" fill="url(#pg)"/>' + gb;
-    var punchTile = svgUrl(TILE, TILE, pb);
     ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts'].forEach(function(id){
       var el = byId(id);
-      if (el) el.style.backgroundImage = punchTile;
+      if (el) el.style.backgroundImage = graphTile;
     });
   })();
 
