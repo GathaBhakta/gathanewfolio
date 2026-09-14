@@ -528,7 +528,6 @@
     position:sticky;top:0;z-index:2;
     width:100%;height:100dvh;min-height:540px;
     overflow:hidden;
-    container:ft/inline-size;
     background:var(--cream);color:var(--ink);
     font-family:var(--gb-sans);font-weight:300;
     -webkit-font-smoothing:antialiased;
@@ -536,7 +535,12 @@
     transform-origin:50% 50%;
     will-change:transform,opacity;
   }
-  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 0;background-size:5.1505cqw 5.1505cqw;opacity:.2}
+  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 0;background-size:89px 89px;opacity:.2}
+  /* the graph texture bleeds full-width behind everything (like the hero's
+     grid collage); the actual composition is capped + centred here, same
+     trick as .hero's claim card, so it reads at its designed scale instead
+     of stretching (and growing every child's cqw with it) on wide screens */
+  .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/inline-size}
   .ft__sig{position:absolute;left:69.1%;top:39.2%;width:7.06%;height:auto;display:block;pointer-events:none}
   .ft__wordmark{position:absolute;left:-.46%;top:64.46%;width:100.98%;height:37.6%;display:block;pointer-events:none}
 
@@ -546,7 +550,7 @@
     font-size:clamp(26px,5.556cqw,88px);line-height:1.28;
     white-space:nowrap;pointer-events:none;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:5.1505cqw 5.1505cqw;
+    background-size:89px 89px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
 
@@ -572,7 +576,7 @@
   .ft__gtitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.083cqw,34px);line-height:1;
     white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
-    background-blend-mode:multiply;background-size:5.1505cqw 5.1505cqw;
+    background-blend-mode:multiply;background-size:89px 89px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
   .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw}
@@ -618,12 +622,12 @@
   .ft__govertitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(24px,5.556cqw,88px);line-height:1;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:5.1505cqw 5.1505cqw;-webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:89px 89px;-webkit-background-clip:text;background-clip:text;color:transparent;
   }
   .ft__goverpts{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.778cqw,44px);line-height:1;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:5.1505cqw 5.1505cqw;-webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:89px 89px;-webkit-background-clip:text;background-clip:text;color:transparent;
   }
   .ft__goverimg{width:11.6cqw;height:auto;display:block}
 
@@ -757,6 +761,7 @@
   <footer class="ft" id="ft">
     <div class="ft__graph" id="ftGraph"></div>
 
+    <div class="ft__frame" id="ftFrame">
     <img class="ft__sig" alt="Gatha" src="assets/ft-signature.webp">
     <img class="ft__wordmark" alt="Gatha" src="assets/ft-wordmark-dots.svg">
 
@@ -835,6 +840,7 @@
       <div class="ft__govertitle" id="ftGoverTitle">Good Game!</div>
       <img class="ft__goverimg" alt="" src="assets/ft-baby-awake.webp">
       <div class="ft__goverpts" id="ftGoverPts">0pts</div>
+    </div>
     </div>
   </footer>
   </div>
@@ -1517,7 +1523,8 @@
      the game and its stickers stay correct at any footer size. */
   (function footerGame(){
     var ft = byId('ft');
-    if (!ft) return;
+    var ftFrame = byId('ftFrame');
+    if (!ft || !ftFrame) return;
 
     var W = 1728, H = 1117;
     var BAR = { y:616, h:34, w:299 };
@@ -1557,7 +1564,7 @@
     var off = STICKERS.map(function(){ return { x:0, y:0 }; });
     var drag = null;
 
-    function box(){ return ft.getBoundingClientRect(); }
+    function box(){ return ftFrame.getBoundingClientRect(); }
     function toVirtual(cx, cy){ var b = box(); return { x:(cx - b.left) / b.width * W, y:(cy - b.top) / b.height * H }; }
     function clampBar(x){ return Math.max(BAR.w / 2, Math.min(FIELD.right - BAR.w / 2, x)); }
     function babyScale(){ return 1 - 0.1 * gs.level; }
