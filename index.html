@@ -541,7 +541,7 @@
      trick as .hero's claim card, so it reads at its designed scale instead
      of stretching (and growing every child's cqw with it) on wide screens */
   .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/inline-size}
-  .ft__sig{position:absolute;left:83.5%;bottom:39.75%;width:7.06%;height:auto;display:block;pointer-events:none}
+  .ft__sig{position:absolute;left:89%;bottom:39.75%;width:7.06%;height:auto;display:block;pointer-events:none}
   .ft__wordmark{position:absolute;left:-.46%;top:64.46%;width:100.98%;height:37.6%;display:block;pointer-events:none}
 
   .ft__thanks{
@@ -549,10 +549,9 @@
     font-family:var(--gb-serif);font-weight:700;
     font-size:clamp(26px,5.556cqw,88px);line-height:1.28;
     white-space:nowrap;pointer-events:none;
-    background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:76px 76px;
+    background-color:var(--pink);background-repeat:no-repeat,repeat;background-blend-mode:multiply,multiply;
+    background-size:100% 100%,76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:url(#ftPunch);
   }
 
   .ft__nav{position:absolute;left:68.23%;top:calc(4.3% + var(--nav-h));display:grid;grid-template-columns:12.85cqw 8.97cqw auto;align-items:flex-start;white-space:nowrap}
@@ -576,10 +575,9 @@
   }
   .ft__gtitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.083cqw,34px);line-height:1;
-    white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
-    background-blend-mode:multiply;background-size:76px 76px;
+    white-space:nowrap;background-color:var(--pink);background-repeat:no-repeat,repeat;
+    background-blend-mode:multiply,multiply;background-size:100% 100%,76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:url(#ftPunch);
   }
   .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw}
   .ft__stats{display:flex;gap:3.41cqw;align-items:flex-start}
@@ -630,15 +628,13 @@
   .ft__gover.is-on{opacity:1}
   .ft__govertitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(24px,5.556cqw,88px);line-height:1;
-    background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:url(#ftPunch);
+    background-color:var(--pink);background-repeat:no-repeat,repeat;background-blend-mode:multiply,multiply;
+    background-size:100% 100%,76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
   }
   .ft__goverpts{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.778cqw,44px);line-height:1;
-    background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:url(#ftPunch);
+    background-color:var(--pink);background-repeat:no-repeat,repeat;background-blend-mode:multiply,multiply;
+    background-size:100% 100%,76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
   }
   .ft__goverimg{width:11.6cqw;height:auto;display:block}
 
@@ -767,19 +763,6 @@
       <img class="work__lead" id="workLead" alt="">
     </div>
   </section>
-
-  <svg width="0" height="0" aria-hidden="true" style="position:absolute;pointer-events:none">
-    <defs>
-      <filter id="ftPunch" x="-15%" y="-15%" width="130%" height="130%">
-        <feOffset in="SourceAlpha" dx="2" dy="2" result="o"></feOffset>
-        <feGaussianBlur in="o" stdDeviation="1.6" result="b"></feGaussianBlur>
-        <feComposite in="SourceAlpha" in2="b" operator="out" result="sh"></feComposite>
-        <feFlood flood-color="#A0376C" flood-opacity="0.85" result="col"></feFlood>
-        <feComposite in="col" in2="sh" operator="in" result="shadow"></feComposite>
-        <feMerge><feMergeNode in="SourceGraphic"></feMergeNode><feMergeNode in="shadow"></feMergeNode></feMerge>
-      </filter>
-    </defs>
-  </svg>
 
   <div class="ft-wrap" id="ftWrap">
   <footer class="ft" id="ft">
@@ -1538,9 +1521,21 @@
 
     if (ftGraph) ftGraph.style.backgroundImage = graphTile;
 
-    ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts', 'ftBall', 'ftBar'].forEach(function(id){
+    ['ftBall', 'ftBar'].forEach(function(id){
       var el = byId(id);
       if (el) el.style.backgroundImage = graphTile;
+    });
+
+    /* "punched" pink text: the graph tile plus a corner vignette baked
+       into the same background-image stack — a compositor-cheap stand-in
+       for the design's inset shadow. A real SVG filter() here forces a
+       full repaint of these layers on every opacity/transform tick, and
+       .ft's own scroll-driven fade never stops moving — that's what was
+       actually stalling scrolling, not the (now-fixed) idle game loop. */
+    var punchTile = "linear-gradient(135deg, rgba(160,55,108,.45) 0%, rgba(160,55,108,0) 30%), " + graphTile;
+    ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts'].forEach(function(id){
+      var el = byId(id);
+      if (el) el.style.backgroundImage = punchTile;
     });
   })();
 
