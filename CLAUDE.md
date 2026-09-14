@@ -62,6 +62,30 @@ inline-size`, proximity scroll-snap). Its children, in order:
    springs four cut-outs onto the thumbnail corners (7c) and trails a
    fifth on the cursor (7b). Cards are fixed-height + top-aligned so a
    filter change never shifts them. The colophon is the frame's footer.
+5. **`.ft-wrap` → `.ft`** — port of `Gatha Footer.dc.html`, a breakout
+   minigame ("sleep breaker": bounce a ball off a bar to wake five
+   sleeping Gathas, score + `localStorage` highscore, five draggable
+   stickers). `.hero` is a lone sticky first section, so it never
+   actually leaves — it just sits pinned under whatever comes after it,
+   which the original 2-section page never exposed (`.work`, once
+   arrived, had nowhere left to scroll either, so it covered that seam
+   permanently). `.ft-wrap` (`height:200dvh;margin-top:-100dvh`) pulls
+   its box back to start exactly where `.work` starts, so the `.ft`
+   inside it — `position:sticky`, one viewport tall — is already pinned
+   the instant `.work` begins to leave. `z-index:2` ties it with `.hero`
+   but sits later in the DOM, so it wins that seam outright, while
+   staying under `.work`'s `z-index:3` so it can never paint over it —
+   it only ever shows in whatever `.work` has vacated. `paint()` reads
+   `.work`'s own remaining `getBoundingClientRect().bottom` to drive a
+   slow (eased, roughly half-speed-reading), barely-there fade + 1.5%
+   scale-in on `.ft` — it never needs to move once pinned. Physics run
+   in the design's own 1728×1117 space (`footerGame()` IIFE) and paint
+   back through `.ft`'s measured width, same normalisation as the
+   hero's sticker drag. The animation loop only runs while a ball is
+   actually in play (`kick()`/`tick()`) — the punched-pink text
+   (`background-clip:text` off the same generated graph tile as
+   `.ft__graph`) is expensive enough to repaint that leaving the loop
+   running forever, even off-screen, stalled scrolling into it.
 
 ## Conventions
 
@@ -88,6 +112,11 @@ inline-size`, proximity scroll-snap). Its children, in order:
   `spark2` stay SVG (~30–36 KB each).
 - The favicon is `assets/favicon.svg` — the quatrefoil mark on a `--pink`
   ground — linked from `<head>` as `rel="icon" type="image/svg+xml"`.
+- Footer stickers/babies are WebP re-encoded from `…/PERSONAL STUDY/UX/
+  FINAL FOLDER/footer/graphics` — see `assets/README.md`. The footer's
+  graph-paper tile and grid-through-text fill are generated in JS
+  (`footerPatterns()`), same trick as the hero's own patterns — no
+  `ft-graph.svg` asset is shipped.
 
 ## Working here
 

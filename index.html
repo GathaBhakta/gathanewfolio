@@ -8,7 +8,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   :root{
     --cream:#FAF6EF;
@@ -25,6 +25,7 @@
     --gb-serif-display:"Lora","JejuMyeongjo",Georgia,serif;
     --gb-serif:"Lora","JejuMyeongjo",Georgia,serif;
     --gb-sans:"DM Sans",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+    --gb-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
     --ease-out:cubic-bezier(.16,1,.3,1);
     --ease:cubic-bezier(.2,0,.2,1);
     --nav-h:clamp(46px,5.2cqw,72px);
@@ -56,6 +57,7 @@
     scroll-snap-type:y proximity;   /* nudge the work panel fully onto the frame */
   }
   .work{scroll-snap-align:start}
+  .ft-wrap{scroll-snap-align:start}
   .stage[data-sb="white"]{ scrollbar-color:#FFFFFF rgba(44,32,24,.10); }
   .stage::-webkit-scrollbar{width:10px}
   .stage::-webkit-scrollbar-track{background:rgba(44,32,24,.05)}
@@ -496,6 +498,135 @@
   }
   .colophon a:hover{color:var(--ink)}
 
+  /* ── footer — "sleep breaker" ──────────────────────────────
+     Port of the Gatha Footer Claude Design canvas: a tiny breakout
+     game — ball breaks past a bar to wake five sleeping Gathas, score
+     + a localStorage highscore live in the panel, five stickers drag
+     anywhere, clamped off the game window.
+
+     .hero never actually leaves — it's a lone sticky first section,
+     so it just sits pinned under everything else forever. On the
+     original two-section page that never showed: .work, once fully
+     arrived, also never had anywhere left to scroll, so it covered
+     that seam permanently. Adding a third section reopened it — for
+     one viewport of scroll, .work is genuinely leaving and nothing
+     yet stood in front of .hero to take its place.
+
+     .ft-wrap fixes that the same way .hero itself is built: a
+     negative top margin pulls its (double-height) box back to start
+     exactly where .work starts, so the .ft inside it — sticky, one
+     viewport tall — is already pinned at top:0 the instant .work
+     begins to leave. z-index:2 ties it with .hero but sits later in
+     the DOM, so it wins that seam outright; it still stays under
+     .work's z-index:3, so it can never paint over it, only ever
+     appear in whatever .work has already vacated. paint() below
+     reads that same reveal (how much of .work's box remains) to
+     drive a slow, barely-there fade + scale-in on .ft — no motion of
+     its own, since it never needs to move once it's pinned. */
+  .ft-wrap{position:relative;height:200dvh;margin-top:-100dvh}
+  .ft{
+    position:sticky;top:0;z-index:2;
+    width:100%;height:100dvh;min-height:540px;
+    overflow:hidden;
+    container:ft/inline-size;
+    background:var(--cream);color:var(--ink);
+    font-family:var(--gb-sans);font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    touch-action:none;
+    transform-origin:50% 50%;
+    will-change:transform,opacity;
+  }
+  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 0;background-size:5.1505cqw 5.1505cqw;opacity:.2}
+  .ft__sig{position:absolute;left:69.1%;top:39.2%;width:7.06%;height:auto;display:block;pointer-events:none}
+  .ft__wordmark{position:absolute;left:-.46%;top:64.46%;width:100.98%;height:37.6%;display:block;pointer-events:none}
+
+  .ft__thanks{
+    position:absolute;left:68.23%;bottom:39.75%;
+    font-family:var(--gb-serif);font-weight:700;
+    font-size:clamp(26px,5.556cqw,88px);line-height:1.28;
+    white-space:nowrap;pointer-events:none;
+    background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
+    background-size:5.1505cqw 5.1505cqw;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+
+  .ft__nav{position:absolute;left:68.23%;top:4.3%;display:grid;grid-template-columns:12.85cqw 8.97cqw auto;align-items:flex-start;white-space:nowrap}
+  .ft__navcol{display:flex;flex-direction:column}
+  .ft__navhead{
+    font-family:var(--gb-serif);font-weight:600;color:var(--ink-mid);
+    font-size:clamp(11px,1.389cqw,22px);line-height:1;margin-bottom:.694cqw;
+  }
+  .ft__navlink{
+    color:var(--ink-soft);font-size:clamp(10px,.984cqw,16px);line-height:1.65;
+    transition:color 240ms var(--ease);
+  }
+  .ft__navlink:hover{color:var(--pink-ink)}
+
+  .ft__game{
+    position:absolute;left:42.36%;top:4.21%;width:21.06%;box-sizing:border-box;
+    background:rgba(255,255,255,.5);border-radius:.463cqw;
+    box-shadow:inset 0 0 0 .116cqw var(--pink);
+    padding:.926cqw;display:flex;flex-direction:column;gap:1.389cqw;
+    z-index:2;
+  }
+  .ft__gtitle{
+    font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.083cqw,34px);line-height:1;
+    white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
+    background-blend-mode:multiply;background-size:5.1505cqw 5.1505cqw;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw}
+  .ft__stats{display:flex;gap:3.41cqw;align-items:flex-start}
+  .ft__statlabel{font-family:var(--gb-mono);font-size:clamp(8px,.926cqw,14px);line-height:1;color:var(--ink-soft)}
+  .ft__statval{font-family:var(--gb-mono);font-size:clamp(13px,1.736cqw,26px);line-height:1.2;color:var(--pink-ink);margin-top:.463cqw}
+  .ft__ctrl{display:flex;align-items:center;justify-content:space-between}
+  .ft__play{
+    display:flex;align-items:center;gap:.7cqw;cursor:pointer;opacity:.92;
+    background:none;border:0;padding:0;font:inherit;transition:opacity 240ms var(--ease);
+  }
+  .ft__play:hover{opacity:1}
+  .ft__play svg{width:clamp(14px,1.389cqw,22px);height:clamp(14px,1.389cqw,22px);display:block;flex:none}
+  .ft__playlabel{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);letter-spacing:.06em;color:var(--pink-ink)}
+  .ft__lvnote{font-family:var(--gb-mono);font-size:clamp(7px,.752cqw,12px);letter-spacing:.04em;color:#B6A190;white-space:nowrap}
+
+  .ft__baby{position:absolute;width:auto;transform:translate(-50%,-50%);display:block;pointer-events:none;transition:transform 620ms cubic-bezier(.34,1.56,.64,1)}
+  .ft__ball{
+    position:absolute;width:1.678cqw;height:1.678cqw;border-radius:50%;
+    background-color:var(--pink);background-repeat:repeat;transform:translate(-50%,-50%);
+    pointer-events:none;box-shadow:inset .116cqw .116cqw .397cqw #A0376C;
+  }
+  .ft__bar{
+    position:absolute;left:18.95%;top:55.15%;width:17.3%;height:3.04%;border-radius:.463cqw;
+    background-color:var(--pink);background-repeat:repeat;transform:translateX(-50%);
+    pointer-events:none;box-shadow:inset .116cqw .116cqw .397cqw #A0376C;
+  }
+
+  .ft__stk{
+    position:absolute;height:auto;cursor:grab;pointer-events:auto;
+    touch-action:none;user-select:none;-webkit-user-drag:none;
+    transform:translate(-50%,-50%);transition:transform 540ms cubic-bezier(.34,1.56,.64,1);
+  }
+  .ft__stk--drag{transition:none;cursor:grabbing;z-index:30;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+
+  .ft__gover{
+    position:absolute;left:.41%;top:0;width:65.74%;height:60.25%;z-index:50;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.894cqw;
+    background:rgba(250,246,239,.93);pointer-events:none;
+    opacity:0;transition:opacity 380ms var(--ease);
+  }
+  .ft__gover.is-on{opacity:1}
+  .ft__govertitle{
+    font-family:var(--gb-serif);font-weight:700;font-size:clamp(24px,5.556cqw,88px);line-height:1;
+    background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
+    background-size:5.1505cqw 5.1505cqw;-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .ft__goverpts{
+    font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.778cqw,44px);line-height:1;
+    background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
+    background-size:5.1505cqw 5.1505cqw;-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .ft__goverimg{width:11.6cqw;height:auto;display:block}
+
   @keyframes gspin{to{transform:rotate(360deg)}}
 
   @media (max-width:720px){
@@ -622,6 +753,92 @@
     </div>
   </section>
 
+  <div class="ft-wrap" id="ftWrap">
+  <footer class="ft" id="ft">
+    <div class="ft__graph" id="ftGraph"></div>
+
+    <img class="ft__sig" alt="Gatha" src="assets/ft-signature.webp">
+    <img class="ft__wordmark" alt="Gatha" src="assets/ft-wordmark-dots.svg">
+
+    <div class="ft__thanks" id="ftThanks">thanks for<br>scrolling<br>this far</div>
+
+    <nav class="ft__nav">
+      <div class="ft__navcol">
+        <span class="ft__navhead">Work</span>
+        <a href="#" class="ft__navlink">National Gallery of Art</a>
+        <a href="#" class="ft__navlink">Knowunity</a>
+        <a href="#" class="ft__navlink">Wizaur AI</a>
+        <a href="#" class="ft__navlink">Affirmation Studio</a>
+        <a href="#" class="ft__navlink">Virtual Hospitals Africa</a>
+        <a href="#" class="ft__navlink">New Model High School</a>
+      </div>
+      <div class="ft__navcol">
+        <span class="ft__navhead">Explore</span>
+        <a href="#" class="ft__navlink">About</a>
+        <a href="#" class="ft__navlink">Visitor Garden</a>
+        <a href="#" class="ft__navlink">Experiments</a>
+        <a href="#" class="ft__navlink">Blog</a>
+      </div>
+      <div class="ft__navcol">
+        <span class="ft__navhead">Find me</span>
+        <a href="mailto:gahtabhakta@gmail.com" class="ft__navlink">Email</a>
+        <a href="#" class="ft__navlink">GitHub</a>
+        <a href="#" class="ft__navlink">LinkedIn</a>
+        <a href="#" class="ft__navlink">X</a>
+      </div>
+    </nav>
+
+    <div class="ft__game">
+      <div>
+        <div class="ft__gtitle" id="ftGtitle">sleep breaker</div>
+        <div class="ft__gsub">THROW A BALL TO WAKE ME</div>
+      </div>
+      <div class="ft__stats">
+        <div>
+          <div class="ft__statlabel">HIGHSCORE</div>
+          <div class="ft__statval" id="ftHs">0</div>
+        </div>
+        <div>
+          <div class="ft__statlabel">POINTS</div>
+          <div class="ft__statval" id="ftPts">0</div>
+        </div>
+        <div>
+          <div class="ft__statlabel">MISSED</div>
+          <div class="ft__statval" id="ftMiss">0/5</div>
+        </div>
+      </div>
+      <div class="ft__ctrl">
+        <button class="ft__play" id="ftPlay" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path id="ftPlayIcon" d="M6 3.5l14 8.5-14 8.5z" fill="#D993B8"></path></svg>
+          <span class="ft__playlabel" id="ftPlayLabel">PLAY</span>
+        </button>
+        <span class="ft__lvnote" id="ftLv">LV 1 &middot; 2 GATHAS &middot; 1.0x</span>
+      </div>
+    </div>
+
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:8.92%;top:17.41%;width:10.01%">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:22.59%;top:33.04%;width:10.28%">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:36.63%;top:17.9%;width:9.55%;display:none">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:12.33%;top:42.7%;width:9.03%;display:none">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:38.89%;top:44.6%;width:8.68%;display:none">
+
+    <div class="ft__ball" id="ftBall"></div>
+    <div class="ft__bar" id="ftBar"></div>
+
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-primogem.webp" style="left:14.29%;top:80.26%;width:16.48%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-heartlock.webp" style="left:27.94%;top:76.09%;width:16.69%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-pen.webp" style="left:52.58%;top:82%;width:24.55%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-diary.webp" style="left:73.85%;top:87.42%;width:19.6%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-ds.webp" style="left:91.06%;top:79.53%;width:17.71%">
+
+    <div class="ft__gover" id="ftGover">
+      <div class="ft__govertitle" id="ftGoverTitle">Good Game!</div>
+      <img class="ft__goverimg" alt="" src="assets/ft-baby-awake.webp">
+      <div class="ft__goverpts" id="ftGoverPts">0pts</div>
+    </div>
+  </footer>
+  </div>
+
 </div>
 
 <script>
@@ -635,6 +852,8 @@
 
   var stage = byId('stage');
   var hero  = $('.hero');
+  var workSec = $('.work');
+  var footerSec = byId('ft');
   var nav   = $('.nav');
   var rulerEl = $('.ruler');
   var solids = document.querySelectorAll('[data-solidbg]');
@@ -642,7 +861,9 @@
   /* ── scroll: scrollbar flip · hero recede · nav contrast ──
      As the pink work panel slides up the hero eases back (a fade and
      a barely-there 3% scale-down), and the sticky nav swaps its links
-     to a legible on-panel ink once a solid section is behind it. */
+     to a legible on-panel ink once a solid section is behind it. Hero
+     and work are otherwise untouched by the footer below it — the
+     footer owns its own entrance only. */
   var scrollPending = false;
   function paint(){
     scrollPending = false;
@@ -660,6 +881,22 @@
       if (r.top <= mid && r.bottom > mid){ onSolid = true; break; }
     }
     nav.classList.toggle('nav--solid', onSolid);
+
+    /* footer reveal — .ft is already pinned (see .ft-wrap above) by
+       the moment .work starts to leave, so what actually changes is
+       how much of .work's own box is still covering it. Read that
+       straight off .work's rect: fp goes 0 (work still full-screen)
+       → 1 (work fully gone) over exactly that one viewport of scroll.
+       Easing fp² before using it stretches the fade + 1.5% scale-in
+       so it visibly lags the raw scroll — arriving at roughly half
+       speed — while staying just about the only thing that moves. */
+    if (footerSec && workSec){
+      var workBottom = Math.max(0, Math.min(ch, workSec.getBoundingClientRect().bottom));
+      var fp = 1 - workBottom / ch;                             // 0 → 1 as work clears the screen
+      var eased = fp * fp;
+      footerSec.style.opacity = (0.92 + eased * 0.08).toFixed(3);
+      footerSec.style.transform = reduce ? 'none' : 'scale(' + (0.985 + eased * 0.015).toFixed(4) + ')';
+    }
     if (rulerEl) rulerEl.classList.toggle('ruler--solid', onSolid);
   }
   function onScroll(){ if (!scrollPending){ scrollPending = true; requestAnimationFrame(paint); } }
@@ -1235,6 +1472,325 @@
     window.addEventListener('resize', render);
 
     render();
+  })();
+
+  /* ── footer patterns — graph tile + a faint paper grain ────
+     Same trick as the hero: an SVG tile built in JS and dropped in
+     as a background-image, so no binary asset is needed. The pink
+     "punched" text (thanks / game title / game-over card) clips this
+     same tile through its own fill — the grid has to show inside the
+     letterforms, not just the cream ground, or the punch reads flat. */
+  (function footerPatterns(){
+    var ftGraph = byId('ftGraph');
+    if (!ftGraph) return;
+
+    function svgUrl(w, h, body){
+      return "url('data:image/svg+xml," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" fill="none">' + body + '</svg>'
+      ).replace(/'/g, '%27') + "')";
+    }
+
+    var LINE = '#E0D4C8', gb = '', minor = [11.25, 22.25, 33.25, 55.25, 66.25, 77.25], gi;
+    for (gi = 0; gi < minor.length; gi++){
+      gb += '<line x1="0" y1="' + minor[gi] + '" x2="89" y2="' + minor[gi] + '" stroke="' + LINE + '" stroke-width="0.5"/>';
+      gb += '<line x1="' + minor[gi] + '" y1="0" x2="' + minor[gi] + '" y2="89" stroke="' + LINE + '" stroke-width="0.5"/>';
+    }
+    gb += '<line x1="0" y1="0.5" x2="89" y2="0.5" stroke="' + LINE + '"/>';
+    gb += '<line x1="0.5" y1="0" x2="0.5" y2="89" stroke="' + LINE + '"/>';
+    gb += '<line x1="0" y1="44.5" x2="89" y2="44.5" stroke="' + LINE + '"/>';
+    gb += '<line x1="44.5" y1="0" x2="44.5" y2="89" stroke="' + LINE + '"/>';
+    var graphTile = svgUrl(89, 89, gb);
+
+    if (ftGraph) ftGraph.style.backgroundImage = graphTile;
+
+    ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts'].forEach(function(id){
+      var el = byId(id);
+      if (el) el.style.backgroundImage = graphTile;
+    });
+  })();
+
+  /* ── footer — "sleep breaker" minigame ──────────────────────
+     Direct port of the "Gatha Footer" Claude Design canvas. Physics
+     run in the design's own 1728×1117 space and are painted back
+     through the footer's own measured width (k = box.width / W) —
+     the same normalisation the hero uses for its sticker drag, so
+     the game and its stickers stay correct at any footer size. */
+  (function footerGame(){
+    var ft = byId('ft');
+    if (!ft) return;
+
+    var W = 1728, H = 1117;
+    var BAR = { y:616, h:34, w:299 };
+    var FIELD = { right:1136, bottom:673 };
+    var R = 14.5, MAX_LEVEL = 4, STEP = 1500, MAX_MISSES = 5, SPEED = 7;
+
+    var SLOTS = [
+      { cx:150, cy:179, w:148, h:163 },
+      { cx:386, cy:353, w:152, h:167 },
+      { cx:633, cy:200, w:141, h:155 },
+      { cx:213, cy:477, w:134, h:147 },
+      { cx:672, cy:498, w:128, h:141 }
+    ];
+    var STICKERS = [
+      { cx:246.9,  cy:896.5, w:284.7, ar:1 },
+      { cx:482.7,  cy:849.9, w:288.4, ar:1.0993 },
+      { cx:908.6,  cy:916,   w:424.1, ar:0.7171 },
+      { cx:1276.2, cy:976.5, w:338.7, ar:0.8081 },
+      { cx:1573.5, cy:888.4, w:306.1, ar:1.0647 }
+    ];
+    var BABY_ROT = [10.5, -11, -6, 8, -9];
+
+    var babyEls = [].slice.call(ft.querySelectorAll('.ft__baby'));
+    var stkEls  = [].slice.call(ft.querySelectorAll('.ft__stk'));
+    var ball = byId('ftBall'), bar = byId('ftBar');
+    var playBtn = byId('ftPlay'), playIcon = byId('ftPlayIcon'), playLabel = byId('ftPlayLabel');
+    var hsEl = byId('ftHs'), ptsEl = byId('ftPts'), missEl = byId('ftMiss'), lvEl = byId('ftLv');
+    var goverEl = byId('ftGover'), goverPtsEl = byId('ftGoverPts');
+
+    var hs = 0;
+    try { hs = parseInt(localStorage.getItem('gatha-sleepbreaker-hs') || '0', 10) || 0; } catch (e) {}
+
+    var gs = { points:0, missed:0, level:0, playing:false, gameOver:false, awake:[false, false, false, false, false] };
+    var barX = 327.5;
+    var vb = { x:412.5, y:514.5, vx:0, vy:0 };
+    var serveAt = 0, inside = false, last = 0, looping = false, napTimer, ggTimer;
+    var off = STICKERS.map(function(){ return { x:0, y:0 }; });
+    var drag = null;
+
+    function box(){ return ft.getBoundingClientRect(); }
+    function toVirtual(cx, cy){ var b = box(); return { x:(cx - b.left) / b.width * W, y:(cy - b.top) / b.height * H }; }
+    function clampBar(x){ return Math.max(BAR.w / 2, Math.min(FIELD.right - BAR.w / 2, x)); }
+    function babyScale(){ return 1 - 0.1 * gs.level; }
+    function babyCount(){ return Math.min(5, 2 + gs.level); }
+    function babyBox(i){ var s = SLOTS[i], k = babyScale(), w = s.w * k, h = s.h * k; return { x:s.cx - w / 2, y:s.cy - h / 2, w:w, h:h }; }
+    function speed(){ return SPEED * Math.min(2.5, 1 + 0.5 * gs.level); }
+
+    function updateLabels(){
+      hsEl.textContent = hs;
+      ptsEl.textContent = gs.points;
+      missEl.textContent = gs.missed + '/' + MAX_MISSES;
+      lvEl.textContent = 'LV ' + (gs.level + 1) + ' · ' + babyCount() + ' GATHAS · ' + Math.min(2.5, 1 + 0.5 * gs.level).toFixed(1) + 'x';
+      playLabel.textContent = gs.playing ? 'PAUSE' : 'PLAY';
+      playIcon.setAttribute('d', gs.playing ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'M6 3.5l14 8.5-14 8.5z');
+    }
+
+    function serve(){
+      vb.x = barX; vb.y = BAR.y - R - 2; vb.vx = 0; vb.vy = 0;
+      serveAt = performance.now() + 650;
+    }
+    function launch(){
+      var s = speed();
+      vb.vx = s * 0.42 * (Math.random() < 0.5 ? -1 : 1);
+      vb.vy = -s;
+    }
+    function toggle(){
+      if (gs.gameOver) return;
+      if (gs.playing) gs.playing = false; else { serve(); gs.playing = true; kick(); }
+      updateLabels();
+    }
+
+    function wake(i){
+      var awake = gs.awake.slice(); awake[i] = true;
+      var n = babyCount(), all = awake.slice(0, n).every(Boolean);
+      var points = gs.points + 50 + (all ? 100 : 0);
+      var level = Math.min(MAX_LEVEL, Math.floor(points / STEP));
+      if (points > hs){ hs = points; try { localStorage.setItem('gatha-sleepbreaker-hs', String(hs)); } catch (e) {} }
+      gs.awake = awake; gs.points = points; gs.level = level;
+      if (all){
+        clearTimeout(napTimer);
+        napTimer = setTimeout(function(){ gs.awake = [false, false, false, false, false]; paintBabies(); }, 1400);
+      }
+      paintBabies(); updateLabels();
+    }
+
+    function endGame(missed){
+      clearTimeout(napTimer); clearTimeout(ggTimer);
+      var pts = gs.points;
+      if (pts > hs){ hs = pts; try { localStorage.setItem('gatha-sleepbreaker-hs', String(hs)); } catch (e) {} }
+      serveAt = 0;
+      gs.playing = false; gs.missed = missed; gs.gameOver = true;
+      goverPtsEl.textContent = pts + 'pts';
+      goverEl.classList.add('is-on');
+      updateLabels();
+      ggTimer = setTimeout(function(){
+        gs.gameOver = false; gs.points = 0; gs.missed = 0; gs.level = 0;
+        gs.awake = [false, false, false, false, false];
+        goverEl.classList.remove('is-on');
+        paintBabies(); updateLabels();
+        serve();
+        kick();
+      }, 2800);
+    }
+
+    function step(dt){
+      vb.x += vb.vx * dt; vb.y += vb.vy * dt;
+      if (vb.x - R < 0){ vb.x = R; vb.vx = Math.abs(vb.vx); }
+      if (vb.x + R > FIELD.right){ vb.x = FIELD.right - R; vb.vx = -Math.abs(vb.vx); }
+      if (vb.y - R < 0){ vb.y = R; vb.vy = Math.abs(vb.vy); }
+
+      if (vb.vy > 0 && vb.y + R >= BAR.y && vb.y - R <= BAR.y + BAR.h){
+        if (vb.x >= barX - BAR.w / 2 - R && vb.x <= barX + BAR.w / 2 + R){
+          vb.y = BAR.y - R;
+          var hit = (vb.x - barX) / (BAR.w / 2), s = speed();
+          vb.vx = hit * s * 0.78;
+          vb.vy = -Math.sqrt(Math.max(s * s - vb.vx * vb.vx, s * s * 0.25));
+        }
+      }
+
+      var n = babyCount();
+      for (var i = 0; i < n; i++){
+        if (gs.awake[i]) continue;
+        var r = babyBox(i);
+        if (vb.x + R < r.x || vb.x - R > r.x + r.w || vb.y + R < r.y || vb.y - R > r.y + r.h) continue;
+        var cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+        var ox = (r.w / 2 + R) - Math.abs(vb.x - cx), oy = (r.h / 2 + R) - Math.abs(vb.y - cy);
+        if (ox < oy){ vb.vx = vb.x < cx ? -Math.abs(vb.vx) : Math.abs(vb.vx); vb.x += vb.x < cx ? -ox : ox; }
+        else { vb.vy = vb.y < cy ? -Math.abs(vb.vy) : Math.abs(vb.vy); vb.y += vb.y < cy ? -oy : oy; }
+        wake(i);
+        break;
+      }
+
+      if (vb.y - R > FIELD.bottom){
+        var missed = gs.missed + 1;
+        if (missed >= MAX_MISSES) endGame(missed);
+        else { gs.missed = missed; serve(); updateLabels(); }
+      }
+    }
+
+    /* The loop only actually runs while a ball is in play — idle, it
+       costs nothing (important: .ft's punched-pink text uses an SVG
+       filter, and repainting that layer every frame forever, even
+       off-screen, was heavy enough to stall scrolling into it). */
+    function kick(){
+      if (looping) return;
+      looping = true;
+      last = 0;
+      requestAnimationFrame(tick);
+    }
+    function tick(t){
+      var dt = Math.min(3, (t - (last || t)) / 16.667);
+      last = t;
+      if (gs.playing){
+        if (serveAt){
+          vb.x = barX; vb.y = BAR.y - R - 2;
+          if (t >= serveAt){ serveAt = 0; launch(); }
+        } else {
+          step(dt);
+        }
+      }
+      paint();
+      if (gs.playing) requestAnimationFrame(tick);
+      else looping = false;
+    }
+
+    function paint(){
+      var b = box(), k = b.width / W;
+      if (ball){
+        ball.style.left = (vb.x / W * 100) + '%';
+        ball.style.top = (vb.y / H * 100) + '%';
+        ball.style.backgroundPosition = (-(vb.x - R) * k) + 'px ' + (-(vb.y - R) * k) + 'px';
+      }
+      if (bar){
+        bar.style.left = (barX / W * 100) + '%';
+        bar.style.backgroundPosition = (-(barX - BAR.w / 2) * k) + 'px ' + (-BAR.y * k) + 'px';
+      }
+    }
+
+    function paintBabies(){
+      var n = babyCount(), k = babyScale();
+      babyEls.forEach(function(el, i){
+        el.style.display = i < n ? 'block' : 'none';
+        el.style.transform = 'translate(-50%,-50%) rotate(' + BABY_ROT[i] + 'deg) scale(' + k + ')';
+        var src = asset(gs.awake[i] ? 'ft-baby-awake.webp' : 'ft-baby-sleep.webp');
+        if (el.getAttribute('src') !== src) el.setAttribute('src', src);
+      });
+    }
+
+    function paintStickers(){
+      var b = box(), k = b.width / W;
+      stkEls.forEach(function(el, i){
+        var dragging = drag && drag.i === i;
+        var rot = dragging ? (i % 2 ? -5 : 5) : 0, sc = dragging ? 1.07 : 1;
+        el.style.transform = 'translate(calc(-50% + ' + (off[i].x * k) + 'px),calc(-50% + ' + (off[i].y * k) + 'px)) rotate(' + rot + 'deg) scale(' + sc + ')';
+      });
+    }
+
+    function clampSticker(i, x, y){
+      var s = STICKERS[i], w = s.w, h = s.w * s.ar;
+      x = Math.max(w * 0.35, Math.min(W - w * 0.35, x));
+      y = Math.max(h * 0.35, Math.min(H + h * 0.1, y));
+      var inFrame = (x - w * 0.4) < FIELD.right && (y - h * 0.4) < FIELD.bottom;
+      if (inFrame){
+        var pushX = FIELD.right + w * 0.4 - x, pushY = FIELD.bottom + h * 0.4 - y;
+        if (Math.abs(pushX) < Math.abs(pushY) && x + pushX <= W - w * 0.35) x += pushX; else y += pushY;
+      }
+      return { x:x, y:y };
+    }
+
+    function startDrag(i, e){
+      e.stopPropagation(); e.preventDefault();
+      var el = stkEls[i];
+      drag = { i:i, id:e.pointerId, sx:e.clientX, sy:e.clientY, bx:off[i].x, by:off[i].y };
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
+      el.classList.add('ft__stk--drag');
+      paintStickers();
+    }
+    function dragMove(e){
+      if (!drag || (drag.id != null && e.pointerId !== drag.id)) return;
+      var b = box(), k = b.width / W, i = drag.i, s = STICKERS[i];
+      var dx = drag.bx + (e.clientX - drag.sx) / k, dy = drag.by + (e.clientY - drag.sy) / k;
+      var p = clampSticker(i, s.cx + dx, s.cy + dy);
+      off[i] = { x:p.x - s.cx, y:p.y - s.cy };
+      paintStickers();
+    }
+    function dragEnd(){
+      if (!drag) return;
+      var i = drag.i, el = stkEls[i], id = drag.id;
+      drag = null;
+      el.classList.remove('ft__stk--drag');
+      try { if (id != null) el.releasePointerCapture(id); } catch (err) {}
+      paintStickers();
+    }
+
+    function moveTo(clientX, clientY){
+      if (drag) return;
+      var v = toVirtual(clientX, clientY);
+      if (v.x < 0 || v.x > FIELD.right || v.y < 0 || v.y > FIELD.bottom) return;
+      barX = clampBar(v.x);
+      if (!gs.playing) paint();
+    }
+
+    stkEls.forEach(function(el, i){
+      el.addEventListener('pointerdown', function(e){ startDrag(i, e); });
+    });
+    window.addEventListener('pointermove', dragMove);
+    window.addEventListener('pointerup', dragEnd);
+
+    ft.addEventListener('pointerenter', function(){ inside = true; });
+    ft.addEventListener('pointerleave', function(){ inside = false; });
+    ft.addEventListener('pointermove', function(e){ moveTo(e.clientX, e.clientY); });
+    ft.addEventListener('pointerdown', function(e){
+      if (drag || gs.gameOver) return;
+      moveTo(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('keydown', function(e){
+      if (e.code === 'Space' || e.key === ' '){
+        if (!inside) return;
+        e.preventDefault(); toggle(); return;
+      }
+      if (!inside || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      barX = clampBar(barX + (e.key === 'ArrowLeft' ? -44 : 44));
+    });
+
+    playBtn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
+    window.addEventListener('resize', function(){ paint(); paintStickers(); });
+
+    updateLabels();
+    paintBabies();
+    paintStickers();
+    serve();
+    paint();
   })();
 })();
 </script>

@@ -51,3 +51,31 @@ in `index.html`) reuse the project photos:
 `cursor-hover.svg` — pink ring, shown over the interactive grid regions (`.cell--dot` / `--check` / `--iso`); graph keeps `crosshair`, stickers keep `grab`.
 `favicon.svg` — the quatrefoil mark on a `--pink` ground.
 `cross-grid.svg` / `pixel-heart.svg` — unused (were the old hero's pixel scribbles); kept for reference.
+
+## Footer — "sleep breaker"
+
+Port of the `Gatha Footer.dc.html` Claude Design canvas (`assets/` in that
+project). Source art for the raster stickers came from
+`…/PERSONAL STUDY/UX/FINAL FOLDER/footer/graphics`, re-encoded here as WebP;
+the wordmark is the design's own SVG with its embedded C2PA metadata
+stripped. The design's `ft-graph.svg` tile and paper-grain texture are
+regenerated in JS instead of shipped as assets (same trick as the hero's
+ruler/graph patterns) — see `footerPatterns()` in `index.html`.
+
+| file                  | placed as                                | source |
+|------------------------|-------------------------------------------|--------|
+| `ft-baby-sleep.webp`  | sleeping Gatha × 5 (`.ft__baby`)          | `footer/graphics/Property 1=Default.png` |
+| `ft-baby-awake.webp`  | woken Gatha (swapped in on hit)           | `footer/graphics/Property 1=touched.png` |
+| `ft-primogem.webp`    | sticker, drag anywhere                    | `footer/graphics/Primogem.png` |
+| `ft-heartlock.webp`   | sticker, drag anywhere                    | `footer/graphics/heartlock.png` |
+| `ft-pen.webp`         | sticker, drag anywhere                    | `footer/graphics/Pen.png` |
+| `ft-diary.webp`       | sticker, drag anywhere                    | `footer/graphics/Diary.png` |
+| `ft-ds.webp`          | sticker, drag anywhere                    | `footer/graphics/DS.png` |
+| `ft-signature.webp`   | "Gatha" signature mark, over the paper    | `footer/graphics/signature 1.png` |
+| `ft-wordmark-dots.svg`| halftone "Gatha" wordmark, bottom bleed   | design project `assets/ft-wordmark-dots.svg` |
+
+The design's `Primogem.svg` / `DS.svg` / `Diary.svg` / `Pen.svg` /
+`heartlock.svg` exports are per-pixel vector dumps (0.5–1.2 MB each,
+same issue as the hero's `wizzy` clippie) — the PNGs are used instead.
+The ball and bar are plain CSS shapes tinted with the same generated graph
+tile, not images; the play/pause icon is an inline SVG path.
