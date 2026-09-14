@@ -535,7 +535,11 @@
     transform-origin:50% 50%;
     will-change:transform,opacity;
   }
-  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 0;background-size:76px 76px;opacity:.2}
+  /* the -18px Y offset isn't arbitrary — .ruler and .cell--graph share it
+     in the hero to phase-lock the ruler's ticks to the paper grid; same
+     tile module here (76px), so the same offset keeps them in sync as
+     the fixed ruler runs down past the footer too. */
+  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 -18px;background-size:76px 76px;opacity:.2}
   /* the graph texture bleeds full-width behind everything (like the hero's
      grid collage); the actual composition is capped + centred here, same
      trick as .hero's claim card, so it reads at its designed scale instead
