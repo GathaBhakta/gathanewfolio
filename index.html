@@ -535,13 +535,13 @@
     transform-origin:50% 50%;
     will-change:transform,opacity;
   }
-  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 0;background-size:89px 89px;opacity:.2}
+  .ft__graph{position:absolute;inset:0;background-repeat:repeat;background-position:0 0;background-size:76px 76px;opacity:.2}
   /* the graph texture bleeds full-width behind everything (like the hero's
      grid collage); the actual composition is capped + centred here, same
      trick as .hero's claim card, so it reads at its designed scale instead
      of stretching (and growing every child's cqw with it) on wide screens */
   .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/inline-size}
-  .ft__sig{position:absolute;left:69.1%;top:39.2%;width:7.06%;height:auto;display:block;pointer-events:none}
+  .ft__sig{position:absolute;left:69.1%;bottom:39.75%;width:7.06%;height:auto;display:block;pointer-events:none}
   .ft__wordmark{position:absolute;left:-.46%;top:64.46%;width:100.98%;height:37.6%;display:block;pointer-events:none}
 
   .ft__thanks{
@@ -550,11 +550,12 @@
     font-size:clamp(26px,5.556cqw,88px);line-height:1.28;
     white-space:nowrap;pointer-events:none;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:89px 89px;
+    background-size:76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(2px 2px 1.6px rgba(160,55,108,.85));
   }
 
-  .ft__nav{position:absolute;left:68.23%;top:4.3%;display:grid;grid-template-columns:12.85cqw 8.97cqw auto;align-items:flex-start;white-space:nowrap}
+  .ft__nav{position:absolute;left:68.23%;top:calc(4.3% + var(--nav-h));display:grid;grid-template-columns:12.85cqw 8.97cqw auto;align-items:flex-start;white-space:nowrap}
   .ft__navcol{display:flex;flex-direction:column}
   .ft__navhead{
     font-family:var(--gb-serif);font-weight:600;color:var(--ink-mid);
@@ -567,7 +568,7 @@
   .ft__navlink:hover{color:var(--pink-ink)}
 
   .ft__game{
-    position:absolute;left:42.36%;top:4.21%;width:21.06%;box-sizing:border-box;
+    position:absolute;left:42.36%;top:calc(4.21% + var(--nav-h));width:21.06%;box-sizing:border-box;
     background:rgba(255,255,255,.5);border-radius:.463cqw;
     box-shadow:inset 0 0 0 .116cqw var(--pink);
     padding:.926cqw;display:flex;flex-direction:column;gap:1.389cqw;
@@ -576,8 +577,9 @@
   .ft__gtitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.083cqw,34px);line-height:1;
     white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
-    background-blend-mode:multiply;background-size:89px 89px;
+    background-blend-mode:multiply;background-size:76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(2px 2px 1.6px rgba(160,55,108,.85));
   }
   .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw}
   .ft__stats{display:flex;gap:3.41cqw;align-items:flex-start}
@@ -596,12 +598,14 @@
   .ft__baby{position:absolute;width:auto;transform:translate(-50%,-50%);display:block;pointer-events:none;transition:transform 620ms cubic-bezier(.34,1.56,.64,1)}
   .ft__ball{
     position:absolute;width:1.678cqw;height:1.678cqw;border-radius:50%;
-    background-color:var(--pink);background-repeat:repeat;transform:translate(-50%,-50%);
+    background-color:var(--pink);background-repeat:repeat;background-size:76px 76px;
+    transform:translate(-50%,-50%);
     pointer-events:none;box-shadow:inset .116cqw .116cqw .397cqw #A0376C;
   }
   .ft__bar{
     position:absolute;left:18.95%;top:55.15%;width:17.3%;height:3.04%;border-radius:.463cqw;
-    background-color:var(--pink);background-repeat:repeat;transform:translateX(-50%);
+    background-color:var(--pink);background-repeat:repeat;background-size:76px 76px;
+    transform:translateX(-50%);
     pointer-events:none;box-shadow:inset .116cqw .116cqw .397cqw #A0376C;
   }
 
@@ -611,6 +615,11 @@
     transform:translate(-50%,-50%);transition:transform 540ms cubic-bezier(.34,1.56,.64,1);
   }
   .ft__stk--drag{transition:none;cursor:grabbing;z-index:30;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+  /* the pen source art (unlike the other stickers) has no white die-cut
+     backing baked in, so it reads flat sitting on the paper — a plain
+     drop shadow at rest gives it the same lift the others already have */
+  .ft__stk[src*="ft-pen"]{filter:drop-shadow(0 6px 10px rgba(44,32,24,.28))}
+  .ft__stk--drag[src*="ft-pen"]{filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
 
   .ft__gover{
     position:absolute;left:.41%;top:0;width:65.74%;height:60.25%;z-index:50;
@@ -622,12 +631,14 @@
   .ft__govertitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(24px,5.556cqw,88px);line-height:1;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:89px 89px;-webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(2px 2px 1.6px rgba(160,55,108,.85));
   }
   .ft__goverpts{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.778cqw,44px);line-height:1;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
-    background-size:89px 89px;-webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:76px 76px;-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(2px 2px 1.6px rgba(160,55,108,.85));
   }
   .ft__goverimg{width:11.6cqw;height:auto;display:block}
 
@@ -830,11 +841,11 @@
     <div class="ft__ball" id="ftBall"></div>
     <div class="ft__bar" id="ftBar"></div>
 
-    <img class="ft__stk" alt="" draggable="false" src="assets/ft-primogem.webp" style="left:14.29%;top:80.26%;width:16.48%">
-    <img class="ft__stk" alt="" draggable="false" src="assets/ft-heartlock.webp" style="left:27.94%;top:76.09%;width:16.69%">
-    <img class="ft__stk" alt="" draggable="false" src="assets/ft-pen.webp" style="left:52.58%;top:82%;width:24.55%">
-    <img class="ft__stk" alt="" draggable="false" src="assets/ft-diary.webp" style="left:73.85%;top:87.42%;width:19.6%">
-    <img class="ft__stk" alt="" draggable="false" src="assets/ft-ds.webp" style="left:91.06%;top:79.53%;width:17.71%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-primogem.webp" style="left:14.29%;top:80.26%;width:14.83%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-heartlock.webp" style="left:27.94%;top:76.09%;width:15.02%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-pen.webp" style="left:52.58%;top:82%;width:22.1%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-diary.webp" style="left:73.85%;top:87.42%;width:17.64%">
+    <img class="ft__stk" alt="" draggable="false" src="assets/ft-ds.webp" style="left:91.06%;top:79.53%;width:15.94%">
 
     <div class="ft__gover" id="ftGover">
       <div class="ft__govertitle" id="ftGoverTitle">Good Game!</div>
@@ -1496,20 +1507,25 @@
       ).replace(/'/g, '%27') + "')";
     }
 
-    var LINE = '#E0D4C8', gb = '', minor = [11.25, 22.25, 33.25, 55.25, 66.25, 77.25], gi;
-    for (gi = 0; gi < minor.length; gi++){
-      gb += '<line x1="0" y1="' + minor[gi] + '" x2="89" y2="' + minor[gi] + '" stroke="' + LINE + '" stroke-width="0.5"/>';
-      gb += '<line x1="' + minor[gi] + '" y1="0" x2="' + minor[gi] + '" y2="89" stroke="' + LINE + '" stroke-width="0.5"/>';
+    /* same module as the hero's own graph paper (GS=38, tile=76) — one
+       continuous canvas scale from hero straight through to the footer. */
+    var LINE = '#E0D4C8', GS = 38, TILE = GS * 2, gb = '', gq = GS / 4, gm, gk;
+    for (gm = 0; gm < 2; gm++){
+      for (gk = 1; gk < 4; gk++){
+        var gy = (gm * GS + gk * gq + 0.25).toFixed(2);
+        gb += '<line x1="0" y1="' + gy + '" x2="' + TILE + '" y2="' + gy + '" stroke="' + LINE + '" stroke-width="0.5"/>';
+        gb += '<line x1="' + gy + '" y1="0" x2="' + gy + '" y2="' + TILE + '" stroke="' + LINE + '" stroke-width="0.5"/>';
+      }
     }
-    gb += '<line x1="0" y1="0.5" x2="89" y2="0.5" stroke="' + LINE + '"/>';
-    gb += '<line x1="0.5" y1="0" x2="0.5" y2="89" stroke="' + LINE + '"/>';
-    gb += '<line x1="0" y1="44.5" x2="89" y2="44.5" stroke="' + LINE + '"/>';
-    gb += '<line x1="44.5" y1="0" x2="44.5" y2="89" stroke="' + LINE + '"/>';
-    var graphTile = svgUrl(89, 89, gb);
+    gb += '<line x1="0" y1="0.5" x2="' + TILE + '" y2="0.5" stroke="' + LINE + '"/>';
+    gb += '<line x1="0.5" y1="0" x2="0.5" y2="' + TILE + '" stroke="' + LINE + '"/>';
+    gb += '<line x1="0" y1="' + (GS + 0.5) + '" x2="' + TILE + '" y2="' + (GS + 0.5) + '" stroke="' + LINE + '"/>';
+    gb += '<line x1="' + (GS + 0.5) + '" y1="0" x2="' + (GS + 0.5) + '" y2="' + TILE + '" stroke="' + LINE + '"/>';
+    var graphTile = svgUrl(TILE, TILE, gb);
 
     if (ftGraph) ftGraph.style.backgroundImage = graphTile;
 
-    ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts'].forEach(function(id){
+    ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts', 'ftBall', 'ftBar'].forEach(function(id){
       var el = byId(id);
       if (el) el.style.backgroundImage = graphTile;
     });
@@ -1539,11 +1555,11 @@
       { cx:672, cy:498, w:128, h:141 }
     ];
     var STICKERS = [
-      { cx:246.9,  cy:896.5, w:284.7, ar:1 },
-      { cx:482.7,  cy:849.9, w:288.4, ar:1.0993 },
-      { cx:908.6,  cy:916,   w:424.1, ar:0.7171 },
-      { cx:1276.2, cy:976.5, w:338.7, ar:0.8081 },
-      { cx:1573.5, cy:888.4, w:306.1, ar:1.0647 }
+      { cx:246.9,  cy:896.5, w:256.23, ar:1 },
+      { cx:482.7,  cy:849.9, w:259.56, ar:1.0993 },
+      { cx:908.6,  cy:916,   w:381.69, ar:0.7171 },
+      { cx:1276.2, cy:976.5, w:304.83, ar:0.8081 },
+      { cx:1573.5, cy:888.4, w:275.49, ar:1.0647 }
     ];
     var BABY_ROT = [10.5, -11, -6, 8, -9];
 
