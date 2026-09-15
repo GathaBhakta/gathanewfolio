@@ -366,6 +366,8 @@
     height:100dvh;min-height:540px;
     container-type:size;
     overflow:hidden;
+    transform-origin:50% 50%;
+    will-change:transform,opacity;
   }
   .work__field{
     position:relative;height:100%;
@@ -534,10 +536,7 @@
     touch-action:none;
     transform-origin:50% 50%;
     will-change:transform,opacity;
-    opacity:.92;transform:scale(.985);
-    transition:opacity 520ms var(--ease),transform 520ms var(--ease);
   }
-  .ft.ft--in{opacity:1;transform:scale(1)}
   /* the -18px Y offset isn't arbitrary — .ruler and .cell--graph share it
      in the hero to phase-lock the ruler's ticks to the paper grid; same
      tile module here (76px), so the same offset keeps them in sync as
@@ -673,7 +672,7 @@
   @media (prefers-reduced-motion:reduce){
     .nav__mark{animation:none}
     .cutout,.qc__corner,.work__lead{transition:opacity 200ms linear}
-    .ft{opacity:1;transform:none;transition:none}
+    .ft{opacity:1;transform:none}
   }
 </style>
 </head>
@@ -901,9 +900,8 @@
   /* ── scroll: scrollbar flip · hero recede · nav contrast ──
      As the pink work panel slides up the hero eases back (a fade and
      a barely-there 3% scale-down), and the sticky nav swaps its links
-     to a legible on-panel ink once a solid section is behind it. Hero
-     and work are otherwise untouched by the footer below it — the
-     footer owns its own entrance only. */
+     to a legible on-panel ink once a solid section is behind it. The
+     footer plays the same trick in reverse as work uncovers it. */
   var scrollPending = false;
   function paint(){
     scrollPending = false;
@@ -922,18 +920,18 @@
     }
     nav.classList.toggle('nav--solid', onSolid);
 
-    /* footer reveal — .ft is already pinned (see .ft-wrap above) by
-       the moment .work starts to leave, so the only real signal is
-       how much of .work's box still covers it. Rather than writing
-       .ft's opacity/transform every scroll frame (which forces a
-       repaint of everything inside it — including the punched text's
-       filter — on every tick, which is what was actually stalling
-       scrolling), flip a single class once .work has mostly cleared
-       and let the CSS transition below do the animating natively. */
-    if (footerSec && workSec){
+    /* footer reveal — .ft is already pinned (see .ft-wrap above) and
+       fully opaque the whole time, exactly like .work is opaque over
+       .hero. So it's .work that gets the recede here, mirroring hero's
+       own treatment exactly (same formula, same 50%/3% swing) rather
+       than fading .ft itself — .ft turning translucent would let it
+       show .hero (permanently pinned behind everything) bleeding
+       through instead of the fully-opaque .ft sitting right there. */
+    if (workSec && footerSec){
       var workBottom = Math.max(0, Math.min(ch, workSec.getBoundingClientRect().bottom));
-      var revealed = (1 - workBottom / ch) > 0.35;
-      footerSec.classList.toggle('ft--in', revealed);
+      var fp = 1 - workBottom / ch;
+      workSec.style.opacity = (1 - fp * 0.5).toFixed(3);
+      workSec.style.transform = reduce ? 'none' : 'scale(' + (1 - fp * 0.03).toFixed(4) + ')';
     }
     if (rulerEl) rulerEl.classList.toggle('ruler--solid', onSolid);
   }
