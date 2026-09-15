@@ -73,7 +73,7 @@ an asset (same trick as the hero's ruler/graph patterns) — see
 | `ft-ds.webp`          | sticker, drag anywhere                    | `footer/graphics/DS.png` |
 | `ft-signature.webp`   | "Gatha" signature mark, over the paper    | `footer/graphics/signature 1.png` |
 | `ft-wordmark-dots.svg`| halftone "Gatha" wordmark, bottom bleed   | design project `assets/ft-wordmark-dots.svg` |
-| `ft-riso.webp`        | `.ft__riso`, full-bleed grain over everything, `mix-blend-mode:luminosity` @ 20% opacity | `footer/graphics/Footer  Riso overlay.png`, downsampled 3456×2234 → 1728×1117 (matches the design canvas 1:1, so it's one image, not a tile) |
+| `ft-riso.webp`        | `.ft__riso`, full-bleed on `.ft` (not capped to `.ft__frame`), repeating 640×414 tile, `mix-blend-mode:luminosity` @ 20% opacity | `footer/graphics/Footer  Riso overlay.png`, downsampled 3456×2234 → 1728×1117 |
 
 The design's `Primogem.svg` / `DS.svg` / `Diary.svg` / `Pen.svg` /
 `heartlock.svg` exports are per-pixel vector dumps (0.5–1.2 MB each,
