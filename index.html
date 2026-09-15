@@ -589,7 +589,7 @@
      space (title 83.5,61.8 → play label end 1059.8,97 = left 4.83%,
      width 56.5%), same coordinate convention as .ft__thanks/.ft__nav. */
   .ft__game{
-    position:absolute;left:4.83%;top:calc(5.53% + var(--nav-h));width:56.5%;box-sizing:border-box;
+    position:absolute;left:4.83%;top:calc(4.3% + var(--nav-h));width:56.5%;box-sizing:border-box;
     display:flex;align-items:center;justify-content:space-between;gap:1cqw;
     z-index:2;
   }
@@ -872,11 +872,11 @@
       </div>
     </div>
 
-    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:8.92%;top:17.41%;width:10.01%">
-    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:22.59%;top:33.04%;width:10.28%">
-    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:36.63%;top:17.9%;width:9.55%;display:none">
-    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:12.33%;top:42.7%;width:9.03%;display:none">
-    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:38.89%;top:44.6%;width:8.68%;display:none">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:11.29%;top:31.33%;width:10.01%">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:24.31%;top:38.5%;width:10.28%">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:37.62%;top:32.23%;width:9.55%;display:none">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:50.35%;top:42.97%;width:9.03%;display:none">
+    <img class="ft__baby" alt="" src="assets/ft-baby-sleep.webp" style="left:59.61%;top:35.81%;width:8.68%;display:none">
 
     <div class="ft__ball" id="ftBall"></div>
     <div class="ft__bar" id="ftBar"></div>
@@ -1589,12 +1589,16 @@
     var FIELD = { right:1136, bottom:673 };
     var R = 14.5, MAX_LEVEL = 4, STEP = 1500, MAX_MISSES = 5, SPEED = 7;
 
+    /* spread across the full field width (up to FIELD.right, below), not
+       just the left third — each level's new slot lands further right,
+       so the game visibly fills out the whole frame as it progresses.
+       cy keeps every slot's top edge below the scoreboard row + nav-h. */
     var SLOTS = [
-      { cx:150, cy:179, w:148, h:163 },
-      { cx:386, cy:353, w:152, h:167 },
-      { cx:633, cy:200, w:141, h:155 },
-      { cx:213, cy:477, w:134, h:147 },
-      { cx:672, cy:498, w:128, h:141 }
+      { cx:195, cy:350, w:148, h:163 },
+      { cx:420, cy:430, w:152, h:167 },
+      { cx:650, cy:360, w:141, h:155 },
+      { cx:870, cy:480, w:134, h:147 },
+      { cx:1030, cy:400, w:128, h:141 }
     ];
     var STICKERS = [
       { cx:246.9,  cy:896.5, w:256.23, ar:1 },
