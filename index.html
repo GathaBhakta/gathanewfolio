@@ -1932,27 +1932,10 @@
     playBtn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     window.addEventListener('resize', function(){ paint(); paintStickers(); });
 
-    /* TEMP dummy preview: start paused at a high score so the multiball
-       easter egg (an extra ball every 1000pts past 4500, capped at 4
-       extras) is visible without playing up to it. Not the real start
-       state — drop this block to go back to a normal 0-point paused
-       load with serve() in its place. */
-    gs.points = 11000;
-    gs.level = Math.min(MAX_LEVEL, Math.floor(gs.points / STEP));
-    var dueExtra = Math.min(MULTIBALL_MAX, Math.floor((gs.points - MULTIBALL_AT) / MULTIBALL_STEP));
-    while (gs.extraBalls < dueExtra){ spawnBall(); gs.extraBalls++; }
-    var previewPos = [
-      { x:260, y:300 }, { x:560, y:420 }, { x:820, y:260 },
-      { x:960, y:470 }, { x:1060, y:330 }
-    ];
-    balls.forEach(function(b, i){
-      var p = previewPos[i % previewPos.length];
-      b.x = p.x; b.y = p.y; b.vx = 0; b.vy = 0;
-    });
-
     updateLabels();
     paintBabies();
     paintStickers();
+    serve();
     paint();
   })();
 })();
