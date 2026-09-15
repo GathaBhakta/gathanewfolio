@@ -1558,7 +1558,7 @@
     /* same module as the hero's own graph paper (GS=38, tile=76) — one
        continuous canvas scale from hero straight through to the footer. */
     var GS = 38, TILE = GS * 2;
-    function buildGraphTile(LINE){
+    function buildGraphTile(LINE, opacity){
       var gb = '', gq = GS / 4, gm, gk;
       for (gm = 0; gm < 2; gm++){
         for (gk = 1; gk < 4; gk++){
@@ -1571,14 +1571,15 @@
       gb += '<line x1="0.5" y1="0" x2="0.5" y2="' + TILE + '" stroke="' + LINE + '"/>';
       gb += '<line x1="0" y1="' + (GS + 0.5) + '" x2="' + TILE + '" y2="' + (GS + 0.5) + '" stroke="' + LINE + '"/>';
       gb += '<line x1="' + (GS + 0.5) + '" y1="0" x2="' + (GS + 0.5) + '" y2="' + TILE + '" stroke="' + LINE + '"/>';
+      if (opacity != null) gb = '<g opacity="' + opacity + '">' + gb + '</g>';
       return svgUrl(TILE, TILE, gb);
     }
     /* the paper itself keeps the hero's own grid-line hue (#E0D4C8); the
        grid tinted into the pink surfaces — punched text, the ball, the
-       bar — uses the locked --cream token (#FAF6EF) instead, so it reads
-       as a genuine cream tint through multiply rather than a gray fleck. */
+       bar — uses the locked --cream token (#FAF6EF) instead, at half
+       opacity so it reads as a soft tint rather than a hard overlay. */
     var graphTile = buildGraphTile('#E0D4C8');
-    var graphTileOnPink = buildGraphTile('#FAF6EF');
+    var graphTileOnPink = buildGraphTile('#FAF6EF', 0.5);
 
     if (ftGraph) ftGraph.style.backgroundImage = graphTile;
 
