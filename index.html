@@ -1546,30 +1546,39 @@
 
     /* same module as the hero's own graph paper (GS=38, tile=76) — one
        continuous canvas scale from hero straight through to the footer. */
-    var LINE = '#E0D4C8', GS = 38, TILE = GS * 2, gb = '', gq = GS / 4, gm, gk;
-    for (gm = 0; gm < 2; gm++){
-      for (gk = 1; gk < 4; gk++){
-        var gy = (gm * GS + gk * gq + 0.25).toFixed(2);
-        gb += '<line x1="0" y1="' + gy + '" x2="' + TILE + '" y2="' + gy + '" stroke="' + LINE + '" stroke-width="0.5"/>';
-        gb += '<line x1="' + gy + '" y1="0" x2="' + gy + '" y2="' + TILE + '" stroke="' + LINE + '" stroke-width="0.5"/>';
+    var GS = 38, TILE = GS * 2;
+    function buildGraphTile(LINE){
+      var gb = '', gq = GS / 4, gm, gk;
+      for (gm = 0; gm < 2; gm++){
+        for (gk = 1; gk < 4; gk++){
+          var gy = (gm * GS + gk * gq + 0.25).toFixed(2);
+          gb += '<line x1="0" y1="' + gy + '" x2="' + TILE + '" y2="' + gy + '" stroke="' + LINE + '" stroke-width="0.5"/>';
+          gb += '<line x1="' + gy + '" y1="0" x2="' + gy + '" y2="' + TILE + '" stroke="' + LINE + '" stroke-width="0.5"/>';
+        }
       }
+      gb += '<line x1="0" y1="0.5" x2="' + TILE + '" y2="0.5" stroke="' + LINE + '"/>';
+      gb += '<line x1="0.5" y1="0" x2="0.5" y2="' + TILE + '" stroke="' + LINE + '"/>';
+      gb += '<line x1="0" y1="' + (GS + 0.5) + '" x2="' + TILE + '" y2="' + (GS + 0.5) + '" stroke="' + LINE + '"/>';
+      gb += '<line x1="' + (GS + 0.5) + '" y1="0" x2="' + (GS + 0.5) + '" y2="' + TILE + '" stroke="' + LINE + '"/>';
+      return svgUrl(TILE, TILE, gb);
     }
-    gb += '<line x1="0" y1="0.5" x2="' + TILE + '" y2="0.5" stroke="' + LINE + '"/>';
-    gb += '<line x1="0.5" y1="0" x2="0.5" y2="' + TILE + '" stroke="' + LINE + '"/>';
-    gb += '<line x1="0" y1="' + (GS + 0.5) + '" x2="' + TILE + '" y2="' + (GS + 0.5) + '" stroke="' + LINE + '"/>';
-    gb += '<line x1="' + (GS + 0.5) + '" y1="0" x2="' + (GS + 0.5) + '" y2="' + TILE + '" stroke="' + LINE + '"/>';
-    var graphTile = svgUrl(TILE, TILE, gb);
+    /* the paper itself keeps the hero's own grid-line hue (#E0D4C8); the
+       grid tinted into the pink surfaces — punched text, the ball, the
+       bar — uses the locked --cream token (#FAF6EF) instead, so it reads
+       as a genuine cream tint through multiply rather than a gray fleck. */
+    var graphTile = buildGraphTile('#E0D4C8');
+    var graphTileOnPink = buildGraphTile('#FAF6EF');
 
     if (ftGraph) ftGraph.style.backgroundImage = graphTile;
 
     ['ftBall', 'ftBar'].forEach(function(id){
       var el = byId(id);
-      if (el) el.style.backgroundImage = graphTile;
+      if (el) el.style.backgroundImage = graphTileOnPink;
     });
 
     ['ftThanks', 'ftGtitle', 'ftGoverTitle', 'ftGoverPts'].forEach(function(id){
       var el = byId(id);
-      if (el) el.style.backgroundImage = graphTile;
+      if (el) el.style.backgroundImage = graphTileOnPink;
     });
   })();
 
