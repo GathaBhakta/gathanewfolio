@@ -582,16 +582,18 @@
   }
   .ft__navlink:hover{color:var(--pink-ink)}
 
-  /* centred on .ft__frame's own midline, same reference the nav mark
-     uses for its centre (both .ft__frame and .nav are centred in the
-     same full-width parent) — not on .ft__game's old left:42.36%,
-     which read off-centre against the nav above it. */
+  /* horizontal/justified treatment per the updated "Footer-new" design
+     export: title+subtitle, the three stats and the play control sit
+     on one row (space-between, vertically centred), instead of the old
+     narrow stacked column — measured off the export's own 1728×1117
+     space (title 83.5,61.8 → play label end 1059.8,97 = left 4.83%,
+     width 56.5%), same coordinate convention as .ft__thanks/.ft__nav. */
   .ft__game{
-    position:absolute;left:50%;top:calc(4.21% + var(--nav-h));width:21.06%;box-sizing:border-box;
-    transform:translateX(-50%);
-    padding:.926cqw;display:flex;flex-direction:column;gap:1.389cqw;
+    position:absolute;left:4.83%;top:calc(5.53% + var(--nav-h));width:56.5%;box-sizing:border-box;
+    display:flex;align-items:center;justify-content:space-between;gap:1cqw;
     z-index:2;
   }
+  .ft__gtitlewrap{display:flex;flex-direction:column;flex:none}
   .ft__gtitle{
     font-family:var(--gb-serif);font-weight:700;font-size:clamp(16px,2.083cqw,34px);line-height:1;
     white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
@@ -599,11 +601,14 @@
     -webkit-background-clip:text;background-clip:text;color:transparent;
     filter:url(#ftPunch);
   }
-  .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw}
-  .ft__stats{display:flex;gap:3.41cqw;align-items:flex-start}
-  .ft__statlabel{font-family:var(--gb-mono);font-size:clamp(8px,.926cqw,14px);line-height:1;color:var(--ink-soft)}
+  .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(9px,1.157cqw,18px);line-height:1;color:var(--ink-soft);margin-top:.463cqw;white-space:nowrap}
+  .ft__stats{display:flex;gap:4.63cqw;align-items:flex-start;flex:none}
+  .ft__statlabel{font-family:var(--gb-mono);font-size:clamp(8px,.926cqw,14px);line-height:1;color:var(--ink-soft);white-space:nowrap}
   .ft__statval{font-family:var(--gb-mono);font-size:clamp(13px,1.736cqw,26px);line-height:1.2;color:var(--pink-ink);margin-top:.463cqw}
-  .ft__ctrl{display:flex;align-items:center;justify-content:space-between}
+  /* the level note has no home in the new row (the export doesn't show
+     it up top at all) — tuck it under PLAY, right-aligned, so it stays
+     out of the row's rhythm but is still reachable at the far right. */
+  .ft__playwrap{display:flex;flex-direction:column;align-items:flex-end;gap:.463cqw;flex:none}
   .ft__play{
     display:flex;align-items:center;gap:.7cqw;cursor:pointer;opacity:.92;
     background:none;border:0;padding:0;font:inherit;transition:opacity 240ms var(--ease);
@@ -840,7 +845,7 @@
     </nav>
 
     <div class="ft__game">
-      <div>
+      <div class="ft__gtitlewrap">
         <div class="ft__gtitle" id="ftGtitle">sleep breaker</div>
         <div class="ft__gsub">THROW A BALL TO WAKE ME</div>
       </div>
@@ -858,7 +863,7 @@
           <div class="ft__statval" id="ftMiss">0/5</div>
         </div>
       </div>
-      <div class="ft__ctrl">
+      <div class="ft__playwrap">
         <button class="ft__play" id="ftPlay" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path id="ftPlayIcon" d="M6 3.5l14 8.5-14 8.5z" fill="#D993B8"></path></svg>
           <span class="ft__playlabel" id="ftPlayLabel">PLAY</span>
