@@ -1588,6 +1588,11 @@
     var BAR = { y:616, h:34, w:299 };
     var FIELD = { right:1136, bottom:673 };
     var R = 14.5, MAX_LEVEL = 4, STEP = 1500, MAX_MISSES = 5, SPEED = 7;
+    /* easter egg: once every Gatha is in frame (5 up, level 3 — babyCount()
+       can't grow further, there's no 6th slot to zoom out for), the game
+       throws in an extra ball every 1000 points instead. MULTIBALL_MAX caps
+       the DOM/physics cost at an absurd score rather than growing forever. */
+    var MULTI_LEVEL = 3, MULTIBALL_AT = MULTI_LEVEL * STEP, MULTIBALL_STEP = 1000, MULTIBALL_MAX = 4;
 
     /* spread across the full field width (up to FIELD.right, below), not
        just the left third — each level's new slot lands further right,
@@ -1619,9 +1624,14 @@
     var hs = 0;
     try { hs = parseInt(localStorage.getItem('gatha-sleepbreaker-hs') || '0', 10) || 0; } catch (e) {}
 
-    var gs = { points:0, missed:0, level:0, playing:false, gameOver:false, awake:[false, false, false, false, false] };
+    var gs = { points:0, missed:0, level:0, playing:false, gameOver:false, extraBalls:0, awake:[false, false, false, false, false] };
     var barX = 327.5;
-    var vb = { x:412.5, y:514.5, vx:0, vy:0 };
+    /* balls[0] is always the "main" ball — the one MAX_MISSES tracks and
+       serve()/launch() drive. Bonus balls from the multiball easter egg
+       ride at balls[1+], each paired 1:1 with ballEls[1+] (a clone of the
+       #ftBall div); dropping one just removes its pair, no miss charged. */
+    var balls = [ { x:412.5, y:514.5, vx:0, vy:0, main:true } ];
+    var ballEls = [ball];
     var serveAt = 0, inside = false, last = 0, looping = false, napTimer, ggTimer;
     var off = STICKERS.map(function(){ return { x:0, y:0 }; });
     var drag = null;
@@ -1644,13 +1654,37 @@
     }
 
     function serve(){
-      vb.x = barX; vb.y = BAR.y - R - 2; vb.vx = 0; vb.vy = 0;
+      var b = balls[0];
+      b.x = barX; b.y = BAR.y - R - 2; b.vx = 0; b.vy = 0;
       serveAt = performance.now() + 650;
     }
     function launch(){
+      var s = speed(), b = balls[0];
+      b.vx = s * 0.42 * (Math.random() < 0.5 ? -1 : 1);
+      b.vy = -s;
+    }
+    /* a bonus ball skips the serve delay/bar-hold — it just appears in
+       play already moving, since it's a mid-round pop-in, not a new life. */
+    function spawnBall(){
       var s = speed();
-      vb.vx = s * 0.42 * (Math.random() < 0.5 ? -1 : 1);
-      vb.vy = -s;
+      balls.push({
+        x:barX, y:BAR.y - R - 2,
+        vx:s * 0.42 * (Math.random() < 0.5 ? -1 : 1), vy:-s,
+        main:false
+      });
+      var el = ball.cloneNode(false);
+      el.removeAttribute('id');
+      el.style.backgroundImage = ball.style.backgroundImage;
+      ball.parentNode.insertBefore(el, ball.nextSibling);
+      ballEls.push(el);
+    }
+    function clearExtraBalls(){
+      while (balls.length > 1){
+        balls.pop();
+        var el = ballEls.pop();
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      }
+      gs.extraBalls = 0;
     }
     function toggle(){
       if (gs.gameOver) return;
@@ -1669,6 +1703,8 @@
         clearTimeout(napTimer);
         napTimer = setTimeout(function(){ gs.awake = [false, false, false, false, false]; paintBabies(); }, 1400);
       }
+      var due = points > MULTIBALL_AT ? Math.min(MULTIBALL_MAX, Math.floor((points - MULTIBALL_AT) / MULTIBALL_STEP)) : 0;
+      while (gs.extraBalls < due){ spawnBall(); gs.extraBalls++; }
       paintBabies(); updateLabels();
     }
 
@@ -1678,6 +1714,7 @@
       if (pts > hs){ hs = pts; try { localStorage.setItem('gatha-sleepbreaker-hs', String(hs)); } catch (e) {} }
       serveAt = 0;
       gs.playing = false; gs.missed = missed; gs.gameOver = true;
+      clearExtraBalls();
       goverPtsEl.textContent = pts + 'pts';
       goverEl.classList.add('is-on');
       updateLabels();
@@ -1691,18 +1728,19 @@
       }, 2800);
     }
 
-    function step(dt){
-      vb.x += vb.vx * dt; vb.y += vb.vy * dt;
-      if (vb.x - R < 0){ vb.x = R; vb.vx = Math.abs(vb.vx); }
-      if (vb.x + R > FIELD.right){ vb.x = FIELD.right - R; vb.vx = -Math.abs(vb.vx); }
-      if (vb.y - R < 0){ vb.y = R; vb.vy = Math.abs(vb.vy); }
+    /* returns true if this ball fell past FIELD.bottom this frame */
+    function stepOne(b, dt){
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if (b.x - R < 0){ b.x = R; b.vx = Math.abs(b.vx); }
+      if (b.x + R > FIELD.right){ b.x = FIELD.right - R; b.vx = -Math.abs(b.vx); }
+      if (b.y - R < 0){ b.y = R; b.vy = Math.abs(b.vy); }
 
-      if (vb.vy > 0 && vb.y + R >= BAR.y && vb.y - R <= BAR.y + BAR.h){
-        if (vb.x >= barX - BAR.w / 2 - R && vb.x <= barX + BAR.w / 2 + R){
-          vb.y = BAR.y - R;
-          var hit = (vb.x - barX) / (BAR.w / 2), s = speed();
-          vb.vx = hit * s * 0.78;
-          vb.vy = -Math.sqrt(Math.max(s * s - vb.vx * vb.vx, s * s * 0.25));
+      if (b.vy > 0 && b.y + R >= BAR.y && b.y - R <= BAR.y + BAR.h){
+        if (b.x >= barX - BAR.w / 2 - R && b.x <= barX + BAR.w / 2 + R){
+          b.y = BAR.y - R;
+          var hit = (b.x - barX) / (BAR.w / 2), s = speed();
+          b.vx = hit * s * 0.78;
+          b.vy = -Math.sqrt(Math.max(s * s - b.vx * b.vx, s * s * 0.25));
         }
       }
 
@@ -1710,19 +1748,34 @@
       for (var i = 0; i < n; i++){
         if (gs.awake[i]) continue;
         var r = babyBox(i);
-        if (vb.x + R < r.x || vb.x - R > r.x + r.w || vb.y + R < r.y || vb.y - R > r.y + r.h) continue;
+        if (b.x + R < r.x || b.x - R > r.x + r.w || b.y + R < r.y || b.y - R > r.y + r.h) continue;
         var cx = r.x + r.w / 2, cy = r.y + r.h / 2;
-        var ox = (r.w / 2 + R) - Math.abs(vb.x - cx), oy = (r.h / 2 + R) - Math.abs(vb.y - cy);
-        if (ox < oy){ vb.vx = vb.x < cx ? -Math.abs(vb.vx) : Math.abs(vb.vx); vb.x += vb.x < cx ? -ox : ox; }
-        else { vb.vy = vb.y < cy ? -Math.abs(vb.vy) : Math.abs(vb.vy); vb.y += vb.y < cy ? -oy : oy; }
+        var ox = (r.w / 2 + R) - Math.abs(b.x - cx), oy = (r.h / 2 + R) - Math.abs(b.y - cy);
+        if (ox < oy){ b.vx = b.x < cx ? -Math.abs(b.vx) : Math.abs(b.vx); b.x += b.x < cx ? -ox : ox; }
+        else { b.vy = b.y < cy ? -Math.abs(b.vy) : Math.abs(b.vy); b.y += b.y < cy ? -oy : oy; }
         wake(i);
         break;
       }
 
-      if (vb.y - R > FIELD.bottom){
-        var missed = gs.missed + 1;
-        if (missed >= MAX_MISSES) endGame(missed);
-        else { gs.missed = missed; serve(); updateLabels(); }
+      return b.y - R > FIELD.bottom;
+    }
+
+    /* extra (multiball) drops just vanish — no charge against MAX_MISSES,
+       per the easter egg's whole point: more balls, not more risk. Only
+       the main ball's miss counts, same as before. */
+    function step(dt){
+      for (var bi = balls.length - 1; bi >= 0; bi--){
+        var b = balls[bi];
+        if (!stepOne(b, dt)) continue;
+        if (b.main){
+          var missed = gs.missed + 1;
+          if (missed >= MAX_MISSES) endGame(missed);
+          else { gs.missed = missed; serve(); updateLabels(); }
+        } else {
+          balls.splice(bi, 1);
+          var el = ballEls.splice(bi, 1)[0];
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        }
       }
     }
 
@@ -1741,7 +1794,8 @@
       last = t;
       if (gs.playing){
         if (serveAt){
-          vb.x = barX; vb.y = BAR.y - R - 2;
+          var mb = balls[0];
+          mb.x = barX; mb.y = BAR.y - R - 2;
           if (t >= serveAt){ serveAt = 0; launch(); }
         } else {
           step(dt);
@@ -1754,10 +1808,12 @@
 
     function paint(){
       var b = box(), k = b.width / W;
-      if (ball){
-        ball.style.left = (vb.x / W * 100) + '%';
-        ball.style.top = (vb.y / H * 100) + '%';
-        ball.style.backgroundPosition = (-(vb.x - R) * k) + 'px ' + (-(vb.y - R) * k) + 'px';
+      for (var i = 0; i < balls.length; i++){
+        var vb = balls[i], el = ballEls[i];
+        if (!el) continue;
+        el.style.left = (vb.x / W * 100) + '%';
+        el.style.top = (vb.y / H * 100) + '%';
+        el.style.backgroundPosition = (-(vb.x - R) * k) + 'px ' + (-(vb.y - R) * k) + 'px';
       }
       if (bar){
         bar.style.left = (barX / W * 100) + '%';
