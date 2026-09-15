@@ -548,6 +548,11 @@
      trick as .hero's claim card, so it reads at its designed scale instead
      of stretching (and growing every child's cqw with it) on wide screens */
   .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/inline-size}
+  /* riso grain, sat on top of the whole composition so its luminosity
+     blend washes over everything beneath — game panel, stickers, text —
+     without touching their hue/saturation. Same aspect ratio as the
+     frame itself (1728:1117), so it's one full-bleed image, not a tile. */
+  .ft__riso{position:absolute;inset:0;background-image:url(assets/ft-riso.webp);background-size:100% 100%;background-repeat:no-repeat;mix-blend-mode:luminosity;opacity:.2;pointer-events:none}
   .ft__sig{position:absolute;left:89%;bottom:39.75%;width:7.06%;height:auto;display:block;pointer-events:none}
   .ft__wordmark{position:absolute;left:-.46%;top:64.46%;width:100.98%;height:37.6%;display:block;pointer-events:none}
 
@@ -875,6 +880,7 @@
       <img class="ft__goverimg" alt="" src="assets/ft-baby-awake.webp">
       <div class="ft__goverpts" id="ftGoverPts">0pts</div>
     </div>
+    <div class="ft__riso"></div>
     </div>
   </footer>
   </div>

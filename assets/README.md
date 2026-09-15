@@ -58,9 +58,9 @@ Port of the `Gatha Footer.dc.html` Claude Design canvas (`assets/` in that
 project). Source art for the raster stickers came from
 `…/PERSONAL STUDY/UX/FINAL FOLDER/footer/graphics`, re-encoded here as WebP;
 the wordmark is the design's own SVG with its embedded C2PA metadata
-stripped. The design's `ft-graph.svg` tile and paper-grain texture are
-regenerated in JS instead of shipped as assets (same trick as the hero's
-ruler/graph patterns) — see `footerPatterns()` in `index.html`.
+stripped. The `ft-graph.svg` tile is regenerated in JS instead of shipped as
+an asset (same trick as the hero's ruler/graph patterns) — see
+`footerPatterns()` in `index.html`.
 
 | file                  | placed as                                | source |
 |------------------------|-------------------------------------------|--------|
@@ -73,6 +73,7 @@ ruler/graph patterns) — see `footerPatterns()` in `index.html`.
 | `ft-ds.webp`          | sticker, drag anywhere                    | `footer/graphics/DS.png` |
 | `ft-signature.webp`   | "Gatha" signature mark, over the paper    | `footer/graphics/signature 1.png` |
 | `ft-wordmark-dots.svg`| halftone "Gatha" wordmark, bottom bleed   | design project `assets/ft-wordmark-dots.svg` |
+| `ft-riso.webp`        | `.ft__riso`, full-bleed grain over everything, `mix-blend-mode:luminosity` @ 20% opacity | `footer/graphics/Footer  Riso overlay.png`, downsampled 3456×2234 → 1728×1117 (matches the design canvas 1:1, so it's one image, not a tile) |
 
 The design's `Primogem.svg` / `DS.svg` / `Diary.svg` / `Pen.svg` /
 `heartlock.svg` exports are per-pixel vector dumps (0.5–1.2 MB each,
