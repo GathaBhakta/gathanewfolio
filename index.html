@@ -548,15 +548,14 @@
      trick as .hero's claim card, so it reads at its designed scale instead
      of stretching (and growing every child's cqw with it) on wide screens */
   .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/inline-size}
-  /* riso grain — full-bleed on .ft itself (like .ft__graph), not capped
-     to .ft__frame, so it isn't stuck centred in a fixed-size block. A
-     repeating fixed-px tile rather than a stretched single image means
-     no distortion and no reflow at any viewport width — same grain
-     density always, seamless regardless of how wide .ft actually is.
-     Sits on top of the whole composition so its luminosity blend washes
-     over everything beneath — game panel, stickers, text — without
-     touching their hue/saturation. */
-  .ft__riso{position:absolute;inset:0;z-index:60;background-image:url(assets/ft-riso.webp);background-size:640px 414px;background-repeat:repeat;mix-blend-mode:luminosity;opacity:.2;pointer-events:none}
+  /* riso grain — the very first thing painted in .ft, so .ft__graph and
+     every real asset (text, stickers, game panel) draw over it normally
+     and stay untouched; the grain only shows through wherever nothing
+     opaque sits on top of it. Full-bleed on .ft itself (not capped to
+     .ft__frame), and a repeating fixed-px tile rather than a stretched
+     single image, so there's no distortion and no reflow at any
+     viewport width — same grain density always. */
+  .ft__riso{position:absolute;inset:0;background-image:url(assets/ft-riso.webp);background-size:640px 414px;background-repeat:repeat;mix-blend-mode:luminosity;opacity:.2;pointer-events:none}
   .ft__sig{position:absolute;left:89%;bottom:39.75%;width:7.06%;height:auto;display:block;pointer-events:none}
   .ft__wordmark{position:absolute;left:-.46%;top:64.46%;width:100.98%;height:37.6%;display:block;pointer-events:none}
 
@@ -802,6 +801,7 @@
 
   <div class="ft-wrap" id="ftWrap">
   <footer class="ft" id="ft">
+    <div class="ft__riso"></div>
     <div class="ft__graph" id="ftGraph"></div>
 
     <div class="ft__frame" id="ftFrame">
@@ -885,7 +885,6 @@
       <div class="ft__goverpts" id="ftGoverPts">0pts</div>
     </div>
     </div>
-    <div class="ft__riso"></div>
   </footer>
   </div>
 
