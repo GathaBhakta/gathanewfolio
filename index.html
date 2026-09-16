@@ -141,18 +141,20 @@
   /* ruler edge — a Figma/Photoshop-style ruler (Shift+R) down the very left
      edge: major ticks + digit labels at full pink, minor ticks + the spine
      at reduced opacity (baked into the generated SVG itself, see buildRuler
-     in heroGrid). Pinned to the viewport like the nav (fixed inside the
-     .stage container), and it recolours over a solid section the same way
-     the nav links do. */
+     in heroGrid), on a faint pink wash. Pinned to the viewport like the nav
+     (fixed inside the .stage container). It doesn't need to fight for
+     legibility over a solid section like .work — it just fades out there
+     and back in once the footer (or hero) is behind it again. */
   .ruler{
     position:fixed;left:0;top:0;bottom:0;
-    width:clamp(30px, 3.75cqw, 54px);z-index:15;
+    width:clamp(24px, 3cqw, 46px);z-index:15;
+    background-color:rgba(240,171,206,.12);
     background-repeat:no-repeat;background-position:0 -18px;
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
-    transition:opacity 700ms var(--ease),filter 260ms var(--ease);
+    transition:opacity 700ms var(--ease);
   }
-  .ruler--solid{filter:grayscale(1) brightness(2.4)}
+  .ruler--hide{opacity:0}
   @media (max-width:820px){ .ruler{display:none} }
 
   /* graph-paper column — same lift, so the sheet dissolves into the nav */
@@ -973,7 +975,7 @@
       var revealed = (1 - workBottom / ch) > 0.35;
       footerSec.classList.toggle('ft--in', revealed);
     }
-    if (rulerEl) rulerEl.classList.toggle('ruler--solid', onSolid);
+    if (rulerEl) rulerEl.classList.toggle('ruler--hide', onSolid);
   }
   function onScroll(){ if (!scrollPending){ scrollPending = true; requestAnimationFrame(paint); } }
   stage.addEventListener('scroll', onScroll, { passive:true });
@@ -1029,24 +1031,25 @@
        right-aligned flush against their tick — the actual Figma/PS
        ruler layout, not a rotated-label guess at it. */
     var RULE_PINK = '#F0ABCE';
-    var RULER_W = 54, SPINE_X = RULER_W - 1.5;
-    var MINOR_OFFSETS = [GS / 4, GS / 2, GS * 3 / 4].map(function(v){ return v + 0.25; });
+    var RULER_W = 46, SPINE_X = RULER_W - 1.5;
+    var RULER_STEP = 111; // decorative round step, independent of the GS=38 grid module
+    var MINOR_OFFSETS = [RULER_STEP / 4, RULER_STEP / 2, RULER_STEP * 3 / 4].map(function(v){ return v + 0.25; });
     function buildRuler(h){
       h = Math.ceil(h) + 18; // +18 covers the -18px phase-lock offset below
-      var b = '<line x1="' + SPINE_X + '" y1="0" x2="' + SPINE_X + '" y2="' + h + '" stroke="' + RULE_PINK + '" stroke-opacity=".25" stroke-width="1"/>';
-      var n = Math.ceil(h / GS) + 1;
+      var b = '<line x1="' + SPINE_X + '" y1="0" x2="' + SPINE_X + '" y2="' + h + '" stroke="' + RULE_PINK + '" stroke-opacity=".25" stroke-width="0.5"/>';
+      var n = Math.ceil(h / RULER_STEP) + 1;
       for (var i = 0; i < n; i++){
-        var y0 = i * GS;
+        var y0 = i * RULER_STEP;
         for (var k = 0; k < MINOR_OFFSETS.length; k++){
           var y = y0 + MINOR_OFFSETS[k];
           if (y > h) continue;
-          b += '<line x1="' + (SPINE_X - 4) + '" y1="' + y.toFixed(2) + '" x2="' + SPINE_X + '" y2="' + y.toFixed(2) + '" stroke="' + RULE_PINK + '" stroke-opacity=".3" stroke-width="0.75"/>';
+          b += '<line x1="' + (SPINE_X - 3) + '" y1="' + y.toFixed(2) + '" x2="' + SPINE_X + '" y2="' + y.toFixed(2) + '" stroke="' + RULE_PINK + '" stroke-opacity=".3" stroke-width="0.5"/>';
         }
         var ym = y0 + 1;
         if (ym > h) continue;
-        b += '<line x1="' + (SPINE_X - 8) + '" y1="' + ym + '" x2="' + SPINE_X + '" y2="' + ym + '" stroke="' + RULE_PINK + '" stroke-opacity=".92" stroke-width="1"/>';
-        b += '<text x="' + (SPINE_X - 11) + '" y="' + (ym + 3) + '" fill="' + RULE_PINK + '" fill-opacity=".92" ' +
-          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="9" text-anchor="end">' + (i * GS) + '</text>';
+        b += '<line x1="' + (SPINE_X - 6) + '" y1="' + ym + '" x2="' + SPINE_X + '" y2="' + ym + '" stroke="' + RULE_PINK + '" stroke-opacity=".92" stroke-width="0.6"/>';
+        b += '<text x="' + (SPINE_X - 9) + '" y="' + (ym + 3) + '" fill="' + RULE_PINK + '" fill-opacity=".92" ' +
+          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="8" text-anchor="end">' + (i * RULER_STEP) + '</text>';
       }
       return svgUrl(RULER_W, h, b);
     }
