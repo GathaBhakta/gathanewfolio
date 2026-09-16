@@ -201,7 +201,7 @@
   .claimbox{
     position:relative;height:100%;width:100%;
     container-type:inline-size;
-    --petal:clamp(22px,5.6cqw,46px);
+    --petal:clamp(17.6px,4.48cqw,36.8px);
     --petal-off:calc(var(--petal) / -2);
   }
   .card{
@@ -1274,10 +1274,15 @@
         var r = t.getBoundingClientRect(), d = DIRS[i];
         t.classList.remove('claim__tick--fly');
         t.style.opacity = '0';
+        /* 8.5 = the old 6.8 calibration rescaled for --petal now being
+           80% of its old size (6.8/0.8), so the parked tick still lands
+           at the intro mark's original full-bloom size — the swap at
+           intro--out stays seamless, and it's only the fly-out that
+           settles onto the smaller corner petal. */
         t.style.transform =
           'translate(' + Math.round(ccx - (r.left + r.width / 2) + d[0] * 68) + 'px,' +
                          Math.round(ccy - (r.top + r.height / 2) + d[1] * 68) + 'px) ' +
-          'rotate(var(--rot)) scale(6.8)';
+          'rotate(var(--rot)) scale(8.5)';
       });
     }
     function release(){
