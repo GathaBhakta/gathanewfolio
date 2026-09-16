@@ -146,7 +146,7 @@
      the nav links do. */
   .ruler{
     position:fixed;left:0;top:0;bottom:0;
-    width:clamp(20px, 3.125cqw, 46px);z-index:15;
+    width:clamp(30px, 3.75cqw, 54px);z-index:15;
     background-repeat:no-repeat;background-position:0 -18px;
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
@@ -1023,27 +1023,32 @@
        their own incrementing numbers. Majors (the "important points")
        and their labels paint at full pink; the spine + minor ticks
        paint at reduced opacity, per design. Rebuilt on resize. */
+    /* spine sits on the content-side edge (right, since the ruler lives at
+       the page's left edge); ticks are short dashes poking out of it
+       toward the numbers, majors longer than minors; labels sit upright,
+       right-aligned flush against their tick — the actual Figma/PS
+       ruler layout, not a rotated-label guess at it. */
     var RULE_PINK = '#F0ABCE';
+    var RULER_W = 54, SPINE_X = RULER_W - 1.5;
     var MINOR_OFFSETS = [GS / 4, GS / 2, GS * 3 / 4].map(function(v){ return v + 0.25; });
     function buildRuler(h){
       h = Math.ceil(h) + 18; // +18 covers the -18px phase-lock offset below
-      var b = '<line x1="1" y1="0" x2="1" y2="' + h + '" stroke="' + RULE_PINK + '" stroke-opacity=".25" stroke-width="1"/>';
+      var b = '<line x1="' + SPINE_X + '" y1="0" x2="' + SPINE_X + '" y2="' + h + '" stroke="' + RULE_PINK + '" stroke-opacity=".25" stroke-width="1"/>';
       var n = Math.ceil(h / GS) + 1;
       for (var i = 0; i < n; i++){
         var y0 = i * GS;
         for (var k = 0; k < MINOR_OFFSETS.length; k++){
           var y = y0 + MINOR_OFFSETS[k];
           if (y > h) continue;
-          b += '<line x1="0.5" y1="' + y.toFixed(2) + '" x2="18.5" y2="' + y.toFixed(2) + '" stroke="' + RULE_PINK + '" stroke-opacity=".3" stroke-width="0.5"/>';
+          b += '<line x1="' + (SPINE_X - 4) + '" y1="' + y.toFixed(2) + '" x2="' + SPINE_X + '" y2="' + y.toFixed(2) + '" stroke="' + RULE_PINK + '" stroke-opacity=".3" stroke-width="0.75"/>';
         }
         var ym = y0 + 1;
         if (ym > h) continue;
-        b += '<line x1="0.5" y1="' + ym + '" x2="30.5" y2="' + ym + '" stroke="' + RULE_PINK + '" stroke-opacity=".92" stroke-width="2"/>';
-        b += '<text x="35" y="' + (ym + 3) + '" fill="' + RULE_PINK + '" fill-opacity=".92" ' +
-          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="9" text-anchor="start" ' +
-          'transform="rotate(-90 35 ' + (ym + 3) + ')">' + (i * GS) + '</text>';
+        b += '<line x1="' + (SPINE_X - 8) + '" y1="' + ym + '" x2="' + SPINE_X + '" y2="' + ym + '" stroke="' + RULE_PINK + '" stroke-opacity=".92" stroke-width="1"/>';
+        b += '<text x="' + (SPINE_X - 11) + '" y="' + (ym + 3) + '" fill="' + RULE_PINK + '" fill-opacity=".92" ' +
+          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="9" text-anchor="end">' + (i * GS) + '</text>';
       }
-      return svgUrl(48, h, b);
+      return svgUrl(RULER_W, h, b);
     }
 
     var DOT_TILE = svgUrl(19, 19, '<circle cx="1" cy="1" r="1" fill="' + GRID_LINE + '"/>');
