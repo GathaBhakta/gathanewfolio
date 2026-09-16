@@ -937,8 +937,6 @@
     scrollPending = false;
     var ch = stage.clientHeight, st = stage.scrollTop;
 
-    stage.setAttribute('data-sb', st > ch * 0.5 ? 'white' : 'pink');
-
     var p = Math.min(1, st / (ch * 0.62));
     hero.style.opacity = (1 - p * 0.5).toFixed(3);
     hero.style.transform = reduce ? 'none' : 'scale(' + (1 - p * 0.03).toFixed(4) + ')';
@@ -949,6 +947,12 @@
       if (r.top <= mid && r.bottom > mid){ onSolid = true; break; }
     }
     nav.classList.toggle('nav--solid', onSolid);
+    /* same signal as the nav's ink swap — pink stays legible over the
+       cream hero and footer, white only while a solid (pink) section
+       like .work is actually behind it. Used to flip on scrollTop
+       alone, so it went white past the hero and never came back for
+       the footer. */
+    stage.setAttribute('data-sb', onSolid ? 'white' : 'pink');
 
     /* footer reveal — .ft is already pinned (see .ft-wrap above) by
        the moment .work starts to leave, so the only real signal is
