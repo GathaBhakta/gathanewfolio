@@ -138,13 +138,16 @@
   }
   .cell{position:relative;overflow:hidden;transition:opacity 820ms var(--ease)}
 
-  /* ruler edge — pink rules down the very left edge. Pinned to the viewport
-     like the nav (fixed inside the .stage container), and it recolours over
-     a solid section the same way the nav links do. Opacity holds at .5. */
+  /* ruler edge — a Figma/Photoshop-style ruler (Shift+R) down the very left
+     edge: major ticks + digit labels at full pink, minor ticks + the spine
+     at reduced opacity (baked into the generated SVG itself, see buildRuler
+     in heroGrid). Pinned to the viewport like the nav (fixed inside the
+     .stage container), and it recolours over a solid section the same way
+     the nav links do. */
   .ruler{
     position:fixed;left:0;top:0;bottom:0;
     width:clamp(20px, 3.125cqw, 46px);z-index:15;
-    opacity:.5;background-repeat:repeat-y;background-position:0 -18px;
+    background-repeat:no-repeat;background-position:0 -18px;
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
     transition:opacity 700ms var(--ease),filter 260ms var(--ease);
@@ -1013,16 +1016,35 @@
       return svgUrl(TILE, TILE, b);
     })();
 
-    var RULER_TILE = (function(){
-      var b = '', minor = minors(), i;
-      for (i = 0; i < minor.length; i++){
-        b += '<line x1="0.5" y1="' + minor[i] + '" x2="18.5" y2="' + minor[i] + '" stroke="' + RULE_MINOR + '" stroke-width="0.5"/>';
+    /* Figma/Photoshop-style ruler: real tick hierarchy + digit labels,
+       not a repeating tile — .ruler is fixed/viewport-height and never
+       scrolls, so a one-off graphic sized to the current viewport is
+       simpler than tiling, and it's the only way to give major ticks
+       their own incrementing numbers. Majors (the "important points")
+       and their labels paint at full pink; the spine + minor ticks
+       paint at reduced opacity, per design. Rebuilt on resize. */
+    var RULE_PINK = '#F0ABCE';
+    var MINOR_OFFSETS = [GS / 4, GS / 2, GS * 3 / 4].map(function(v){ return v + 0.25; });
+    function buildRuler(h){
+      h = Math.ceil(h) + 18; // +18 covers the -18px phase-lock offset below
+      var b = '<line x1="1" y1="0" x2="1" y2="' + h + '" stroke="' + RULE_PINK + '" stroke-opacity=".25" stroke-width="1"/>';
+      var n = Math.ceil(h / GS) + 1;
+      for (var i = 0; i < n; i++){
+        var y0 = i * GS;
+        for (var k = 0; k < MINOR_OFFSETS.length; k++){
+          var y = y0 + MINOR_OFFSETS[k];
+          if (y > h) continue;
+          b += '<line x1="0.5" y1="' + y.toFixed(2) + '" x2="18.5" y2="' + y.toFixed(2) + '" stroke="' + RULE_PINK + '" stroke-opacity=".3" stroke-width="0.5"/>';
+        }
+        var ym = y0 + 1;
+        if (ym > h) continue;
+        b += '<line x1="0.5" y1="' + ym + '" x2="30.5" y2="' + ym + '" stroke="' + RULE_PINK + '" stroke-opacity=".92" stroke-width="2"/>';
+        b += '<text x="35" y="' + (ym + 3) + '" fill="' + RULE_PINK + '" fill-opacity=".92" ' +
+          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="9" text-anchor="start" ' +
+          'transform="rotate(-90 35 ' + (ym + 3) + ')">' + (i * GS) + '</text>';
       }
-      b += '<line x1="1" y1="0" x2="1" y2="' + TILE + '" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
-      b += '<line x1="0.5" y1="1" x2="30.5" y2="1" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
-      b += '<line x1="0.5" y1="' + (GS + 1) + '" x2="30.5" y2="' + (GS + 1) + '" stroke="' + RULE_MAJOR + '" stroke-width="2"/>';
-      return svgUrl(48, TILE, b);
-    })();
+      return svgUrl(48, h, b);
+    }
 
     var DOT_TILE = svgUrl(19, 19, '<circle cx="1" cy="1" r="1" fill="' + GRID_LINE + '"/>');
 
@@ -1056,7 +1078,11 @@
     /* pattern tiles — assigned as style properties so no data URI
        has to survive HTML attribute quoting */
     var rl = $('.ruler');
-    if (rl) rl.style.backgroundImage = RULER_TILE;
+    if (rl){
+      var paintRuler = function(){ rl.style.backgroundImage = buildRuler(rl.clientHeight || window.innerHeight); };
+      paintRuler();
+      window.addEventListener('resize', paintRuler);
+    }
     var gp = $('.cell--graph .pat');
     if (gp) gp.style.backgroundImage = GRAPH_TILE;
     [].slice.call(document.querySelectorAll('.cell--dot .pat, .cell--claim .pat')).forEach(function(p){ p.style.backgroundImage = DOT_TILE; });
