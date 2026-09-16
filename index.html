@@ -941,10 +941,15 @@
     hero.style.opacity = (1 - p * 0.5).toFixed(3);
     hero.style.transform = reduce ? 'none' : 'scale(' + (1 - p * 0.03).toFixed(4) + ')';
 
-    var mid = nav.offsetHeight * 0.5, onSolid = false;
+    /* fires once a solid section is ~75% scrolled into view, not the
+       instant its edge merely brushes the nav — same rule going in
+       and coming back out, so it doesn't linger through to a section's
+       tail end before reverting. */
+    var onSolid = false;
     for (var i = 0; i < solids.length; i++){
       var r = solids[i].getBoundingClientRect();
-      if (r.top <= mid && r.bottom > mid){ onSolid = true; break; }
+      var visible = Math.min(r.bottom, ch) - Math.max(r.top, 0);
+      if (visible / r.height >= 0.75){ onSolid = true; break; }
     }
     nav.classList.toggle('nav--solid', onSolid);
     /* same signal as the nav's ink swap — pink stays legible over the
