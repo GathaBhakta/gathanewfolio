@@ -60,17 +60,24 @@
   /* the true pointer position — a small pink outline the wand chases */
   .wand-cursor__dot{position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;border:1.5px solid #F0ABCE;box-sizing:border-box}
   .wand-cursor__body{position:absolute;left:0;top:0;width:47px;height:68.47px;transform-origin:22.46px 7.43px;display:block;will-change:transform}
-  .wand-cursor.is-ready .wand-cursor__body{transition:transform 220ms cubic-bezier(.22,1,.36,1)}
+  .wand-cursor.is-ready .wand-cursor__body{transition:transform 220ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
   /* 3 independent twinkles, each with its own 200ms-cycle starting shape
      (see the tick offset in the script) so they read as scattered
      variation, not one synced blink — and each with a longer transition
      duration than the wand so they visibly trail further behind it */
   .wand-cursor__spark{position:absolute;left:0;top:0;width:15px;height:15px;will-change:transform}
-  .wand-cursor.is-ready #wandSpark0{transition:transform 300ms cubic-bezier(.22,1,.36,1)}
-  .wand-cursor.is-ready #wandSpark1{transition:transform 380ms cubic-bezier(.22,1,.36,1)}
-  .wand-cursor.is-ready #wandSpark2{transition:transform 460ms cubic-bezier(.22,1,.36,1)}
+  .wand-cursor.is-ready #wandSpark0{transition:transform 300ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
+  .wand-cursor.is-ready #wandSpark1{transition:transform 380ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
+  .wand-cursor.is-ready #wandSpark2{transition:transform 460ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
   .wand-cursor__spark-shape{opacity:0}
   .wand-cursor__spark-shape.is-active{opacity:1}
+  /* the work carousel's case-study cards (their own hover tint + corner
+     cut-outs are plenty) and the footer game frame (where a spinning
+     wand is just distracting mid-gameplay) both drop the wand + sparkles
+     — the game frame keeps the plain dot as a minimal, non-distracting
+     cursor rather than going fully invisible. */
+  .wand-cursor.is-simple .wand-cursor__body,
+  .wand-cursor.is-simple .wand-cursor__spark{opacity:0}
   html{background:var(--cream)}
   body{
     background:var(--cream);
@@ -1082,14 +1089,18 @@
      animation, not a per-frame JS loop, so it costs nothing once the
      mouse stops. Each sparkle also starts its 200ms shape-cycle on a
      different one of the 3 shapes, so they read as scattered variation
-     instead of one synced blink. Suppressed over the hero's own canvas
-     cursors, which keep their explicit cursor: url() rules — this only
-     hides the DOM overlay so it doesn't sit on top of them; the CSS
-     cascade already lets those cells' own `cursor` win over the
-     site-wide `cursor:none` regardless. The suppression check itself
-     hangs off mouseenter/mouseleave on just those 4 cells, not on every
-     mousemove, so it doesn't add a DOM walk to every pixel of movement.
-     Skipped entirely on touch. */
+     instead of one synced blink.
+
+     Two zones dial the cursor back, both driven by delegated
+     mouseover/mouseout so they don't add a DOM walk to every pixel of
+     mousemove: is-suppressed drops the whole overlay over the hero's own
+     canvas cursors (which already draw their own heart-in-crosshair /
+     heart-in-ring cursor: url()) and over the work carousel's .qc cards
+     (their own hover tint + corner cut-outs are the feedback there,
+     the wand would just be extra motion on top); is-simple keeps only
+     the plain dot over the footer's .ft__frame, since the game needs
+     *some* visible cursor but the full wand+sparkles is distracting
+     mid-gameplay. Skipped entirely on touch. */
   (function wandCursor(){
     if (!window.matchMedia('(pointer:fine)').matches) return;
     var wrap = byId('wandCursor');
@@ -1133,9 +1144,29 @@
       if (!e.relatedTarget) wrap.classList.remove('is-on');
     });
 
-    [].slice.call(document.querySelectorAll('.cell--graph,.cell--dot,.cell--check,.cell--iso')).forEach(function(cell){
-      cell.addEventListener('mouseenter', function(){ wrap.classList.add('is-suppressed'); });
-      cell.addEventListener('mouseleave', function(){ wrap.classList.remove('is-suppressed'); });
+    /* delegated on document (rather than bound to each cell directly) so
+       it still works for .qc — the work carousel builds those cards
+       after this runs, so a one-time querySelectorAll here would've
+       missed them entirely. mouseover/mouseout bubble, unlike
+       mouseenter/mouseleave, so closest() on the target (and, on the
+       way out, on relatedTarget) finds the right zone from any nested
+       child — a card's thumbnail or corner cut-out, the frame's ball or
+       score display, etc. */
+    var SUPPRESS_SEL = '.cell--graph,.cell--dot,.cell--check,.cell--iso,.qc';
+    var SIMPLE_SEL = '.ft__frame';
+    function zonesFor(el){
+      if (!el || !el.closest) return { suppress:false, simple:false };
+      return { suppress: !!el.closest(SUPPRESS_SEL), simple: !!el.closest(SIMPLE_SEL) };
+    }
+    document.addEventListener('mouseover', function(e){
+      var z = zonesFor(e.target);
+      wrap.classList.toggle('is-suppressed', z.suppress);
+      wrap.classList.toggle('is-simple', z.simple);
+    });
+    document.addEventListener('mouseout', function(e){
+      var z = zonesFor(e.relatedTarget);
+      wrap.classList.toggle('is-suppressed', z.suppress);
+      wrap.classList.toggle('is-simple', z.simple);
     });
 
     var tick = 0;
