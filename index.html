@@ -153,7 +153,6 @@
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
   }
-  .ruler--hide{opacity:0}
   .ruler__cursor{
     position:absolute;left:0;width:100%;height:2px;background:var(--pink-ink);
     pointer-events:none;opacity:0;transition:opacity 200ms var(--ease);
@@ -974,23 +973,29 @@
        repaint of everything inside it — including the punched text's
        filter — on every tick), flip a single class once .work has
        mostly cleared and let the CSS transition below animate it. */
+    var footerReveal = 0;
     if (footerSec && workSec){
       var workBottom = Math.max(0, Math.min(ch, workSec.getBoundingClientRect().bottom));
-      var revealed = (1 - workBottom / ch) > 0.35;
-      footerSec.classList.toggle('ft--in', revealed);
+      footerReveal = 1 - workBottom / ch;
+      footerSec.classList.toggle('ft--in', footerReveal > 0.35);
     }
-    /* .work paints over the ruler (same stacking column) the instant any
-       of it is on screen — it doesn't ease in, it's pinned the moment it
-       arrives (see paint()'s own hero/work notes), so waiting for the
-       75% onSolid threshold left the ruler visually cut off by .work
-       well before the class caught up. Hide on any overlap instead. */
-    if (rulerEl && workSec){
+    /* ruler opacity is a straight extension of whatever's actually behind
+       it, computed every frame like hero's own fade above — no class
+       toggle, no separate transition, so it can't drift out of step with
+       the section it belongs to. Two terms: heroOp*(1-workCoverage) fades
+       it exactly as hero fades, then the rest of the way to 0 as .work's
+       own (near-instant) pin covers it; footerReveal — the same fraction
+       driving .ft--in above — brings it back the moment the footer
+       actually starts revealing, not after .ft has already finished
+       easing in. */
+    /* skip while the intro's own opacity:0 (.stage--intro .ruler) is meant
+       to hold it back — an inline style here would win over that class
+       and show it early. */
+    if (rulerEl && workSec && !stage.classList.contains('stage--intro')){
       var wr = workSec.getBoundingClientRect();
-      /* >1px, not >0 — hero and .work meet at an exact seam (.work's top
-         sits right at the viewport bottom), and sub-pixel rounding there
-         registered as a sliver of "visible" even at scrollTop 0. */
-      var workVisible = Math.min(wr.bottom, ch) - Math.max(wr.top, 0) > 1;
-      rulerEl.classList.toggle('ruler--hide', workVisible);
+      var workCoverage = Math.max(0, Math.min(wr.bottom, ch) - Math.max(wr.top, 0)) / ch;
+      var heroOp = parseFloat(hero.style.opacity) || 0;
+      rulerEl.style.opacity = Math.max(heroOp * (1 - workCoverage), footerReveal).toFixed(3);
     }
   }
   function onScroll(){ if (!scrollPending){ scrollPending = true; requestAnimationFrame(paint); } }
