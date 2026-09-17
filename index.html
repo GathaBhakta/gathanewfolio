@@ -1089,6 +1089,11 @@
     var WAND_EASE = 0.18;
     var SPARK_EASE  = [0.14, 0.11, 0.085];
     var SPARK_OFFSET = [ {x:20,y:-14}, {x:-16,y:-4}, {x:6,y:20} ];
+    /* the wand eases toward this point, not the dot's own exact spot, so
+       there's always a little daylight between them — otherwise the wand
+       body sits right on top of whatever the dot (the real hotspot) is
+       hovering, like a link's text. */
+    var WAND_GAP = { x: 18, y: 24 };
 
     var mouseX = 0, mouseY = 0, haveMouse = false;
     var wandX = 0, wandY = 0;
@@ -1098,8 +1103,8 @@
       mouseX = e.clientX; mouseY = e.clientY;
       if (!haveMouse){
         haveMouse = true;
-        wandX = mouseX; wandY = mouseY;
-        sparkPos.forEach(function(p){ p.x = mouseX; p.y = mouseY; });
+        wandX = mouseX + WAND_GAP.x; wandY = mouseY + WAND_GAP.y;
+        sparkPos.forEach(function(p){ p.x = wandX; p.y = wandY; });
       }
       dot.style.transform = 'translate(' + (mouseX - 6).toFixed(1) + 'px,' + (mouseY - 6).toFixed(1) + 'px)';
       wrap.classList.add('is-on');
@@ -1114,8 +1119,8 @@
 
     function raf(){
       if (haveMouse){
-        wandX += (mouseX - wandX) * WAND_EASE;
-        wandY += (mouseY - wandY) * WAND_EASE;
+        wandX += (mouseX + WAND_GAP.x - wandX) * WAND_EASE;
+        wandY += (mouseY + WAND_GAP.y - wandY) * WAND_EASE;
         body.style.transform = 'translate(' + (wandX - TIP_X).toFixed(1) + 'px,' + (wandY - TIP_Y).toFixed(1) + 'px) rotate(' + TILT + 'deg)';
         sparkPos.forEach(function(p, i){
           p.x += (wandX - p.x) * SPARK_EASE[i];
