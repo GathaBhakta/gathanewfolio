@@ -1,8 +1,9 @@
-<svg width="30" height="30" viewBox="0 0 242 242" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<filter id="glow" x="-70%" y="-70%" width="240%" height="240%" color-interpolation-filters="sRGB">
-<feDropShadow dx="0" dy="0" stdDeviation="16" flood-color="#FFFFFF" flood-opacity="0.9"/>
-</filter>
-</defs>
-<path d="M126.682 82.3624C147.756 61.2882 181.924 61.2882 202.998 82.3624C224.073 103.437 224.072 137.605 202.998 158.679C202.998 158.679 158.48 198.79 120.521 198.79C82.5618 198.79 38.1584 158.794 38.1584 158.794C17.0841 137.72 17.0837 103.552 38.1583 82.4776C59.2325 61.4036 93.4004 61.4036 114.475 82.4778L120.521 88.5233L126.682 82.3624Z" fill="none" stroke="#F0ABCE" stroke-width="16" filter="url(#glow)"/>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+<line x1="16" y1="2" x2="16" y2="10" stroke="#F0ABCE" stroke-width="1"/>
+<line x1="16" y1="22" x2="16" y2="30" stroke="#F0ABCE" stroke-width="1"/>
+<line x1="2" y1="16" x2="10" y2="16" stroke="#F0ABCE" stroke-width="1"/>
+<line x1="22" y1="16" x2="30" y2="16" stroke="#F0ABCE" stroke-width="1"/>
+<path d="M126.682 82.3624C147.756 61.2882 181.924 61.2882 202.998 82.3624C224.073 103.437 224.072 137.605 202.998 158.679C202.998 158.679 158.48 198.79 120.521 198.79C82.5618 198.79 38.1584 158.794 38.1584 158.794C17.0841 137.72 17.0837 103.552 38.1583 82.4776C59.2325 61.4036 93.4004 61.4036 114.475 82.4778L120.521 88.5233L126.682 82.3624Z"
+  fill="none" stroke="#F0ABCE" stroke-width="1" vector-effect="non-scaling-stroke"
+  transform="translate(16 16) scale(0.0483) translate(-120.5 -130)"/>
 </svg>

@@ -49,7 +49,7 @@ in `index.html`) reuse the project photos:
 
 `cursor.svg` — pink-dot pointer, the hero's default cursor.
 `cursor-hover.svg` — pink ring, shown over the interactive grid regions (`.cell--dot` / `--check` / `--iso`); stickers keep `grab`.
-`cursor-crosshair.svg` — pink heart-outline mark shown over `.cell--graph`, replacing the OS crosshair's plain square-in-the-middle look. Traced from `FINAL FOLDER/footer/graphics/cross hair.svg` (a 242×242 heart outline, not a literal crosshair) — rendered at 30×30 with the stroke and glow thickened for legibility at cursor size, hotspot at its own centre.
+`cursor-crosshair.svg` — a plain crosshair (four gapped line segments) shown over `.cell--graph`, but with the usual centre dot swapped for a tiny pink heart outline instead of a square. The heart is traced from `FINAL FOLDER/footer/graphics/cross hair.svg` (a 242×242 heart, not a literal crosshair on its own), scaled into the 32×32 canvas's centre gap via `vector-effect="non-scaling-stroke"` so its outline stays a crisp 1px regardless of the scale transform. No glow/shadow — flat lines only. Hotspot at the exact centre (16,16).
 `favicon.svg` — the quatrefoil mark on a `--pink` ground.
 `cross-grid.svg` / `pixel-heart.svg` — unused (were the old hero's pixel scribbles); kept for reference.
 
