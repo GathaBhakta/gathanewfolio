@@ -48,7 +48,8 @@ in `index.html`) reuse the project photos:
 | `spark2.svg`          | project-02 corner cut-outs 1,2 — 30 KB, 444 paths. |
 
 `cursor.svg` — pink-dot pointer, the hero's default cursor.
-`cursor-hover.svg` — pink ring, shown over the interactive grid regions (`.cell--dot` / `--check` / `--iso`); graph keeps `crosshair`, stickers keep `grab`.
+`cursor-hover.svg` — pink ring, shown over the interactive grid regions (`.cell--dot` / `--check` / `--iso`); stickers keep `grab`.
+`cursor-crosshair.svg` — pink heart-outline mark shown over `.cell--graph`, replacing the OS crosshair's plain square-in-the-middle look. Traced from `FINAL FOLDER/footer/graphics/cross hair.svg` (a 242×242 heart outline, not a literal crosshair) — rendered at 30×30 with the stroke and glow thickened for legibility at cursor size, hotspot at its own centre.
 `favicon.svg` — the quatrefoil mark on a `--pink` ground.
 `cross-grid.svg` / `pixel-heart.svg` — unused (were the old hero's pixel scribbles); kept for reference.
 

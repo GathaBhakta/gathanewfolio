@@ -162,8 +162,11 @@
   .ruler__cursor.is-on{opacity:1}
   @media (max-width:820px){ .ruler{display:none} }
 
-  /* graph-paper column — same lift, so the sheet dissolves into the nav */
-  .cell--graph{overflow:visible;cursor:crosshair}
+  /* graph-paper column — same lift, so the sheet dissolves into the nav.
+     Cursor is a custom heart-outline mark (not the OS crosshair's plain
+     square-in-the-middle look), hotspot at its own centre; crosshair
+     stays as the fallback if the SVG ever fails to load. */
+  .cell--graph{overflow:visible;cursor:url(assets/cursor-crosshair.svg) 15 15, crosshair}
   .cell--graph .pat{
     position:absolute;inset:-30px 0 0 0;opacity:.5;
     background-repeat:repeat;background-position:0 -18px;
