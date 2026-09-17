@@ -154,6 +154,11 @@
     transition:opacity 700ms var(--ease);
   }
   .ruler--hide{opacity:0}
+  .ruler__cursor{
+    position:absolute;left:0;width:100%;height:2px;background:var(--pink-ink);
+    pointer-events:none;opacity:0;transition:opacity 200ms var(--ease);
+  }
+  .ruler__cursor.is-on{opacity:1}
   @media (max-width:820px){ .ruler{display:none} }
 
   /* graph-paper column — same lift, so the sheet dissolves into the nav */
@@ -974,7 +979,16 @@
       var revealed = (1 - workBottom / ch) > 0.35;
       footerSec.classList.toggle('ft--in', revealed);
     }
-    if (rulerEl) rulerEl.classList.toggle('ruler--hide', onSolid);
+    /* .work paints over the ruler (same stacking column) the instant any
+       of it is on screen — it doesn't ease in, it's pinned the moment it
+       arrives (see paint()'s own hero/work notes), so waiting for the
+       75% onSolid threshold left the ruler visually cut off by .work
+       well before the class caught up. Hide on any overlap instead. */
+    if (rulerEl && workSec){
+      var wr = workSec.getBoundingClientRect();
+      var workVisible = Math.min(wr.bottom, ch) - Math.max(wr.top, 0) > 0;
+      rulerEl.classList.toggle('ruler--hide', workVisible);
+    }
   }
   function onScroll(){ if (!scrollPending){ scrollPending = true; requestAnimationFrame(paint); } }
   stage.addEventListener('scroll', onScroll, { passive:true });
@@ -1026,7 +1040,7 @@
        better than tiling. Rebuilt on resize. */
     var RULE_PINK = '#C97FA6'; // matches the reference export's own tick/label color
     var RULER_W = 28, TICK_X = RULER_W - 4.5;
-    var TICK_STEP = 27;
+    var TICK_STEP = GS; // locked to the paper grid's own module, not an arbitrary step
     function buildRuler(h){
       h = Math.ceil(h) + 18; // +18 covers the -18px phase-lock offset below
       var b = '', n = Math.ceil(h / TICK_STEP) + 1;
@@ -1077,6 +1091,20 @@
       var paintRuler = function(){ rl.style.backgroundImage = buildRuler(rl.clientHeight || window.innerHeight); };
       paintRuler();
       window.addEventListener('resize', paintRuler);
+
+      /* cursor-position tick — the small line design tools (Figma,
+         Photoshop) show alongside a ruler, tracking the pointer's Y
+         wherever it is on the page, not just when hovering the ruler
+         itself. A child of .ruler so it inherits the same hide-over-.work
+         and hero-fade behaviour for free. */
+      var rulerCursor = document.createElement('div');
+      rulerCursor.className = 'ruler__cursor';
+      rl.appendChild(rulerCursor);
+      window.addEventListener('mousemove', function(e){
+        rulerCursor.style.top = e.clientY + 'px';
+        rulerCursor.classList.add('is-on');
+      }, { passive:true });
+      document.addEventListener('mouseleave', function(){ rulerCursor.classList.remove('is-on'); });
     }
     var gp = $('.cell--graph .pat');
     if (gp) gp.style.backgroundImage = GRAPH_TILE;
