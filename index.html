@@ -138,17 +138,16 @@
   }
   .cell{position:relative;overflow:hidden;transition:opacity 820ms var(--ease)}
 
-  /* ruler edge — a Figma/Photoshop-style ruler (Shift+R) down the very left
-     edge: major ticks + digit labels at full pink, minor ticks + the spine
-     at reduced opacity (baked into the generated SVG itself, see buildRuler
-     in heroGrid), on a faint pink wash. Pinned to the viewport like the nav
-     (fixed inside the .stage container). It doesn't need to fight for
-     legibility over a solid section like .work — it just fades out there
-     and back in once the footer (or hero) is behind it again. */
+  /* ruler edge — matches the supplied reference SVG: a pale pink strip with
+     a plain tick + rotated integer label at every step (see buildRuler in
+     heroGrid). Pinned to the viewport like the nav (fixed inside the
+     .stage container). It doesn't need to fight for legibility over a
+     solid section like .work — it just fades out there and back in once
+     the footer (or hero) is behind it again. */
   .ruler{
     position:fixed;left:0;top:0;bottom:0;
-    width:clamp(24px, 3cqw, 46px);z-index:15;
-    background-color:rgba(240,171,206,.12);
+    width:clamp(16px, 1.9cqw, 28px);z-index:15;
+    background-color:#F4E5EC;
     background-repeat:no-repeat;background-position:0 -18px;
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
             mask-image:linear-gradient(to bottom,transparent 0,#000 44px);
@@ -1018,38 +1017,26 @@
       return svgUrl(TILE, TILE, b);
     })();
 
-    /* Figma/Photoshop-style ruler: real tick hierarchy + digit labels,
-       not a repeating tile — .ruler is fixed/viewport-height and never
-       scrolls, so a one-off graphic sized to the current viewport is
-       simpler than tiling, and it's the only way to give major ticks
-       their own incrementing numbers. Majors (the "important points")
-       and their labels paint at full pink; the spine + minor ticks
-       paint at reduced opacity, per design. Rebuilt on resize. */
-    /* spine sits on the content-side edge (right, since the ruler lives at
-       the page's left edge); ticks are short dashes poking out of it
-       toward the numbers, majors longer than minors; labels sit upright,
-       right-aligned flush against their tick — the actual Figma/PS
-       ruler layout, not a rotated-label guess at it. */
-    var RULE_PINK = '#F0ABCE';
-    var RULER_W = 46, SPINE_X = RULER_W - 1.5;
-    var RULER_STEP = 111; // decorative round step, independent of the GS=38 grid module
-    var MINOR_OFFSETS = [RULER_STEP / 4, RULER_STEP / 2, RULER_STEP * 3 / 4].map(function(v){ return v + 0.25; });
+    /* Figma/Photoshop-style ruler, matched to the supplied reference SVG:
+       a plain tick + a rotated (reads bottom-to-top) integer label at every
+       step, no minor sub-ticks, no separate spine — just the pale pink
+       fill (set in CSS) with evenly spaced marks over it, all one dusty
+       pink. Not a repeating tile — .ruler is fixed/viewport-height and
+       never scrolls, so a one-off graphic sized to the viewport works
+       better than tiling. Rebuilt on resize. */
+    var RULE_PINK = '#C97FA6'; // matches the reference export's own tick/label color
+    var RULER_W = 28, TICK_X = RULER_W - 4.5;
+    var TICK_STEP = 27;
     function buildRuler(h){
       h = Math.ceil(h) + 18; // +18 covers the -18px phase-lock offset below
-      var b = '<line x1="' + SPINE_X + '" y1="0" x2="' + SPINE_X + '" y2="' + h + '" stroke="' + RULE_PINK + '" stroke-opacity=".25" stroke-width="0.5"/>';
-      var n = Math.ceil(h / RULER_STEP) + 1;
+      var b = '', n = Math.ceil(h / TICK_STEP) + 1;
       for (var i = 0; i < n; i++){
-        var y0 = i * RULER_STEP;
-        for (var k = 0; k < MINOR_OFFSETS.length; k++){
-          var y = y0 + MINOR_OFFSETS[k];
-          if (y > h) continue;
-          b += '<line x1="' + (SPINE_X - 3) + '" y1="' + y.toFixed(2) + '" x2="' + SPINE_X + '" y2="' + y.toFixed(2) + '" stroke="' + RULE_PINK + '" stroke-opacity=".3" stroke-width="0.5"/>';
-        }
-        var ym = y0 + 1;
-        if (ym > h) continue;
-        b += '<line x1="' + (SPINE_X - 6) + '" y1="' + ym + '" x2="' + SPINE_X + '" y2="' + ym + '" stroke="' + RULE_PINK + '" stroke-opacity=".92" stroke-width="0.6"/>';
-        b += '<text x="' + (SPINE_X - 9) + '" y="' + (ym + 3) + '" fill="' + RULE_PINK + '" fill-opacity=".92" ' +
-          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="8" text-anchor="end">' + (i * RULER_STEP) + '</text>';
+        var y = i * TICK_STEP + 1;
+        if (y > h) continue;
+        b += '<line x1="' + TICK_X + '" y1="' + y + '" x2="' + RULER_W + '" y2="' + y + '" stroke="' + RULE_PINK + '" stroke-width="0.6"/>';
+        b += '<text x="' + (TICK_X - 2) + '" y="' + (y + 2.2) + '" fill="' + RULE_PINK + '" ' +
+          'font-family="IBM Plex Mono,ui-monospace,monospace" font-size="6.5" text-anchor="start" ' +
+          'transform="rotate(-90 ' + (TICK_X - 2) + ' ' + (y + 2.2) + ')">' + i + '</text>';
       }
       return svgUrl(RULER_W, h, b);
     }
