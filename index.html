@@ -33,6 +33,32 @@
 
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
+  /* native cursor off site-wide on real pointers — the wand cursor (see
+     wandCursor in the script) is the default everywhere except the hero's
+     own canvas cursors (.cell--graph / --dot / --check / --iso), which
+     keep their explicit cursor: rules below and so still win the cascade.
+     Left alone on touch, where there's no pointer to draw a cursor for. */
+  @media (pointer:fine){ html,body{cursor:none} }
+  /* the wand cursor itself: a fixed-position overlay driven by wandCursor()
+     in the script. transform-origin sits at the wand's own tip (in the
+     box's local px, which line up 1:1 with cursor-wand.svg's viewBox
+     scaled down) so translate+rotate keeps that tip pinned under the
+     real mouse position while the body rotates to face travel direction. */
+  .wand-cursor{
+    position:fixed;left:0;top:0;width:47px;height:68.47px;
+    transform-origin:22.46px 7.43px;
+    pointer-events:none;z-index:9999;
+    opacity:0;transition:opacity 120ms var(--ease);
+  }
+  .wand-cursor.is-on{opacity:1}
+  .wand-cursor.is-suppressed{opacity:0}
+  .wand-cursor__body{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+  /* a small twinkle beside the tip, held upright (counter-rotated against
+     the wand's own spin) and cycled through 3 shapes every 200ms — see
+     SPARK_MS in the script */
+  .wand-cursor__spark{position:absolute;left:28.88px;top:-3.55px;width:15px;height:15px}
+  .wand-cursor__spark-shape{opacity:0}
+  .wand-cursor__spark-shape.is-active{opacity:1}
   html{background:var(--cream)}
   body{
     background:var(--cream);
@@ -87,7 +113,7 @@
   .nav__group--right{justify-content:flex-end}
   .nav__group a{transition:color 160ms var(--ease)}
   .nav__group a:hover{color:var(--ink)}
-  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;cursor:pointer;animation:gspin 40s linear infinite}
+  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;cursor:none;animation:gspin 40s linear infinite}
   .nav__mark path{fill:var(--pink);transition:fill 260ms var(--ease)}
   .nav--solid .nav__group{ color:var(--nav-ink,var(--cream)); }
   .nav--solid .nav__mark path{ fill:var(--nav-ink,var(--cream)); }
@@ -106,8 +132,9 @@
     z-index:2;
     transform-origin:50% 50%;
     will-change:transform,opacity;
-    /* white-glow pink dot across the canvas; interactive regions swap it below */
-    cursor:url(assets/cursor.svg) 13 13, auto;
+    /* native cursor stays off everywhere; the wand cursor (see wandCursor
+       in the script) is the site-wide default now. */
+    cursor:none;
   }
   /* the grid reacts to the pointer — a ring reticle signals that before you act */
   .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 20 20, auto}
@@ -302,7 +329,7 @@
 
   /* stickers — spring in, then draggable anywhere on the hero */
   .stk{
-    position:absolute;z-index:12;display:block;height:auto;opacity:0;cursor:grab;
+    position:absolute;z-index:12;display:block;height:auto;opacity:0;cursor:none;
     pointer-events:auto;
     touch-action:none;user-select:none;-webkit-user-drag:none;
     transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) rotate(calc(var(--rot,0deg) + var(--gr,0deg))) scale(.22);
@@ -310,7 +337,7 @@
   }
   .stk--sq{aspect-ratio:1;height:auto;object-fit:contain}
   .stk--in{opacity:1;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) rotate(calc(var(--rot,0deg) + var(--gr,0deg))) scale(var(--gs,1))}
-  .stk--drag{transition:none;cursor:grabbing;z-index:30;--gr:5deg;--gs:1.07;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+  .stk--drag{transition:none;cursor:none;z-index:30;--gr:5deg;--gs:1.07;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
   .stk--drag.stk--ccw{--gr:-5deg}
   .stk--settle{transition:transform 540ms cubic-bezier(.34,1.5,.64,1);z-index:30}
 
@@ -411,7 +438,7 @@
     padding-bottom:clamp(10px,1.6cqh,20px);
   }
   .work__chips button{
-    cursor:pointer;
+    cursor:none;
     padding:clamp(5px,.7cqh,10px) clamp(11px,1.5cqw,20px);
     border-radius:999px;border:0;background:rgba(250,246,239,.45);
     font:600 clamp(9px,.92cqw,12px)/1 var(--gb-sans);
@@ -434,7 +461,7 @@
     width:clamp(236px,29cqw,420px);margin-right:clamp(16px,2.3cqw,38px);
     min-height:clamp(290px,31cqw,420px);
     display:flex;flex-direction:column;gap:clamp(5px,.7cqw,11px);
-    cursor:pointer;opacity:.5;
+    cursor:none;opacity:.5;
     overflow:clip;overflow-clip-margin:4cqw;
     transition:width 520ms var(--ease),margin-right 520ms var(--ease),opacity 380ms ease;
   }
@@ -481,7 +508,7 @@
 
   .work__nav{display:flex;align-items:center;gap:1.2cqw;padding-top:clamp(10px,1.6cqh,20px)}
   .work__arrow{
-    cursor:pointer;
+    cursor:none;
     width:clamp(30px,3.2cqw,44px);height:clamp(30px,3.2cqw,44px);
     border-radius:50%;border:1px solid rgba(44,32,24,.35);background:transparent;
     display:flex;align-items:center;justify-content:center;
@@ -489,7 +516,7 @@
     transition:background 240ms var(--ease),opacity 240ms var(--ease);
   }
   .work__arrow:hover{background:rgba(250,246,239,.6)}
-  .work__arrow[disabled]{opacity:.3;cursor:default}
+  .work__arrow[disabled]{opacity:.3;cursor:none}
   .work__prog{flex:1;height:1px;background:rgba(44,32,24,.22);position:relative;margin-left:1.4cqw}
   .work__prog i{position:absolute;left:0;top:-1px;height:3px;background:var(--ink);width:0;transition:width 600ms var(--ease)}
 
@@ -628,7 +655,7 @@
      out of the row's rhythm but is still reachable at the far right. */
   .ft__playwrap{display:flex;flex-direction:column;align-items:flex-end;gap:.463cqw;flex:none}
   .ft__play{
-    display:flex;align-items:center;gap:.7cqw;cursor:pointer;opacity:.92;
+    display:flex;align-items:center;gap:.7cqw;cursor:none;opacity:.92;
     background:none;border:0;padding:0;font:inherit;transition:opacity 240ms var(--ease);
   }
   .ft__play:hover{opacity:1}
@@ -655,11 +682,11 @@
   }
 
   .ft__stk{
-    position:absolute;height:auto;cursor:grab;pointer-events:auto;
+    position:absolute;height:auto;cursor:none;pointer-events:auto;
     touch-action:none;user-select:none;-webkit-user-drag:none;
     transform:translate(-50%,-50%);transition:transform 540ms cubic-bezier(.34,1.56,.64,1);
   }
-  .ft__stk--drag{transition:none;cursor:grabbing;z-index:30;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+  .ft__stk--drag{transition:none;cursor:none;z-index:30;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
   /* the pen source art (unlike the other stickers) has no white die-cut
      backing baked in, so it reads flat sitting on the paper — a plain
      drop shadow at rest gives it the same lift the others already have */
@@ -925,6 +952,20 @@
   <div class="ruler"></div>
 </div>
 
+<!-- site-wide default cursor: a rotating magic wand with a 3-mode sparkle
+     that cycles every 200ms (see wandCursor in the script). Hidden
+     automatically over the hero's own canvas cursors (.cell--graph /
+     --dot / --check / --iso), which keep their native heart-in-crosshair
+     / heart-in-ring cursor: url() rules. -->
+<div class="wand-cursor" id="wandCursor" aria-hidden="true">
+  <img class="wand-cursor__body" src="assets/cursor-wand.svg" alt="">
+  <svg class="wand-cursor__spark" id="wandSpark" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
+    <path class="wand-cursor__spark-shape is-active" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+    <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+    <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+  </svg>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -1007,6 +1048,53 @@
   stage.addEventListener('scroll', onScroll, { passive:true });
   window.addEventListener('resize', onScroll);
   onScroll();
+
+  /* ── wand cursor — site-wide default, replaces the native pointer ───
+     A static wand body that translates to the mouse and rotates to face
+     travel direction (tip pinned under the cursor, per the CSS
+     transform-origin on .wand-cursor), with a small twinkle beside the
+     tip cycling through 3 shapes every 200ms. Suppressed over the hero's
+     own canvas cursors, which keep their explicit cursor: url() rules —
+     this only hides the DOM overlay so it doesn't sit on top of them;
+     the CSS cascade already lets those cells' own `cursor` win over the
+     site-wide `cursor:none` regardless. Skipped entirely on touch. */
+  (function wandCursor(){
+    if (!window.matchMedia('(pointer:fine)').matches) return;
+    var wand = byId('wandCursor');
+    var spark = byId('wandSpark');
+    if (!wand || !spark) return;
+    var shapes = [].slice.call(spark.querySelectorAll('.wand-cursor__spark-shape'));
+
+    var TIP_X = 22.46, TIP_Y = 7.43;
+    var lastX = 0, lastY = 0, angle = -90, haveMouse = false;
+
+    function onMove(e){
+      var x = e.clientX, y = e.clientY;
+      var dx = x - lastX, dy = y - lastY;
+      if (haveMouse && (dx * dx + dy * dy) > 4){
+        angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+      }
+      lastX = x; lastY = y;
+      wand.style.transform = 'translate(' + (x - TIP_X).toFixed(1) + 'px,' + (y - TIP_Y).toFixed(1) + 'px) rotate(' + angle.toFixed(1) + 'deg)';
+      spark.style.transform = 'rotate(' + (-angle).toFixed(1) + 'deg)';
+      haveMouse = true;
+      wand.classList.add('is-on');
+
+      var onCanvas = e.target.closest && e.target.closest('.cell--graph,.cell--dot,.cell--check,.cell--iso');
+      wand.classList.toggle('is-suppressed', !!onCanvas);
+    }
+    document.addEventListener('mousemove', onMove, { passive: true });
+    document.addEventListener('mouseout', function(e){
+      if (!e.relatedTarget) wand.classList.remove('is-on');
+    });
+
+    var mode = 0;
+    setInterval(function(){
+      shapes[mode].classList.remove('is-active');
+      mode = (mode + 1) % shapes.length;
+      shapes[mode].classList.add('is-active');
+    }, 200);
+  })();
 
   /* ── hero — 7A locked grid ─────────────────────────────────────────
      Exact tiles from the design file. Graph + ruler are the attached
