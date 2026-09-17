@@ -41,22 +41,34 @@
   @media (pointer:fine){ html,body{cursor:none} }
   /* the wand cursor itself: a fixed, full-viewport overlay driven by
      wandCursor() in the script. The dot sits exactly on the real mouse
-     position; the wand body and its 3 sparkles each ease toward it on
-     their own damping, so the whole cluster trails a beat behind the
-     actual pointer instead of snapping to it. The wand keeps a constant
-     -30deg tilt (no travel-direction rotation) pivoting on its own tip,
-     in the box's local px lined up 1:1 with cursor-wand.svg's viewBox
-     scaled down. */
+     position; the wand body and its 3 sparkles each hold a CSS
+     transition on transform and just get a new target on every
+     mousemove, so the compositor does the trailing/easing — no
+     per-frame JS. Different durations per element (below) stagger how
+     far behind each one lags, standing in for the old per-frame damping.
+     The wand keeps a constant -30deg tilt (no travel-direction rotation)
+     pivoting on its own tip, in the box's local px lined up 1:1 with
+     cursor-wand.svg's viewBox scaled down. Transitions only turn on
+     after `is-ready` (added one frame after the first move) so the very
+     first position doesn't sweep in from (0,0). `will-change` promotes
+     the wand/sparkles to their own layer so animating them doesn't
+     repaint cursor-wand.svg's ~270 masked paths every time — it's
+     rasterized once and then just recomposited. */
   .wand-cursor{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0;transition:opacity 120ms var(--ease)}
   .wand-cursor.is-on{opacity:1}
   .wand-cursor.is-suppressed{opacity:0}
   /* the true pointer position — a small pink outline the wand chases */
   .wand-cursor__dot{position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;border:1.5px solid #F0ABCE;box-sizing:border-box}
-  .wand-cursor__body{position:absolute;left:0;top:0;width:47px;height:68.47px;transform-origin:22.46px 7.43px;display:block}
-  /* 3 independent twinkles, each with its own trailing lag and its own
-     200ms-cycle starting shape (see SPARK_EASE / tick offset in the
-     script) so they read as scattered variation, not one synced blink */
-  .wand-cursor__spark{position:absolute;left:0;top:0;width:15px;height:15px}
+  .wand-cursor__body{position:absolute;left:0;top:0;width:47px;height:68.47px;transform-origin:22.46px 7.43px;display:block;will-change:transform}
+  .wand-cursor.is-ready .wand-cursor__body{transition:transform 220ms cubic-bezier(.22,1,.36,1)}
+  /* 3 independent twinkles, each with its own 200ms-cycle starting shape
+     (see the tick offset in the script) so they read as scattered
+     variation, not one synced blink — and each with a longer transition
+     duration than the wand so they visibly trail further behind it */
+  .wand-cursor__spark{position:absolute;left:0;top:0;width:15px;height:15px;will-change:transform}
+  .wand-cursor.is-ready #wandSpark0{transition:transform 300ms cubic-bezier(.22,1,.36,1)}
+  .wand-cursor.is-ready #wandSpark1{transition:transform 380ms cubic-bezier(.22,1,.36,1)}
+  .wand-cursor.is-ready #wandSpark2{transition:transform 460ms cubic-bezier(.22,1,.36,1)}
   .wand-cursor__spark-shape{opacity:0}
   .wand-cursor__spark-shape.is-active{opacity:1}
   html{background:var(--cream)}
@@ -1064,16 +1076,20 @@
   /* ── wand cursor — site-wide default, replaces the native pointer ───
      A pink-outline dot sits exactly on the real mouse position; the wand
      body (held at a constant -30deg tilt, tip pinned per the CSS
-     transform-origin) and its 3 sparkles each ease toward that dot on
-     their own damping every animation frame, so the wand and its
-     twinkles trail a beat behind the actual pointer rather than
-     snapping to it. Each sparkle also starts its 200ms shape-cycle on a
+     transform-origin) and its 3 sparkles each just get a new transform
+     target on every mousemove and let their own CSS transition (see the
+     stylesheet) do the easing — the compositor runs the trailing
+     animation, not a per-frame JS loop, so it costs nothing once the
+     mouse stops. Each sparkle also starts its 200ms shape-cycle on a
      different one of the 3 shapes, so they read as scattered variation
      instead of one synced blink. Suppressed over the hero's own canvas
      cursors, which keep their explicit cursor: url() rules — this only
      hides the DOM overlay so it doesn't sit on top of them; the CSS
      cascade already lets those cells' own `cursor` win over the
-     site-wide `cursor:none` regardless. Skipped entirely on touch. */
+     site-wide `cursor:none` regardless. The suppression check itself
+     hangs off mouseenter/mouseleave on just those 4 cells, not on every
+     mousemove, so it doesn't add a DOM walk to every pixel of movement.
+     Skipped entirely on touch. */
   (function wandCursor(){
     if (!window.matchMedia('(pointer:fine)').matches) return;
     var wrap = byId('wandCursor');
@@ -1086,52 +1102,41 @@
     });
 
     var TIP_X = 22.46, TIP_Y = 7.43, TILT = -30;
-    var WAND_EASE = 0.18;
-    var SPARK_EASE  = [0.14, 0.11, 0.085];
     var SPARK_OFFSET = [ {x:20,y:-14}, {x:-16,y:-4}, {x:6,y:20} ];
-    /* the wand eases toward this point, not the dot's own exact spot, so
-       there's always a little daylight between them — otherwise the wand
-       body sits right on top of whatever the dot (the real hotspot) is
-       hovering, like a link's text. */
+    /* the wand and sparkles target this point, not the dot's own exact
+       spot, so there's always a little daylight between them —
+       otherwise the wand body sits right on top of whatever the dot
+       (the real hotspot) is hovering, like a link's text. */
     var WAND_GAP = { x: 18, y: 24 };
 
-    var mouseX = 0, mouseY = 0, haveMouse = false;
-    var wandX = 0, wandY = 0;
-    var sparkPos = [ {x:0,y:0}, {x:0,y:0}, {x:0,y:0} ];
+    var haveMouse = false;
 
     function onMove(e){
-      mouseX = e.clientX; mouseY = e.clientY;
+      var mouseX = e.clientX, mouseY = e.clientY;
+      var tx = mouseX + WAND_GAP.x, ty = mouseY + WAND_GAP.y;
+      dot.style.transform = 'translate(' + (mouseX - 6).toFixed(1) + 'px,' + (mouseY - 6).toFixed(1) + 'px)';
+      body.style.transform = 'translate(' + (tx - TIP_X).toFixed(1) + 'px,' + (ty - TIP_Y).toFixed(1) + 'px) rotate(' + TILT + 'deg)';
+      sparkEls.forEach(function(el, i){
+        var x = tx + SPARK_OFFSET[i].x - 7.5, y = ty + SPARK_OFFSET[i].y - 7.5;
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+      });
+      wrap.classList.add('is-on');
       if (!haveMouse){
         haveMouse = true;
-        wandX = mouseX + WAND_GAP.x; wandY = mouseY + WAND_GAP.y;
-        sparkPos.forEach(function(p){ p.x = wandX; p.y = wandY; });
+        /* one frame late, so this first snap-into-place doesn't itself
+           get animated by the transition it's about to turn on */
+        requestAnimationFrame(function(){ wrap.classList.add('is-ready'); });
       }
-      dot.style.transform = 'translate(' + (mouseX - 6).toFixed(1) + 'px,' + (mouseY - 6).toFixed(1) + 'px)';
-      wrap.classList.add('is-on');
-
-      var onCanvas = e.target.closest && e.target.closest('.cell--graph,.cell--dot,.cell--check,.cell--iso');
-      wrap.classList.toggle('is-suppressed', !!onCanvas);
     }
     document.addEventListener('mousemove', onMove, { passive: true });
     document.addEventListener('mouseout', function(e){
       if (!e.relatedTarget) wrap.classList.remove('is-on');
     });
 
-    function raf(){
-      if (haveMouse){
-        wandX += (mouseX + WAND_GAP.x - wandX) * WAND_EASE;
-        wandY += (mouseY + WAND_GAP.y - wandY) * WAND_EASE;
-        body.style.transform = 'translate(' + (wandX - TIP_X).toFixed(1) + 'px,' + (wandY - TIP_Y).toFixed(1) + 'px) rotate(' + TILT + 'deg)';
-        sparkPos.forEach(function(p, i){
-          p.x += (wandX - p.x) * SPARK_EASE[i];
-          p.y += (wandY - p.y) * SPARK_EASE[i];
-          var x = p.x + SPARK_OFFSET[i].x - 7.5, y = p.y + SPARK_OFFSET[i].y - 7.5;
-          sparkEls[i].style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
-        });
-      }
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
+    [].slice.call(document.querySelectorAll('.cell--graph,.cell--dot,.cell--check,.cell--iso')).forEach(function(cell){
+      cell.addEventListener('mouseenter', function(){ wrap.classList.add('is-suppressed'); });
+      cell.addEventListener('mouseleave', function(){ wrap.classList.remove('is-suppressed'); });
+    });
 
     var tick = 0;
     setInterval(function(){
