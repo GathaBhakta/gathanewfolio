@@ -39,24 +39,24 @@
      keep their explicit cursor: rules below and so still win the cascade.
      Left alone on touch, where there's no pointer to draw a cursor for. */
   @media (pointer:fine){ html,body{cursor:none} }
-  /* the wand cursor itself: a fixed-position overlay driven by wandCursor()
-     in the script. transform-origin sits at the wand's own tip (in the
-     box's local px, which line up 1:1 with cursor-wand.svg's viewBox
-     scaled down) so translate+rotate keeps that tip pinned under the
-     real mouse position while the body rotates to face travel direction. */
-  .wand-cursor{
-    position:fixed;left:0;top:0;width:47px;height:68.47px;
-    transform-origin:22.46px 7.43px;
-    pointer-events:none;z-index:9999;
-    opacity:0;transition:opacity 120ms var(--ease);
-  }
+  /* the wand cursor itself: a fixed, full-viewport overlay driven by
+     wandCursor() in the script. The dot sits exactly on the real mouse
+     position; the wand body and its 3 sparkles each ease toward it on
+     their own damping, so the whole cluster trails a beat behind the
+     actual pointer instead of snapping to it. The wand keeps a constant
+     -30deg tilt (no travel-direction rotation) pivoting on its own tip,
+     in the box's local px lined up 1:1 with cursor-wand.svg's viewBox
+     scaled down. */
+  .wand-cursor{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0;transition:opacity 120ms var(--ease)}
   .wand-cursor.is-on{opacity:1}
   .wand-cursor.is-suppressed{opacity:0}
-  .wand-cursor__body{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
-  /* a small twinkle beside the tip, held upright (counter-rotated against
-     the wand's own spin) and cycled through 3 shapes every 200ms — see
-     SPARK_MS in the script */
-  .wand-cursor__spark{position:absolute;left:28.88px;top:-3.55px;width:15px;height:15px}
+  /* the true pointer position — a small pink outline the wand chases */
+  .wand-cursor__dot{position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;border:1.5px solid #F0ABCE;box-sizing:border-box}
+  .wand-cursor__body{position:absolute;left:0;top:0;width:47px;height:68.47px;transform-origin:22.46px 7.43px;display:block}
+  /* 3 independent twinkles, each with its own trailing lag and its own
+     200ms-cycle starting shape (see SPARK_EASE / tick offset in the
+     script) so they read as scattered variation, not one synced blink */
+  .wand-cursor__spark{position:absolute;left:0;top:0;width:15px;height:15px}
   .wand-cursor__spark-shape{opacity:0}
   .wand-cursor__spark-shape.is-active{opacity:1}
   html{background:var(--cream)}
@@ -952,15 +952,27 @@
   <div class="ruler"></div>
 </div>
 
-<!-- site-wide default cursor: a rotating magic wand with a 3-mode sparkle
-     that cycles every 200ms (see wandCursor in the script). Hidden
-     automatically over the hero's own canvas cursors (.cell--graph /
-     --dot / --check / --iso), which keep their native heart-in-crosshair
+<!-- site-wide default cursor: a pink-outline dot sits on the real pointer
+     position, and a magic wand (fixed -30deg tilt) plus 3 sparkles each
+     trail behind it on their own lag (see wandCursor in the script).
+     Hidden automatically over the hero's own canvas cursors (.cell--graph
+     / --dot / --check / --iso), which keep their native heart-in-crosshair
      / heart-in-ring cursor: url() rules. -->
 <div class="wand-cursor" id="wandCursor" aria-hidden="true">
-  <img class="wand-cursor__body" src="assets/cursor-wand.svg" alt="">
-  <svg class="wand-cursor__spark" id="wandSpark" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
-    <path class="wand-cursor__spark-shape is-active" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+  <div class="wand-cursor__dot" id="wandDot"></div>
+  <img class="wand-cursor__body" id="wandBody" src="assets/cursor-wand.svg" alt="">
+  <svg class="wand-cursor__spark" id="wandSpark0" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
+    <path class="wand-cursor__spark-shape" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+    <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+    <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+  </svg>
+  <svg class="wand-cursor__spark" id="wandSpark1" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
+    <path class="wand-cursor__spark-shape" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+    <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+    <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
+  </svg>
+  <svg class="wand-cursor__spark" id="wandSpark2" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
+    <path class="wand-cursor__spark-shape" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
     <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
     <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
   </svg>
@@ -1050,49 +1062,80 @@
   onScroll();
 
   /* ── wand cursor — site-wide default, replaces the native pointer ───
-     A static wand body that translates to the mouse and rotates to face
-     travel direction (tip pinned under the cursor, per the CSS
-     transform-origin on .wand-cursor), with a small twinkle beside the
-     tip cycling through 3 shapes every 200ms. Suppressed over the hero's
-     own canvas cursors, which keep their explicit cursor: url() rules —
-     this only hides the DOM overlay so it doesn't sit on top of them;
-     the CSS cascade already lets those cells' own `cursor` win over the
+     A pink-outline dot sits exactly on the real mouse position; the wand
+     body (held at a constant -30deg tilt, tip pinned per the CSS
+     transform-origin) and its 3 sparkles each ease toward that dot on
+     their own damping every animation frame, so the wand and its
+     twinkles trail a beat behind the actual pointer rather than
+     snapping to it. Each sparkle also starts its 200ms shape-cycle on a
+     different one of the 3 shapes, so they read as scattered variation
+     instead of one synced blink. Suppressed over the hero's own canvas
+     cursors, which keep their explicit cursor: url() rules — this only
+     hides the DOM overlay so it doesn't sit on top of them; the CSS
+     cascade already lets those cells' own `cursor` win over the
      site-wide `cursor:none` regardless. Skipped entirely on touch. */
   (function wandCursor(){
     if (!window.matchMedia('(pointer:fine)').matches) return;
-    var wand = byId('wandCursor');
-    var spark = byId('wandSpark');
-    if (!wand || !spark) return;
-    var shapes = [].slice.call(spark.querySelectorAll('.wand-cursor__spark-shape'));
+    var wrap = byId('wandCursor');
+    var dot  = byId('wandDot');
+    var body = byId('wandBody');
+    var sparkEls = [byId('wandSpark0'), byId('wandSpark1'), byId('wandSpark2')];
+    if (!wrap || !dot || !body || sparkEls.indexOf(null) !== -1) return;
+    var sparkShapes = sparkEls.map(function(el){
+      return [].slice.call(el.querySelectorAll('.wand-cursor__spark-shape'));
+    });
 
-    var TIP_X = 22.46, TIP_Y = 7.43;
-    var lastX = 0, lastY = 0, angle = -90, haveMouse = false;
+    var TIP_X = 22.46, TIP_Y = 7.43, TILT = -30;
+    var WAND_EASE = 0.18;
+    var SPARK_EASE  = [0.14, 0.11, 0.085];
+    var SPARK_OFFSET = [ {x:20,y:-14}, {x:-16,y:-4}, {x:6,y:20} ];
+
+    var mouseX = 0, mouseY = 0, haveMouse = false;
+    var wandX = 0, wandY = 0;
+    var sparkPos = [ {x:0,y:0}, {x:0,y:0}, {x:0,y:0} ];
 
     function onMove(e){
-      var x = e.clientX, y = e.clientY;
-      var dx = x - lastX, dy = y - lastY;
-      if (haveMouse && (dx * dx + dy * dy) > 4){
-        angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+      mouseX = e.clientX; mouseY = e.clientY;
+      if (!haveMouse){
+        haveMouse = true;
+        wandX = mouseX; wandY = mouseY;
+        sparkPos.forEach(function(p){ p.x = mouseX; p.y = mouseY; });
       }
-      lastX = x; lastY = y;
-      wand.style.transform = 'translate(' + (x - TIP_X).toFixed(1) + 'px,' + (y - TIP_Y).toFixed(1) + 'px) rotate(' + angle.toFixed(1) + 'deg)';
-      spark.style.transform = 'rotate(' + (-angle).toFixed(1) + 'deg)';
-      haveMouse = true;
-      wand.classList.add('is-on');
+      dot.style.transform = 'translate(' + (mouseX - 6).toFixed(1) + 'px,' + (mouseY - 6).toFixed(1) + 'px)';
+      wrap.classList.add('is-on');
 
       var onCanvas = e.target.closest && e.target.closest('.cell--graph,.cell--dot,.cell--check,.cell--iso');
-      wand.classList.toggle('is-suppressed', !!onCanvas);
+      wrap.classList.toggle('is-suppressed', !!onCanvas);
     }
     document.addEventListener('mousemove', onMove, { passive: true });
     document.addEventListener('mouseout', function(e){
-      if (!e.relatedTarget) wand.classList.remove('is-on');
+      if (!e.relatedTarget) wrap.classList.remove('is-on');
     });
 
-    var mode = 0;
+    function raf(){
+      if (haveMouse){
+        wandX += (mouseX - wandX) * WAND_EASE;
+        wandY += (mouseY - wandY) * WAND_EASE;
+        body.style.transform = 'translate(' + (wandX - TIP_X).toFixed(1) + 'px,' + (wandY - TIP_Y).toFixed(1) + 'px) rotate(' + TILT + 'deg)';
+        sparkPos.forEach(function(p, i){
+          p.x += (wandX - p.x) * SPARK_EASE[i];
+          p.y += (wandY - p.y) * SPARK_EASE[i];
+          var x = p.x + SPARK_OFFSET[i].x - 7.5, y = p.y + SPARK_OFFSET[i].y - 7.5;
+          sparkEls[i].style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+        });
+      }
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    var tick = 0;
     setInterval(function(){
-      shapes[mode].classList.remove('is-active');
-      mode = (mode + 1) % shapes.length;
-      shapes[mode].classList.add('is-active');
+      sparkShapes.forEach(function(shapes, i){
+        var mode = (tick + i) % shapes.length;
+        shapes.forEach(function(s){ s.classList.remove('is-active'); });
+        shapes[mode].classList.add('is-active');
+      });
+      tick = (tick + 1) % 3;
     }, 200);
   })();
 
