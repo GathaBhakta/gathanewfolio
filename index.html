@@ -141,12 +141,14 @@
   /* ruler edge — matches the supplied reference SVG: a pale pink strip with
      a plain tick + rotated integer label at every step (see buildRuler in
      heroGrid). Pinned to the viewport like the nav (fixed inside the
-     .stage container). It doesn't need to fight for legibility over a
-     solid section like .work — it just fades out there and back in once
-     the footer (or hero) is behind it again. */
+     .stage container). z-index:2 ties it with .hero and .ft — moved last
+     in the DOM (see markup near </div> closing .stage) so it wins that
+     tie and paints over their paper texture — but .work sits at z-index:3,
+     genuinely above it, so .work's opaque panel covers the ruler outright
+     the instant any of it is on screen. Pure stacking, no opacity math. */
   .ruler{
     position:fixed;left:0;top:0;bottom:0;
-    width:clamp(16px, 1.9cqw, 28px);z-index:15;
+    width:clamp(16px, 1.9cqw, 28px);z-index:2;
     background-color:#F4E5EC;
     border-right:1px solid #C97FA6;
     background-repeat:no-repeat;background-position:0 -18px;
@@ -733,8 +735,6 @@
     </div>
   </nav>
 
-  <div class="ruler"></div>
-
   <section class="hero">
     <div class="grid">
       <div class="cell cell--graph" style="grid-area:2 / 2 / 5 / 3">
@@ -914,6 +914,12 @@
   </footer>
   </div>
 
+  <!-- last in .stage on purpose: at the same z-index as .hero/.ft, DOM
+       order breaks the tie, so the ruler paints over their paper texture
+       — but .work sits at a genuinely higher z-index, so its opaque
+       panel still covers the ruler outright whenever any of it is on
+       screen. No JS opacity math needed for that part any more. -->
+  <div class="ruler"></div>
 </div>
 
 <script>
@@ -979,23 +985,19 @@
       footerReveal = 1 - workBottom / ch;
       footerSec.classList.toggle('ft--in', footerReveal > 0.35);
     }
-    /* ruler opacity is a straight extension of whatever's actually behind
-       it, computed every frame like hero's own fade above — no class
-       toggle, no separate transition, so it can't drift out of step with
-       the section it belongs to. Two terms: heroOp*(1-workCoverage) fades
-       it exactly as hero fades, then the rest of the way to 0 as .work's
-       own (near-instant) pin covers it; footerReveal — the same fraction
-       driving .ft--in above — brings it back the moment the footer
-       actually starts revealing, not after .ft has already finished
-       easing in. */
+    /* ruler opacity just extends hero's own fade (it's part of the same
+       surface) and, separately, rides footerReveal — the same fraction
+       driving .ft--in above — in on the way back, so it starts rising the
+       moment the footer actually begins revealing rather than after .ft
+       has already eased in. Getting hidden behind .work is handled by
+       stacking now (.ruler is DOM-last at z-index:2, .work is z-index:3),
+       not by opacity, so there's no workCoverage term to compute here. */
     /* skip while the intro's own opacity:0 (.stage--intro .ruler) is meant
        to hold it back — an inline style here would win over that class
        and show it early. */
-    if (rulerEl && workSec && !stage.classList.contains('stage--intro')){
-      var wr = workSec.getBoundingClientRect();
-      var workCoverage = Math.max(0, Math.min(wr.bottom, ch) - Math.max(wr.top, 0)) / ch;
+    if (rulerEl && !stage.classList.contains('stage--intro')){
       var heroOp = parseFloat(hero.style.opacity) || 0;
-      rulerEl.style.opacity = Math.max(heroOp * (1 - workCoverage), footerReveal).toFixed(3);
+      rulerEl.style.opacity = Math.max(heroOp, footerReveal).toFixed(3);
     }
   }
   function onScroll(){ if (!scrollPending){ scrollPending = true; requestAnimationFrame(paint); } }
