@@ -33,51 +33,6 @@
 
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
-  /* native cursor off site-wide on real pointers — the wand cursor (see
-     wandCursor in the script) is the default everywhere except the hero's
-     own canvas cursors (.cell--graph / --dot / --check / --iso), which
-     keep their explicit cursor: rules below and so still win the cascade.
-     Left alone on touch, where there's no pointer to draw a cursor for. */
-  @media (pointer:fine){ html,body{cursor:none} }
-  /* the wand cursor itself: a fixed, full-viewport overlay driven by
-     wandCursor() in the script. The dot sits exactly on the real mouse
-     position; the wand body and its 3 sparkles each hold a CSS
-     transition on transform and just get a new target on every
-     mousemove, so the compositor does the trailing/easing — no
-     per-frame JS. Different durations per element (below) stagger how
-     far behind each one lags, standing in for the old per-frame damping.
-     The wand keeps a constant -30deg tilt (no travel-direction rotation)
-     pivoting on its own tip, in the box's local px lined up 1:1 with
-     cursor-wand.svg's viewBox scaled down. Transitions only turn on
-     after `is-ready` (added one frame after the first move) so the very
-     first position doesn't sweep in from (0,0). `will-change` promotes
-     the wand/sparkles to their own layer so animating them doesn't
-     repaint cursor-wand.svg's ~270 masked paths every time — it's
-     rasterized once and then just recomposited. */
-  .wand-cursor{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0;transition:opacity 120ms var(--ease)}
-  .wand-cursor.is-on{opacity:1}
-  .wand-cursor.is-suppressed{opacity:0}
-  /* the true pointer position — a small pink outline the wand chases */
-  .wand-cursor__dot{position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;border:1.5px solid #F0ABCE;box-sizing:border-box}
-  .wand-cursor__body{position:absolute;left:0;top:0;width:47px;height:68.47px;transform-origin:22.46px 7.43px;display:block;will-change:transform}
-  .wand-cursor.is-ready .wand-cursor__body{transition:transform 220ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
-  /* 3 independent twinkles, each with its own 200ms-cycle starting shape
-     (see the tick offset in the script) so they read as scattered
-     variation, not one synced blink — and each with a longer transition
-     duration than the wand so they visibly trail further behind it */
-  .wand-cursor__spark{position:absolute;left:0;top:0;width:15px;height:15px;will-change:transform}
-  .wand-cursor.is-ready #wandSpark0{transition:transform 300ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
-  .wand-cursor.is-ready #wandSpark1{transition:transform 380ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
-  .wand-cursor.is-ready #wandSpark2{transition:transform 460ms cubic-bezier(.22,1,.36,1),opacity 150ms var(--ease)}
-  .wand-cursor__spark-shape{opacity:0}
-  .wand-cursor__spark-shape.is-active{opacity:1}
-  /* the work carousel's case-study cards (their own hover tint + corner
-     cut-outs are plenty) and the footer game frame (where a spinning
-     wand is just distracting mid-gameplay) both drop the wand + sparkles
-     — the game frame keeps the plain dot as a minimal, non-distracting
-     cursor rather than going fully invisible. */
-  .wand-cursor.is-simple .wand-cursor__body,
-  .wand-cursor.is-simple .wand-cursor__spark{opacity:0}
   html{background:var(--cream)}
   body{
     background:var(--cream);
@@ -132,7 +87,7 @@
   .nav__group--right{justify-content:flex-end}
   .nav__group a{transition:color 160ms var(--ease)}
   .nav__group a:hover{color:var(--ink)}
-  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;cursor:none;animation:gspin 40s linear infinite}
+  .nav__mark{width:2.2cqw;height:2.2cqw;min-width:22px;min-height:22px;display:block;cursor:pointer;animation:gspin 40s linear infinite}
   .nav__mark path{fill:var(--pink);transition:fill 260ms var(--ease)}
   .nav--solid .nav__group{ color:var(--nav-ink,var(--cream)); }
   .nav--solid .nav__mark path{ fill:var(--nav-ink,var(--cream)); }
@@ -151,9 +106,7 @@
     z-index:2;
     transform-origin:50% 50%;
     will-change:transform,opacity;
-    /* native cursor stays off everywhere; the wand cursor (see wandCursor
-       in the script) is the site-wide default now. */
-    cursor:none;
+    cursor:url(assets/cursor.svg) 13 13, auto;
   }
   /* the grid reacts to the pointer — a ring reticle signals that before you act */
   .cell--dot,.cell--check,.cell--iso{cursor:url(assets/cursor-hover.svg) 20 20, auto}
@@ -348,7 +301,7 @@
 
   /* stickers — spring in, then draggable anywhere on the hero */
   .stk{
-    position:absolute;z-index:12;display:block;height:auto;opacity:0;cursor:none;
+    position:absolute;z-index:12;display:block;height:auto;opacity:0;cursor:grab;
     pointer-events:auto;
     touch-action:none;user-select:none;-webkit-user-drag:none;
     transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) rotate(calc(var(--rot,0deg) + var(--gr,0deg))) scale(.22);
@@ -356,7 +309,7 @@
   }
   .stk--sq{aspect-ratio:1;height:auto;object-fit:contain}
   .stk--in{opacity:1;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) rotate(calc(var(--rot,0deg) + var(--gr,0deg))) scale(var(--gs,1))}
-  .stk--drag{transition:none;cursor:none;z-index:30;--gr:5deg;--gs:1.07;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+  .stk--drag{transition:none;cursor:grabbing;z-index:30;--gr:5deg;--gs:1.07;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
   .stk--drag.stk--ccw{--gr:-5deg}
   .stk--settle{transition:transform 540ms cubic-bezier(.34,1.5,.64,1);z-index:30}
 
@@ -457,7 +410,7 @@
     padding-bottom:clamp(10px,1.6cqh,20px);
   }
   .work__chips button{
-    cursor:none;
+    cursor:pointer;
     padding:clamp(5px,.7cqh,10px) clamp(11px,1.5cqw,20px);
     border-radius:999px;border:0;background:rgba(250,246,239,.45);
     font:600 clamp(9px,.92cqw,12px)/1 var(--gb-sans);
@@ -480,7 +433,7 @@
     width:clamp(236px,29cqw,420px);margin-right:clamp(16px,2.3cqw,38px);
     min-height:clamp(290px,31cqw,420px);
     display:flex;flex-direction:column;gap:clamp(5px,.7cqw,11px);
-    cursor:none;opacity:.5;
+    cursor:pointer;opacity:.5;
     overflow:clip;overflow-clip-margin:4cqw;
     transition:width 520ms var(--ease),margin-right 520ms var(--ease),opacity 380ms ease;
   }
@@ -527,7 +480,7 @@
 
   .work__nav{display:flex;align-items:center;gap:1.2cqw;padding-top:clamp(10px,1.6cqh,20px)}
   .work__arrow{
-    cursor:none;
+    cursor:pointer;
     width:clamp(30px,3.2cqw,44px);height:clamp(30px,3.2cqw,44px);
     border-radius:50%;border:1px solid rgba(44,32,24,.35);background:transparent;
     display:flex;align-items:center;justify-content:center;
@@ -535,7 +488,7 @@
     transition:background 240ms var(--ease),opacity 240ms var(--ease);
   }
   .work__arrow:hover{background:rgba(250,246,239,.6)}
-  .work__arrow[disabled]{opacity:.3;cursor:none}
+  .work__arrow[disabled]{opacity:.3;cursor:default}
   .work__prog{flex:1;height:1px;background:rgba(44,32,24,.22);position:relative;margin-left:1.4cqw}
   .work__prog i{position:absolute;left:0;top:-1px;height:3px;background:var(--ink);width:0;transition:width 600ms var(--ease)}
 
@@ -674,7 +627,7 @@
      out of the row's rhythm but is still reachable at the far right. */
   .ft__playwrap{display:flex;flex-direction:column;align-items:flex-end;gap:.463cqw;flex:none}
   .ft__play{
-    display:flex;align-items:center;gap:.7cqw;cursor:none;opacity:.92;
+    display:flex;align-items:center;gap:.7cqw;cursor:pointer;opacity:.92;
     background:none;border:0;padding:0;font:inherit;transition:opacity 240ms var(--ease);
   }
   .ft__play:hover{opacity:1}
@@ -701,11 +654,11 @@
   }
 
   .ft__stk{
-    position:absolute;height:auto;cursor:none;pointer-events:auto;
+    position:absolute;height:auto;cursor:grab;pointer-events:auto;
     touch-action:none;user-select:none;-webkit-user-drag:none;
     transform:translate(-50%,-50%);transition:transform 540ms cubic-bezier(.34,1.56,.64,1);
   }
-  .ft__stk--drag{transition:none;cursor:none;z-index:30;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
+  .ft__stk--drag{transition:none;cursor:grabbing;z-index:30;filter:drop-shadow(0 10px 18px rgba(44,32,24,.22))}
   /* the pen source art (unlike the other stickers) has no white die-cut
      backing baked in, so it reads flat sitting on the paper — a plain
      drop shadow at rest gives it the same lift the others already have */
@@ -971,32 +924,6 @@
   <div class="ruler"></div>
 </div>
 
-<!-- site-wide default cursor: a pink-outline dot sits on the real pointer
-     position, and a magic wand (fixed -30deg tilt) plus 3 sparkles each
-     trail behind it on their own lag (see wandCursor in the script).
-     Hidden automatically over the hero's own canvas cursors (.cell--graph
-     / --dot / --check / --iso), which keep their native heart-in-crosshair
-     / heart-in-ring cursor: url() rules. -->
-<div class="wand-cursor" id="wandCursor" aria-hidden="true">
-  <div class="wand-cursor__dot" id="wandDot"></div>
-  <img class="wand-cursor__body" id="wandBody" src="assets/cursor-wand.svg" alt="">
-  <svg class="wand-cursor__spark" id="wandSpark0" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
-    <path class="wand-cursor__spark-shape" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-    <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-    <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-  </svg>
-  <svg class="wand-cursor__spark" id="wandSpark1" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
-    <path class="wand-cursor__spark-shape" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-    <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-    <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-  </svg>
-  <svg class="wand-cursor__spark" id="wandSpark2" viewBox="-1 -1 23 23" xmlns="http://www.w3.org/2000/svg">
-    <path class="wand-cursor__spark-shape" d="M6 0V5H15V0H21V6H16V15H21V21H15V16H6V21H0V15H5V6H0V0H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-    <path class="wand-cursor__spark-shape" d="M16 5V16H5V5H16Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-    <path class="wand-cursor__spark-shape" d="M16 0V5H21V16H16V21H5V16H0V5H5V0H16ZM6 6V15H15V6H6Z" fill="#FDDD83" stroke="white" stroke-width="2"/>
-  </svg>
-</div>
-
 <script>
 (function(){
   "use strict";
@@ -1079,106 +1006,6 @@
   stage.addEventListener('scroll', onScroll, { passive:true });
   window.addEventListener('resize', onScroll);
   onScroll();
-
-  /* ── wand cursor — site-wide default, replaces the native pointer ───
-     A pink-outline dot sits exactly on the real mouse position; the wand
-     body (held at a constant -30deg tilt, tip pinned per the CSS
-     transform-origin) and its 3 sparkles each just get a new transform
-     target on every mousemove and let their own CSS transition (see the
-     stylesheet) do the easing — the compositor runs the trailing
-     animation, not a per-frame JS loop, so it costs nothing once the
-     mouse stops. Each sparkle also starts its 200ms shape-cycle on a
-     different one of the 3 shapes, so they read as scattered variation
-     instead of one synced blink.
-
-     Two zones dial the cursor back, both driven by delegated
-     mouseover/mouseout so they don't add a DOM walk to every pixel of
-     mousemove: is-suppressed drops the whole overlay over the hero's own
-     canvas cursors (which already draw their own heart-in-crosshair /
-     heart-in-ring cursor: url()) and over the work carousel's .qc cards
-     (their own hover tint + corner cut-outs are the feedback there,
-     the wand would just be extra motion on top); is-simple keeps only
-     the plain dot over the footer's .ft__frame, since the game needs
-     *some* visible cursor but the full wand+sparkles is distracting
-     mid-gameplay. Skipped entirely on touch. */
-  (function wandCursor(){
-    if (!window.matchMedia('(pointer:fine)').matches) return;
-    var wrap = byId('wandCursor');
-    var dot  = byId('wandDot');
-    var body = byId('wandBody');
-    var sparkEls = [byId('wandSpark0'), byId('wandSpark1'), byId('wandSpark2')];
-    if (!wrap || !dot || !body || sparkEls.indexOf(null) !== -1) return;
-    var sparkShapes = sparkEls.map(function(el){
-      return [].slice.call(el.querySelectorAll('.wand-cursor__spark-shape'));
-    });
-
-    var TIP_X = 22.46, TIP_Y = 7.43, TILT = -30;
-    var SPARK_OFFSET = [ {x:20,y:-14}, {x:-16,y:-4}, {x:6,y:20} ];
-    /* the wand and sparkles target this point, not the dot's own exact
-       spot, so there's always a little daylight between them —
-       otherwise the wand body sits right on top of whatever the dot
-       (the real hotspot) is hovering, like a link's text. */
-    var WAND_GAP = { x: 18, y: 24 };
-
-    var haveMouse = false;
-
-    function onMove(e){
-      var mouseX = e.clientX, mouseY = e.clientY;
-      var tx = mouseX + WAND_GAP.x, ty = mouseY + WAND_GAP.y;
-      dot.style.transform = 'translate(' + (mouseX - 6).toFixed(1) + 'px,' + (mouseY - 6).toFixed(1) + 'px)';
-      body.style.transform = 'translate(' + (tx - TIP_X).toFixed(1) + 'px,' + (ty - TIP_Y).toFixed(1) + 'px) rotate(' + TILT + 'deg)';
-      sparkEls.forEach(function(el, i){
-        var x = tx + SPARK_OFFSET[i].x - 7.5, y = ty + SPARK_OFFSET[i].y - 7.5;
-        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
-      });
-      wrap.classList.add('is-on');
-      if (!haveMouse){
-        haveMouse = true;
-        /* one frame late, so this first snap-into-place doesn't itself
-           get animated by the transition it's about to turn on */
-        requestAnimationFrame(function(){ wrap.classList.add('is-ready'); });
-      }
-    }
-    document.addEventListener('mousemove', onMove, { passive: true });
-    document.addEventListener('mouseout', function(e){
-      if (!e.relatedTarget) wrap.classList.remove('is-on');
-    });
-
-    /* delegated on document (rather than bound to each cell directly) so
-       it still works for .qc — the work carousel builds those cards
-       after this runs, so a one-time querySelectorAll here would've
-       missed them entirely. mouseover/mouseout bubble, unlike
-       mouseenter/mouseleave, so closest() on the target (and, on the
-       way out, on relatedTarget) finds the right zone from any nested
-       child — a card's thumbnail or corner cut-out, the frame's ball or
-       score display, etc. */
-    var SUPPRESS_SEL = '.cell--graph,.cell--dot,.cell--check,.cell--iso,.qc';
-    var SIMPLE_SEL = '.ft__frame';
-    function zonesFor(el){
-      if (!el || !el.closest) return { suppress:false, simple:false };
-      return { suppress: !!el.closest(SUPPRESS_SEL), simple: !!el.closest(SIMPLE_SEL) };
-    }
-    document.addEventListener('mouseover', function(e){
-      var z = zonesFor(e.target);
-      wrap.classList.toggle('is-suppressed', z.suppress);
-      wrap.classList.toggle('is-simple', z.simple);
-    });
-    document.addEventListener('mouseout', function(e){
-      var z = zonesFor(e.relatedTarget);
-      wrap.classList.toggle('is-suppressed', z.suppress);
-      wrap.classList.toggle('is-simple', z.simple);
-    });
-
-    var tick = 0;
-    setInterval(function(){
-      sparkShapes.forEach(function(shapes, i){
-        var mode = (tick + i) % shapes.length;
-        shapes.forEach(function(s){ s.classList.remove('is-active'); });
-        shapes[mode].classList.add('is-active');
-      });
-      tick = (tick + 1) % 3;
-    }, 200);
-  })();
 
   /* ── hero — 7A locked grid ─────────────────────────────────────────
      Exact tiles from the design file. Graph + ruler are the attached
