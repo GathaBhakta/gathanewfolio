@@ -558,7 +558,7 @@
      grid collage); the actual composition is capped + centred here, same
      trick as .hero's claim card, so it reads at its designed scale instead
      of stretching (and growing every child's cqw with it) on wide screens */
-  .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/size}
+  .ft__frame{position:relative;width:100%;max-width:1280px;height:100%;margin:0 auto;container:ft/inline-size}
   /* riso grain — the very first thing painted in .ft, so .ft__graph and
      every real asset (text, stickers, game panel) draw over it normally
      and stay untouched; the grain only shows through wherever nothing
@@ -573,7 +573,7 @@
   .ft__thanks{
     position:absolute;left:68.23%;bottom:39.75%;
     font-family:var(--gb-serif);font-weight:700;
-    font-size:clamp(1.625rem,5.556cqmin,5.5rem);line-height:1.28;
+    font-size:clamp(1.625rem,5.556cqw,5.5rem);line-height:1.28;
     white-space:nowrap;pointer-events:none;
     background-color:var(--pink);background-repeat:repeat;background-blend-mode:multiply;
     background-size:76px 76px;
@@ -582,19 +582,19 @@
   }
   .ft__copyright{
     position:absolute;left:68.23%;bottom:37.5%;
-    font:400 clamp(.5625rem,1cqmin,.75rem)/1 var(--gb-sans);
+    font:400 clamp(.5625rem,1cqw,.75rem)/1 var(--gb-sans);
     letter-spacing:.16em;text-transform:uppercase;color:rgba(44,32,24,.5);
     white-space:nowrap;pointer-events:none;
   }
 
-  .ft__nav{position:absolute;left:68.23%;top:calc(4.3% + var(--nav-h));display:grid;grid-template-columns:clamp(150px,12.85cqmin,220px) clamp(105px,8.97cqmin,155px) auto;align-items:flex-start;white-space:nowrap}
+  .ft__nav{position:absolute;left:68.23%;top:calc(4.3% + var(--nav-h));display:grid;grid-template-columns:12.85cqw 8.97cqw auto;align-items:flex-start;white-space:nowrap}
   .ft__navcol{display:flex;flex-direction:column}
   .ft__navhead{
     font-family:var(--gb-serif);font-weight:600;color:var(--ink-mid);
-    font-size:clamp(.6875rem,1.389cqmin,1.375rem);line-height:1;margin-bottom:.694cqmin;
+    font-size:clamp(.6875rem,1.389cqw,1.375rem);line-height:1;margin-bottom:.694cqw;
   }
   .ft__navlink{
-    color:var(--ink-soft);font-size:clamp(.625rem,.984cqmin,1rem);line-height:1.65;
+    color:var(--ink-soft);font-size:clamp(.625rem,.984cqw,1rem);line-height:1.65;
     transition:color 240ms var(--ease);
   }
   .ft__navlink:hover{color:var(--pink-ink)}
@@ -607,33 +607,33 @@
      width 56.5%), same coordinate convention as .ft__thanks/.ft__nav. */
   .ft__game{
     position:absolute;left:4.83%;top:calc(4.3% + var(--nav-h));width:56.5%;box-sizing:border-box;
-    display:flex;align-items:center;justify-content:space-between;gap:1cqmin;
+    display:flex;align-items:center;justify-content:space-between;gap:1cqw;
     z-index:2;
   }
   .ft__gtitlewrap{display:flex;flex-direction:column;flex:none}
   .ft__gtitle{
-    font-family:var(--gb-serif);font-weight:700;font-size:clamp(1rem,2.083cqmin,2.125rem);line-height:1;
+    font-family:var(--gb-serif);font-weight:700;font-size:clamp(1rem,2.083cqw,2.125rem);line-height:1;
     white-space:nowrap;background-color:var(--pink);background-repeat:repeat;
     background-blend-mode:multiply;background-size:76px 76px;
     -webkit-background-clip:text;background-clip:text;color:transparent;
     filter:url(#ftPunch);
   }
-  .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(.5625rem,1.157cqmin,1.125rem);line-height:1;color:var(--ink-soft);margin-top:.463cqmin;white-space:nowrap}
-  .ft__stats{display:flex;gap:4.63cqmin;align-items:flex-start;flex:none}
-  .ft__statlabel{font-family:var(--gb-mono);font-size:clamp(.5rem,.926cqmin,.875rem);line-height:1;color:var(--ink-soft);white-space:nowrap}
-  .ft__statval{font-family:var(--gb-mono);font-size:clamp(.8125rem,1.736cqmin,1.625rem);line-height:1.2;color:var(--pink-ink);margin-top:.463cqmin}
+  .ft__gsub{font-family:var(--gb-mono);font-weight:500;font-size:clamp(.5625rem,1.157cqw,1.125rem);line-height:1;color:var(--ink-soft);margin-top:.463cqw;white-space:nowrap}
+  .ft__stats{display:flex;gap:4.63cqw;align-items:flex-start;flex:none}
+  .ft__statlabel{font-family:var(--gb-mono);font-size:clamp(.5rem,.926cqw,.875rem);line-height:1;color:var(--ink-soft);white-space:nowrap}
+  .ft__statval{font-family:var(--gb-mono);font-size:clamp(.8125rem,1.736cqw,1.625rem);line-height:1.2;color:var(--pink-ink);margin-top:.463cqw}
   /* the level note has no home in the new row (the export doesn't show
      it up top at all) — tuck it under PLAY, right-aligned, so it stays
      out of the row's rhythm but is still reachable at the far right. */
-  .ft__playwrap{display:flex;flex-direction:column;align-items:flex-end;gap:.463cqmin;flex:none}
+  .ft__playwrap{display:flex;flex-direction:column;align-items:flex-end;gap:.463cqw;flex:none}
   .ft__play{
-    display:flex;align-items:center;gap:.7cqmin;cursor:pointer;opacity:.92;
+    display:flex;align-items:center;gap:.7cqw;cursor:pointer;opacity:.92;
     background:none;border:0;padding:0;font:inherit;transition:opacity 240ms var(--ease);
   }
   .ft__play:hover{opacity:1}
-  .ft__play svg{width:clamp(14px,1.389cqmin,22px);height:clamp(14px,1.389cqmin,22px);display:block;flex:none}
-  .ft__playlabel{font-family:var(--gb-mono);font-weight:500;font-size:clamp(.5625rem,1.157cqmin,1.125rem);letter-spacing:.06em;color:var(--pink-ink)}
-  .ft__lvnote{font-family:var(--gb-mono);font-size:clamp(.4375rem,.752cqmin,.75rem);letter-spacing:.04em;color:#B6A190;white-space:nowrap}
+  .ft__play svg{width:clamp(14px,1.389cqw,22px);height:clamp(14px,1.389cqw,22px);display:block;flex:none}
+  .ft__playlabel{font-family:var(--gb-mono);font-weight:500;font-size:clamp(.5625rem,1.157cqw,1.125rem);letter-spacing:.06em;color:var(--pink-ink)}
+  .ft__lvnote{font-family:var(--gb-mono);font-size:clamp(.4375rem,.752cqw,.75rem);letter-spacing:.04em;color:#B6A190;white-space:nowrap}
 
   .ft__baby{position:absolute;width:auto;transform:translate(-50%,-50%);display:block;pointer-events:none;transition:transform 620ms cubic-bezier(.34,1.56,.64,1)}
   /* multiply (used on the punched text) barely moves a near-white cream
