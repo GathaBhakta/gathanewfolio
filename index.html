@@ -428,13 +428,19 @@
   }
   .work__strip{display:flex;width:max-content;transition:transform 600ms var(--ease)}
 
+  /* no overflow:clip here — iPad/iOS Safari doesn't honour
+     overflow-clip-margin, so it fell back to a flush 0-margin clip and
+     chopped the corner cut-outs off right at the thumbnail edge on
+     every card's hover. .work__strip-wrap above still bounds the strip
+     itself (with the same cqw margin, so it works wherever the margin
+     is respected), so dropping this inner clip only risks a card's
+     corners lightly overlapping its neighbour's gap — never full loss. */
   .qc{
     flex:0 0 auto;
     width:clamp(236px,29cqw,420px);margin-right:clamp(16px,2.3cqw,38px);
     min-height:clamp(290px,31cqw,420px);
     display:flex;flex-direction:column;gap:clamp(5px,.7cqw,11px);
     cursor:pointer;opacity:.5;
-    overflow:clip;overflow-clip-margin:4cqw;
     transition:width 520ms var(--ease),margin-right 520ms var(--ease),opacity 380ms ease;
   }
   .qc.is-current{opacity:1}
