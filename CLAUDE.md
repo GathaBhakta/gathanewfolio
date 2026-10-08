@@ -104,8 +104,8 @@ inline-size`, proximity scroll-snap). Its children, in order:
 - Hero tapes + stickers are WebP re-encoded from `…/PERSONAL STUDY/UX/
   FINAL FOLDER` (+ `/TAPE`) and the design project's `assets/` — see
   `assets/README.md` for the file → placement map. The five `fig-s*`
-  square cut-outs are centre-cropped project photos (except `fig-s5`, the
-  pink heart paperclip). The work panel's project-02 clippie `wizzy` is
+  square cut-outs are centre-cropped project photos (except `fig-s6`, the
+  pink Pi board). The work panel's project-02 clippie `wizzy` is
   transparent PNG @2x — its Figma SVG was a 3,996-path 265 KB pixel grid
   that janked the carousel, so it stays raster with
   `image-rendering:pixelated` on `[src$=".png"]`; corner cut-outs `chat` /

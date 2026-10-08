@@ -22,7 +22,7 @@ size-capped (tapes + stickers ride a centred `.hero__frame`, max-width
 | `fig-s2.webp`          | square cut-out, upper-left (NYC model)            | `nycmodel.webp`, centre-cropped |
 | `fig-s3.webp`          | square cut-out, lower-right (matcha)              | `matcha.webp` |
 | `fig-s4.webp`          | square cut-out, mid-right (cheesecake)            | `cheesecake.webp` |
-| `fig-s5.webp`          | square cut-out, top-right (pink heart paperclip)  | `FINAL FOLDER/CLIP HEART.png` |
+| `fig-s6.webp`          | square cut-out, top-right (pink Pi board)         | `…/UX/DECOPI.png` |
 | `sticker-logomark.webp`| origami quatrefoil, centre                        | `FINAL FOLDER/logomark.png` |
 | `sticker-baby.webp`    | baby photo, lower-left                            | `FINAL FOLDER/GATHA BABY PIC.png` |
 | `sticker-lotus.webp`   | lotus, bottom-right                               | `FINAL FOLDER/LOTUS.png` |
