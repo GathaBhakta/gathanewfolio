@@ -20,12 +20,11 @@ size-capped (tapes + stickers ride a centred `.hero__frame`, max-width
 | `tape-4.webp`          | tape, right                                       | `FINAL FOLDER/TAPE/Frame 259.png` |
 | `fig-s1.webp`          | square cut-out, top-right (Gatha avatar)          | `Gatha 1.webp`, centre-cropped |
 | `fig-s2.webp`          | square cut-out, upper-left (NYC model)            | `nycmodel.webp`, centre-cropped |
-| `fig-s3.webp`          | square cut-out, lower-right (matcha)              | `matcha.webp` |
 | `fig-s4.webp`          | square cut-out, mid-right (cheesecake)            | `cheesecake.webp` |
-| `fig-s6.webp`          | square cut-out, top-right (pink Pi board)         | `…/UX/DECOPI.png` |
+| `fig-s6.webp`          | square cut-out, lower-right (pink Pi board)       | `…/UX/DECOPI.png` |
 | `sticker-logomark.webp`| origami quatrefoil, centre                        | `FINAL FOLDER/logomark.png` |
 | `sticker-baby.webp`    | baby photo, lower-left                            | `FINAL FOLDER/GATHA BABY PIC.png` |
-| `sticker-lotus.webp`   | lotus, bottom-right                               | `FINAL FOLDER/LOTUS.png` |
+| `sticker-lotus.webp`   | lotus, top-right                                  | `FINAL FOLDER/LOTUS.png` |
 | `sticker-ipod.webp`    | iPod, bottom-centre (on the checker base)         | `FINAL FOLDER/ipod 3.png` |
 
 The ruler edge, graph-paper column, dot-field bands, checker base and

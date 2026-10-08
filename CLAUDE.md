@@ -103,7 +103,7 @@ inline-size`, proximity scroll-snap). Its children, in order:
   Helpers: `asset(name)` → `assets/<encoded name>`, `byId`, `$`.
 - Hero tapes + stickers are WebP re-encoded from `…/PERSONAL STUDY/UX/
   FINAL FOLDER` (+ `/TAPE`) and the design project's `assets/` — see
-  `assets/README.md` for the file → placement map. The five `fig-s*`
+  `assets/README.md` for the file → placement map. The `fig-s*`
   square cut-outs are centre-cropped project photos (except `fig-s6`, the
   pink Pi board). The work panel's project-02 clippie `wizzy` is
   transparent PNG @2x — its Figma SVG was a 3,996-path 265 KB pixel grid
